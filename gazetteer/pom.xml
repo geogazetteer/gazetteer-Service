@@ -12,11 +12,19 @@
 	<modules>
 		<module>web</module>
 		<module>service</module>
+		<module>database</module>
+		<module>utilities</module>
 	</modules>
 	<organization>
 		<name>geogazetteer</name>
 		<url>https://github.com/geogazetteer</url>
 	</organization>
+
+	<properties>
+		<junit_version>4.11</junit_version>
+		<opencsv_version>4.5</opencsv_version>
+	</properties>
+
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/junit/junit -->
 		<dependency>
@@ -24,8 +32,15 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
+		<dependency>
+		    <groupId>com.opencsv</groupId>
+		    <artifactId>opencsv</artifactId>
+		</dependency>
 
 	</dependencies>
+	
+	
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -33,9 +48,12 @@
 				<artifactId>junit</artifactId>
 				<version>${junit_version}</version>
 			</dependency>
+			<dependency>
+			    <groupId>com.opencsv</groupId>
+			    <artifactId>opencsv</artifactId>
+			    <version>${opencsv_version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	<properties>
-		<junit_version>4.11</junit_version>
-	</properties>
+	
 </project>
