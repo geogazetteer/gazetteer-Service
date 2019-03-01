@@ -23,12 +23,26 @@
 hs_err_pid*
 
 #eclipse workspace .metadata
-.project
-.settings
 .metadata
+<<<<<<< HEAD
 .classpath
 
 ~$龙华地名地址服务设计书.docx
 Servers/Tomcat v9.0 Server at localhost-config/context.xml
 Servers/Tomcat v9.0 Server at localhost-config/catalina.properties
 Servers/Tomcat v9.0 Server at localhost-config/catalina.policy
+=======
+>>>>>>> parent of 664dcc5... change .ignore  to ignore some eclipse auto created files
+gazetteer/.project
+gazetteer/service/.project
+*.prefs
+gazetteer/web/.project
+gazetteer/web/.settings/.jsdtscope
+*.component
+gazetteer/web/.settings/org.eclipse.wst.common.project.facet.core.xml
+*.container
+gazetteer/web/.settings/org.eclipse.wst.jsdt.ui.superType.name
+Servers/.project
+Servers/Tomcat v9.0 Server at localhost-config/server.xml
+Servers/Tomcat v9.0 Server at localhost-config/tomcat-users.xml
+Servers/Tomcat v9.0 Server at localhost-config/web.xml
