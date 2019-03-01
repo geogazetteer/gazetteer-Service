@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>top.geomatics.gazetteer</groupId>
+	<artifactId>gazetteer</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>gazetteer</name>
+	<description>gazetteer service for smart Longhhua</description>
+	<modules>
+		<module>web</module>
+		<module>service</module>
+	</modules>
+	<organization>
+		<name>geogazetteer</name>
+		<url>https://github.com/geogazetteer</url>
+	</organization>
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit_version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	<properties>
+		<junit_version>4.11</junit_version>
+	</properties>
+</project>
