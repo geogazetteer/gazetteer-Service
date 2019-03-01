@@ -28,3 +28,7 @@ hs_err_pid*
 .metadata
 .classpath
 
+~$龙华地名地址服务设计书.docx
+Servers/Tomcat v9.0 Server at localhost-config/context.xml
+Servers/Tomcat v9.0 Server at localhost-config/catalina.properties
+Servers/Tomcat v9.0 Server at localhost-config/catalina.policy
