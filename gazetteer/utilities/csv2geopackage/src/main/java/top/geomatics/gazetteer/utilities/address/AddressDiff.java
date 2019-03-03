@@ -118,14 +118,8 @@ public class AddressDiff {
 					while (rs.next()) {
 						// read the result set
 						reString = rs.getString("ADDRESS");
-						// 匹配最后一个
-						String laString = segString[segString.length - 1];
-						laString.trim();
-						laString = laString.replaceAll("[a-zA-Z0-9]", "");
-						boolean b = Pattern.matches(laString, reString);
-						if (b) {
-							System.out.println(reString);
-						}
+						//进一步计算两个地址的相似性
+						
 					}
 				} catch (SQLException e) {
 					e.printStackTrace();
