@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import com.opencsv.CSVReader;
 
@@ -18,7 +19,17 @@ import com.opencsv.CSVReader;
  * @author whudyj 将CSV文件转换为Sqlite数据库
  */
 public class CSV2SQLITE {
+	private static CSVReader csvReader = null;
+	private static long count = 0l; // CSV数据记录数
+	// 准备SQLite数据库
+	private static Connection connection = null;
+	private static Statement statement = null;
+	private static String sqlString = "";
+	private static String tableName = "dmdz";
+	private static PreparedStatement pstmt = null;
+	private static int count2 = 0;
 
+	private static ArrayList<AddressRecord> recordList = new ArrayList<AddressRecord>();
 	/**
 	 * @param args 第一个参数为CSV文件路径名，第二个参数为Sqlite文件路径名
 	 */
@@ -27,25 +38,43 @@ public class CSV2SQLITE {
 		if (args.length != 2) {
 			System.exit(0);
 		}
-		CSVReader csvReader = null;
-		boolean isHeader = true; // CSV文件第一行
-		long count = 0l; // CSV数据记录数
-		int length = 0; // 数据字段数
+		openCSV(args[0]);
+		openSqlite(args[1]);
+	
+		Producer apProducer = new Producer(csvReader, recordList);
+		Consumer aConsumer = new Consumer(pstmt, recordList);
+		Thread th1 = new Thread(apProducer);
+		th1.setName("ReaderThread");
+		th1.start();
+		Thread th2 = new Thread(aConsumer);
+		th2.setName("WriterThread");
+		th2.start();
+		if (!th1.isAlive() && !th2.isAlive()) {
+			closeCSV();
+			closeSqlite();
+		}
+	}
 
-		String[] nextLine = null;// CSV文件中的一行数据
+	public static void openCSV(String csvFName) {
 		// 准备CSV文件
 		try {
-			csvReader = new CSVReader(new FileReader(args[0]));// 打开CSV文件
+			csvReader = new CSVReader(new FileReader(csvFName));// 打开CSV文件
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
-		// 准备SQLite数据库
-		Connection connection = null;
-		Statement statement = null;
-		String sqlString = "";
-		String strConn = "jdbc:sqlite:" + args[1];// 数据库地址
-		String tableName = "dmdz";
-		PreparedStatement pstmt = null;
+	}
+
+	public static void closeCSV() {
+		try {
+			csvReader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("读取的总记录数：\t" + count);
+	}
+
+	public static void openSqlite(String sqlFName) {
+		String strConn = "jdbc:sqlite:" + sqlFName;// 数据库地址
 		// create a database connection
 		try {
 			connection = DriverManager.getConnection(strConn);
@@ -55,80 +84,29 @@ public class CSV2SQLITE {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
+		// create table dmdz
+		sqlString = "drop table if exists " + tableName;// 如果表已经存在，则先删除
+		String insertString = "insert into " + tableName + " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		try {
-			while ((nextLine = csvReader.readNext()) != null) {
-				// nextLine[] is an array of values from the line
-				// 先输出内容到console
-				for (String str : nextLine) {
-					System.out.print(str + "\t");
-				}
-				System.out.println();
-
-				// 文件第一行是结构行，结构为：
-				/*
-				 * "ADDRESS_ID", "CODE", "BUILDING_ID", "HOUSE_ID", "PROVINCE", "CITY",
-				 * "DISTRICT", "STREET", "COMMUNITY", "ROAD", "ROAD_NUM", "VILLAGE", "BUILDING",
-				 * "FLOOR", "ADDRESS", "UPDATE_ADDRESS_DATE", "PUBLISH", "CREATE_ADDRESS_DATE"
-				 */
-				if (isHeader) {
-					isHeader = false;
-					length = nextLine.length;
-					// create table dmdz
-					sqlString = "drop table if exists " + tableName;// 如果表已经存在，则先删除
-					statement.executeUpdate(sqlString);
-
-					sqlString = "create table " + tableName + " (";
-					String insertString = "insert into " + tableName + " values(";
-
-					for (int i = 0; i < nextLine.length; i++) {
-						sqlString += nextLine[i];
-						sqlString += " string";
-						insertString += "?";
-						if (i < nextLine.length - 1) {
-							sqlString += ",";
-							insertString += ",";
-						}
-					}
-					sqlString += ")";
-					insertString += ")";
-					statement.executeUpdate(sqlString);
-					pstmt = connection.prepareStatement(insertString);
-					continue;
-				}
-				if (length != nextLine.length) {
-					System.out.println("Warning");
-				}
-				count++;
-				// "63EEDE6BA4206A3AE0538CC0C0C07BB0",
-				// "44030600960102T0117",
-				// "44030600960102T0117",
-				// "",
-				// "广东省",
-				// "深圳市",
-				// "龙华区",
-				// "民治街道",
-				// "龙塘社区",
-				// "",
-				// "",
-				// "上塘农贸建材市场",
-				// "L25号铁皮房",
-				// "",
-				// "广东省深圳市龙华区民治街道龙塘社区上塘农贸建材市场L25号铁皮房",
-				// "2016/12/12 23:46:17",
-				// "0",
-				// "2018/7/3 20:30:11"
-				for (int i = 0; i < nextLine.length; i++) {
-					pstmt.setString(i+1, nextLine[i]);
-				}
-				pstmt.addBatch();
-			}
-			csvReader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+			statement.executeUpdate(sqlString);
+			/*
+			 * "ADDRESS_ID", "CODE", "BUILDING_ID", "HOUSE_ID", "PROVINCE", "CITY",
+			 * "DISTRICT", "STREET", "COMMUNITY", "ROAD", "ROAD_NUM", "VILLAGE", "BUILDING",
+			 * "FLOOR", "ADDRESS", "UPDATE_ADDRESS_DATE", "PUBLISH", "CREATE_ADDRESS_DATE"
+			 */
+			sqlString = "create table " + tableName + " (ADDRESS_ID string, CODE string,  BUILDING_ID string,"
+					+ "HOUSE_ID string, PROVINCE string, CITY string,DISTRICT string, STREET string,"
+					+ "COMMUNITY string, ROAD string, ROAD_NUM string, VILLAGE string,  BUILDING string,"
+					+ "FLOOR string, ADDRESS string, UPDATE_ADDRESS_DATE string,PUBLISH string, CREATE_ADDRESS_DATE string)";
+			statement.executeUpdate(sqlString);
+			pstmt = connection.prepareStatement(insertString);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	public static void closeSqlite() {
 		try {
 			pstmt.executeBatch();
 			connection.commit();
@@ -138,9 +116,7 @@ public class CSV2SQLITE {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		System.out.println(count);
-
+		System.out.println("写入的总记录数：\t" + count2);
 	}
 
 }
