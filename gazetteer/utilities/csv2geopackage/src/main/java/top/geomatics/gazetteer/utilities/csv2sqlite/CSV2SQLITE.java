@@ -11,7 +11,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import com.opencsv.CSVReader;
 
@@ -29,7 +30,6 @@ public class CSV2SQLITE {
 	private static PreparedStatement pstmt = null;
 	private static int count2 = 0;
 
-	private static ArrayList<AddressRecord> recordList = new ArrayList<AddressRecord>();
 	/**
 	 * @param args 第一个参数为CSV文件路径名，第二个参数为Sqlite文件路径名
 	 */
@@ -40,19 +40,28 @@ public class CSV2SQLITE {
 		}
 		openCSV(args[0]);
 		openSqlite(args[1]);
-	
-		Producer apProducer = new Producer(csvReader, recordList);
-		Consumer aConsumer = new Consumer(pstmt, recordList);
+
+		BlockingQueue<AddressRecord> blockingQueue = new ArrayBlockingQueue<AddressRecord>(1000);
+		Producer apProducer = new Producer(csvReader, blockingQueue);
+		Consumer aConsumer = new Consumer(pstmt, blockingQueue);
 		Thread th1 = new Thread(apProducer);
 		th1.setName("ReaderThread");
-		th1.start();
+
 		Thread th2 = new Thread(aConsumer);
 		th2.setName("WriterThread");
-		th2.start();
-		if (!th1.isAlive() && !th2.isAlive()) {
-			closeCSV();
-			closeSqlite();
+
+		try {
+			th1.join();
+			th2.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
+		th1.start();
+		th2.start();
+
+		closeCSV();
+		closeSqlite();
+
 	}
 
 	public static void openCSV(String csvFName) {
@@ -86,7 +95,9 @@ public class CSV2SQLITE {
 		}
 		// create table dmdz
 		sqlString = "drop table if exists " + tableName;// 如果表已经存在，则先删除
-		String insertString = "insert into " + tableName + " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		// String insertString = "insert into " + tableName + "
+		// values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		String insertString = "insert into " + tableName + " values(?,?,?,?,?,?,?)";
 		try {
 			statement.executeUpdate(sqlString);
 			/*
@@ -94,10 +105,12 @@ public class CSV2SQLITE {
 			 * "DISTRICT", "STREET", "COMMUNITY", "ROAD", "ROAD_NUM", "VILLAGE", "BUILDING",
 			 * "FLOOR", "ADDRESS", "UPDATE_ADDRESS_DATE", "PUBLISH", "CREATE_ADDRESS_DATE"
 			 */
-			sqlString = "create table " + tableName + " (ADDRESS_ID string, CODE string,  BUILDING_ID string,"
-					+ "HOUSE_ID string, PROVINCE string, CITY string,DISTRICT string, STREET string,"
-					+ "COMMUNITY string, ROAD string, ROAD_NUM string, VILLAGE string,  BUILDING string,"
-					+ "FLOOR string, ADDRESS string, UPDATE_ADDRESS_DATE string,PUBLISH string, CREATE_ADDRESS_DATE string)";
+//			sqlString = "create table " + tableName + " (ADDRESS_ID string, CODE string,  BUILDING_ID string,"
+//					+ "HOUSE_ID string, PROVINCE string, CITY string,DISTRICT string, STREET string,"
+//					+ "COMMUNITY string, ROAD string, ROAD_NUM string, VILLAGE string,  BUILDING string,"
+//					+ "FLOOR string, ADDRESS string, UPDATE_ADDRESS_DATE string,PUBLISH string, CREATE_ADDRESS_DATE string)";
+			sqlString = "create table " + tableName + " (f1 string, f2 string,"
+					+ "f3 string, f4 string, f5 string,f6 string, f7 string)";
 			statement.executeUpdate(sqlString);
 			pstmt = connection.prepareStatement(insertString);
 		} catch (SQLException e) {

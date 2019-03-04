@@ -6,6 +6,7 @@ package top.geomatics.gazetteer.utilities.csv2sqlite;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * @author whudyj
@@ -13,12 +14,12 @@ import java.util.ArrayList;
  */
 public class Consumer implements Runnable {
 	private PreparedStatement pstmt = null;
-	private ArrayList<AddressRecord> recordList;
+	private BlockingQueue<AddressRecord> blockingQueue;
 
-	public Consumer(PreparedStatement pstmt, ArrayList<AddressRecord> recordList) {
+	public Consumer(PreparedStatement pstmt, BlockingQueue<AddressRecord> blockingQueue) {
 		super();
 		this.pstmt = pstmt;
-		this.recordList = recordList;
+		this.blockingQueue = blockingQueue;
 	}
 
 	public PreparedStatement getSqlStatement() {
@@ -29,12 +30,12 @@ public class Consumer implements Runnable {
 		this.pstmt = pstmt;
 	}
 
-	public ArrayList<AddressRecord> getRecord() {
-		return this.recordList;
+	public BlockingQueue<AddressRecord> getRecord() {
+		return this.blockingQueue;
 	}
 
-	public void setRecord(ArrayList<AddressRecord> recordList) {
-		this.recordList = recordList;
+	public void setRecord(BlockingQueue<AddressRecord> blockingQueue) {
+		this.blockingQueue = blockingQueue;
 	}
 
 	/*
@@ -43,33 +44,26 @@ public class Consumer implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
-		
-		synchronized (this.recordList) {
-			int size = this.recordList.size() ;
-			while (this.recordList.size() == 0) {
-				try {
-					this.recordList.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			//
+
+		while (true) {
+			AddressRecord record = null;
 			try {
-				for (AddressRecord record : this.recordList) {
+				record = this.blockingQueue.take();
+				System.out.println("还有苹果:" + this.blockingQueue.size());
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if (null != record) {
+				try {
 					for (int i = 0; i < record.getFieldLength(); i++) {
 						pstmt.setString(i + 1, record.getValues()[i]);
 					}
 					pstmt.addBatch();
-					size--;
-					System.out.println(size);
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
-				//boolean isRemovedAll = this.recordList.removeAll(this.recordList);
-				//assert (true == isRemovedAll);
-			} catch (SQLException e) {
-				e.printStackTrace();
 			}
-		
-			this.recordList.notify();
+
 		}
 	}
 
