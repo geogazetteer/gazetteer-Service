@@ -9,14 +9,7 @@ package top.geomatics.gazetteer.utilities.csv2sqlite;
  */
 public class AddressRecord {
 	private int fieldLength; // 字段长度
-	String values[];
-
-	// 地址数据结构为：
-	/*
-	 * "ADDRESS_ID", "CODE", "BUILDING_ID", "HOUSE_ID", "PROVINCE", "CITY",
-	 * "DISTRICT", "STREET", "COMMUNITY", "ROAD", "ROAD_NUM", "VILLAGE", "BUILDING",
-	 * "FLOOR", "ADDRESS", "UPDATE_ADDRESS_DATE", "PUBLISH", "CREATE_ADDRESS_DATE"
-	 */
+	String values[]; // 字段值数组
 
 	public AddressRecord(int fieldLength, String[] values) {
 		super();
