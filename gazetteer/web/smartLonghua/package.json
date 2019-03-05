@@ -13,7 +13,9 @@
     "iview": "^3.2.2",
     "maptalks": "^0.43.0",
     "vue": "^2.5.2",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "axios": "^0.16.2",
+    "qs": "^6.5.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

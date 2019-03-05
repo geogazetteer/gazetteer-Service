@@ -18,6 +18,13 @@ export default {
   components: {
     baseMap,searchBox,rightTool
   },
+  created(){
+    //获取接口数据get方法的demo
+    var url='https://www.seniorland.cn/v1/pb/vusers/10177'
+    this.$api.getSrarchList(url).then(function(res){
+      debugger
+    })
+  },
   data () {
     return {
       markerCoord:[]
