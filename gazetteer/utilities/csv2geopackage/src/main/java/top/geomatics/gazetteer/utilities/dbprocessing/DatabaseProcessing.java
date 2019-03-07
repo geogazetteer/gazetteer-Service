@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +46,7 @@ public class DatabaseProcessing {
 
 	// open database
 	private static void openDatabase() {
+		System.out.println("打开数据库，准备处理......");
 		// create a database connection
 		try {
 			connection = DriverManager.getConnection(strConn);
@@ -64,6 +66,7 @@ public class DatabaseProcessing {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		System.out.println("关闭数据库，处理结束！");
 	}
 
 	// 查询龙华区下面有多少街道，创建表district，一个字段为street
@@ -86,6 +89,7 @@ public class DatabaseProcessing {
 				return;
 			}
 			// 创建表LH_district
+			System.out.println("创建数据表：" + tName + "......");
 			statement.executeUpdate(dropString);
 			statement.executeUpdate(createString);
 			String insertString = "insert into " + tName + " values(?)";
@@ -130,6 +134,7 @@ public class DatabaseProcessing {
 					return;
 				}
 				// 创建表
+				System.out.println("创建数据表：" + tName + "......");
 				statement.executeUpdate(dropString);
 				statement.executeUpdate(createString);
 				String insertString = "insert into " + tName + " values(?)";
@@ -152,24 +157,39 @@ public class DatabaseProcessing {
 	private static void queryOthers() {
 		String slqString = "select street from district";
 		ResultSet rs0 = null;
+		ArrayList<String> streets = new ArrayList<String>();
+		String street;
+		String community;
 		try {
 			rs0 = statement.executeQuery(slqString);
 			while (rs0.next()) {
-				String street = rs0.getString(1);// 街道
+				street = rs0.getString(1);// 街道
+				streets.add(street);
+			}
+			for (String keyString : streets) {
+				street = keyString;
 				String slq2 = "select community from " + street;
 				ResultSet rs1 = null;
 				rs1 = statement.executeQuery(slq2);
+				ArrayList<String> communitys = new ArrayList<String>();
 				while (rs1.next()) {
-					String community = rs1.getString(1);// 社区
+					community = rs1.getString(1);// 社区
+					communitys.add(community);
+				}
+				for (String conString : communitys) {
+					community = conString;
 					String slq3 = "select code, building_id, village, building, address from " + strTableName
 							+ " where community = \'" + community + "\'";
 					ResultSet rs2 = null;
 
 					String tName = community;
+					tName = tName.replace("(", "_");
+					tName = tName.replace(")", "_");
 					String dropString = "drop table if exists " + tName;// 如果表已经存在，则先删除
 					String createString = "create table " + tName
 							+ " (code string ,building_id string ,village string,building string,address string)";
 					// 创建表
+					System.out.println("创建数据表：" + tName + "......");
 					statement.executeUpdate(dropString);
 					statement.executeUpdate(createString);
 					rs2 = statement.executeQuery(slq3);
@@ -181,15 +201,15 @@ public class DatabaseProcessing {
 						pstmt.setString(3, rs2.getString(3));
 						pstmt.setString(4, rs2.getString(4));
 						pstmt.setString(5, rs2.getString(5));
-						//pstmt.setString(6, rs2.getString(6));
+						// pstmt.setString(6, rs2.getString(6));
 						pstmt.addBatch();
 					}
 					pstmt.executeBatch();
-					
+					connection.commit();
 					pstmt.close();
 				}
 			}
-			connection.commit();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
