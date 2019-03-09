@@ -6,40 +6,100 @@
       <div class="toolscontainer flex_row">
         <!--编辑-->
         <div class="itemBlock flex_row" @click="toggleEditModal">
-          <span class="imgItem">
-            <img src="../../static/images/map/edit.png">
-          </span>
+          <img src="../../static/images/map/edit.png" class="imgItem">
           <span class="item">编辑</span>
         </div>
 
         <!--编辑对话框-->
         <Modal
           v-model="showEditModal"
-          title="采集数据"
+          title="地址编辑"
           ok-text="确定"
-          cancel-text="取消">
-          <p>信息一...</p>
-          <p>信息二...</p>
-          <p>信息三...</p>
+          cancel-text="取消"
+          @on-ok="submitEdit"
+          :mask="false"
+          :styles="{
+          width: '320px',
+          position: 'absolute',
+          top: '75px',
+          right: '20px'}"
+          loading scrollable
+        >
+
+          <div v-for="(e,index) in editObj" class="editLine flex_row">
+            <div class="label flex_row">
+              <span style="color:red;vertical-align: middle;padding-right: 4px;" v-if="e.necessary">*</span>
+              <span >{{e.label}}：</span>
+            </div>
+
+
+            <input type="text" v-model="e.value" v-if="e.type=='text'" :class="e.disabled?'text':'text canEdit'" :disabled="e.disabled"/>
+            <select v-if="e.type=='select'" v-model="e.value" class="select">
+              <option  v-for="s in e.selectors">
+                {{s}}
+              </option>
+            </select>
+
+            <textarea v-if="e.type=='textarea'" class="textarea"
+                      v-model="e.value" :placeholder="e.placeholder"></textarea>
+          </div>
+
         </Modal>
 
         <!--导入-->
-        <div class="itemBlock flex_row" >
+        <div class="itemBlock flex_row">
           <input type="file" class="fileInput" @change="setFilePath" multiple>
-          <span class="imgItem">
-            <img src="../../static/images/map/input.png">
-          </span>
+          <img src="../../static/images/map/input.png" class="imgItem">
           <span class="item">导入</span>
         </div>
 
         <!--导出-->
         <div class="itemBlock flex_row" @click="outputFile">
-          <span class="imgItem">
-            <img src="../../static/images/map/output.png">
-          </span>
+          <img src="../../static/images/map/output.png" class="imgItem">
           <span class="item">导出</span>
         </div>
 
+        <!--我要反馈-->
+        <div class="itemBlock flex_row" @click="toggleAssumeModal">
+          <img src="../../static/images/map/msg.png" class="imgItem">
+          <span class="item">我要反馈</span>
+        </div>
+
+        <!--反馈对话框-->
+        <Modal
+          v-model="showAssumeModal"
+          title="地址反馈"
+          ok-text="确定"
+          cancel-text="取消"
+          @on-ok="submitAssume"
+          :mask="false"
+          :styles="{
+          width: '320px',
+          position: 'absolute',
+          top: '75px',
+          right: '20px'}"
+          loading scrollable
+        >
+
+          <div v-for="(e,index) in assumeObj" class="editLine flex_row">
+            <div class="label flex_row">
+              <span style="color:red;vertical-align: middle;padding-right: 4px;" v-if="e.necessary">*</span>
+              <span >{{e.label}}：</span>
+            </div>
+
+
+            <input type="text" v-model="e.value" v-if="e.type=='text'" :class="e.disabled?'text':'text canEdit'" :disabled="e.disabled"/>
+            <select v-if="e.type=='select'" v-model="e.value" class="select">
+              <option  v-for="s in e.selectors">
+                {{s}}
+              </option>
+            </select>
+
+            <textarea v-if="e.type=='textarea'" class="textarea"
+                      v-model="e.value" :placeholder="e.placeholder"></textarea>
+          </div>
+
+        </Modal>
       </div>
       <!--头像-->
       <div class="user-center">
@@ -68,7 +128,37 @@
     data() {
       return {
         needUser:false,
-        showEditModal:false,//编辑浮云
+        showEditModal:false,//是否打开编辑浮云
+
+        //编辑对象
+        editObj:[
+          {'label':'省份','disabled':true,value:'广东省','necessary':true,type:'text'},
+          {'label':'城市','disabled':true,value:'深圳市','necessary':true,type:'text'},
+          {'label':'区县','disabled':true,value:'宝安区','necessary':true,type:'text'},
+          {'label':'街道','disabled':true,value:'xxx街道','necessary':true,type:'text'},
+          {'label':'社区','selectors':['A社区','B社区'],value:'A社区','necessary':true,type:'select'},
+          {'label':'姓名',value:'','necessary':true,type:'text'},
+          {'label':'手机',value:'','necessary':true,type:'text'},
+          {'label':'标准地址',value:'','necessary':true,type:'text'},//选择确认的标准地址
+          {'label':'历史地址',value:'','necessary':true,type:'text'},//JYCS字段
+          {'label':'相似标准地址','value':'',placeholder:'(可选)列出相似标准地址，帮助匹配地址',type:'textarea',},//列出相似的标准地址,可选择
+        ],
+
+        //是否打开反馈浮云
+        showAssumeModal:false,
+        assumeObj:[
+          {'label':'省份','disabled':true,value:'广东省','necessary':true,type:'text'},
+          {'label':'城市','disabled':true,value:'深圳市','necessary':true,type:'text'},
+          {'label':'区县','disabled':true,value:'宝安区','necessary':true,type:'text'},
+          {'label':'街道','disabled':true,value:'xxx街道','necessary':true,type:'text'},
+          {'label':'社区','selectors':['A社区','B社区'],value:'A社区','necessary':true,type:'select'},
+          {'label':'姓名',value:'','necessary':true,type:'text'},
+          {'label':'手机',value:'','necessary':true,type:'text'},
+          {'label':'问题编码',value:'','necessary':true,type:'text'},//选择确认的标准地址
+          {'label':'问题地址',value:'','necessary':true,type:'text'},//JYCS字段
+          {'label':'问题描述','value':'','necessary':true,type:'textarea',},//列出相似的标准地址,可选择
+
+        ]
       }
     },
     components: {},
@@ -88,6 +178,16 @@
       toggleEditModal(){
         this.showEditModal = !this.showEditModal
       },
+      //提交地址编辑
+      submitEdit(){
+        console.log(this.editObj)
+        debugger;
+        var editObj = this.editObj;
+        for (var i=0;i<editObj.length;i++){
+
+        }
+
+      },
       //存储获取的文件路径
       setFilePath(e) {
         var paths = e.currentTarget.files
@@ -95,6 +195,11 @@
       //导出文件
       outputFile(){
         alert('url为空！')
+      },
+
+      //打开我要反馈窗口
+      toggleAssumeModal(){
+        this.showAssumeModal = !this.showAssumeModal
       }
     },
     beforedestroy(){
@@ -116,7 +221,7 @@
     position: absolute;
     top: 20px;
     right: 10px;
-    width: 300px;
+    width: 340px;
   }
   /*用户中心*/
   .user-center {
@@ -150,7 +255,7 @@
     padding: 8px 0;
   }
   .toolscontainer .itemBlock{
-    padding: 0 12px;
+    padding: 0 6px;
     border-right: 1px solid #f2f2f2;
     font-size: 12px;
     cursor: pointer;
@@ -172,6 +277,7 @@
   }
   .toolscontainer  .imgItem{
     margin-right: 6px;
+    width: 16px;
   }
   .toolscontainer  .imgItem img{
     width: 80%;
@@ -212,5 +318,43 @@
     padding: 5px 10px;
     margin-left: 10px;
 
+  }
+
+  /*编辑对话框*/
+  .editModal .ivu-modal{
+    position: absolute;
+    top:120px;
+    right: 0;
+  }
+  .editLine{
+    justify-content: flex-start;
+    width: 100%;
+    height: 35px;
+    border-bottom: 2px solid #f2f2f2;
+  }
+  .editLine .label{
+    background: #3385ff;
+    color: #fff;
+    height: 100%;
+    width: 85px;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .editLine .canEdit{
+    border: 1px solid #7f7f7f;
+  }
+  .editLine .text{
+    background: none;
+  }
+  .editLine .text,.editLine .select,.editLine .textarea{
+    margin-left: 10px;
+    height: 80%;
+    width: 100%;
+  }
+  .editLine .textarea{
+    padding: 2px;
+  }
+  .editLine:last-child{
+    height: 100px;
   }
 </style>
