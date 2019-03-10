@@ -23,6 +23,8 @@
 
 	<properties>
 		<junit_version>4.11</junit_version>
+		<log4j_version>2.11.2</log4j_version>
+		<slf4j_version>1.7.26</slf4j_version>
 		<commons_lang3.version>3.8.1</commons_lang3.version>
 		<opencsv_version>4.5</opencsv_version>
 		<geotools.version>22-SNAPSHOT</geotools.version>
@@ -78,6 +80,19 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 -->
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+		</dependency>
+
+
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -110,7 +125,7 @@
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-swing</artifactId>
-        </dependency>
+		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-epsg-hsql</artifactId>
@@ -186,6 +201,21 @@
 				<groupId>org.geotools</groupId>
 				<artifactId>gt-epsg-hsql</artifactId>
 				<version>${geotools.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j_version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-core</artifactId>
+				<version>${log4j_version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>${slf4j_version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
