@@ -20,7 +20,6 @@ import java.util.Set;
 import org.ansj.domain.Result;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.DicAnalysis;
-import org.geotools.filter.expression.ThisPropertyAccessorFactory;
 
 import com.opencsv.CSVWriter;
 import com.opencsv.CSVWriterBuilder;
