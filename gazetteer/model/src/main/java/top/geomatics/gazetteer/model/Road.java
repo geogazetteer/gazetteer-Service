@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package top.geomatics.gazetteer.model;
 

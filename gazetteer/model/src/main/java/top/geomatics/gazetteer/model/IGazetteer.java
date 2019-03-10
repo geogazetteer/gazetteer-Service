@@ -2,12 +2,12 @@ package top.geomatics.gazetteer.model;
 
 public interface IGazetteer {
 
-	String getCode();
+    String getCode();
 
-	void setCode(String code);
+    void setCode(String code);
 
-	String getName();
+    String getName();
 
-	void setName(String name);
+    void setName(String name);
 
 }

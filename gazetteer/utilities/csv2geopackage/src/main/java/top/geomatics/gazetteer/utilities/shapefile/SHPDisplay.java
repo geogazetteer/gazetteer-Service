@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package top.geomatics.gazetteer.utilities.shapefile;
 
@@ -19,33 +19,32 @@ import org.geotools.swing.data.JFileDataStoreChooser;
 
 /**
  * @author whudyj
- *
  */
 public class SHPDisplay {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) throws Exception {
-		File file = JFileDataStoreChooser.showOpenFile("shp", null);
-		if (file == null) {
-			return;
-		}
+    /**
+     * @param args
+     */
+    public static void main(String[] args) throws Exception {
+        File file = JFileDataStoreChooser.showOpenFile("shp" , null);
+        if (file == null) {
+            return;
+        }
 
-		FileDataStore store = FileDataStoreFinder.getDataStore(file);
-		SimpleFeatureSource featureSource = store.getFeatureSource();
+        FileDataStore store = FileDataStoreFinder.getDataStore(file);
+        SimpleFeatureSource featureSource = store.getFeatureSource();
 
-		// Create a map content and add our shapefile to it
-		MapContent map = new MapContent();
-		map.setTitle("Quickstart");
+        // Create a map content and add our shapefile to it
+        MapContent map = new MapContent();
+        map.setTitle("Quickstart");
 
-		Style style = SLD.createSimpleStyle(featureSource.getSchema());
-		Layer layer = new FeatureLayer(featureSource, style);
-		map.addLayer(layer);
+        Style style = SLD.createSimpleStyle(featureSource.getSchema());
+        Layer layer = new FeatureLayer(featureSource, style);
+        map.addLayer(layer);
 
-		// Now display the map
-		JMapFrame.showMap(map);
+        // Now display the map
+        JMapFrame.showMap(map);
 
-	}
+    }
 
 }
