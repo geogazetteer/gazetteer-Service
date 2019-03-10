@@ -1,11 +1,25 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>top.geomatics.gazetteer.utilities</groupId>
-    <artifactId>utilities</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-  </parent>
-  <groupId>top.geomatics.gazetteer.utilities.csv2gpkg</groupId>
-  <artifactId>csv2geopackage</artifactId>
-  <name>csv2gpkg</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>top.geomatics.gazetteer.utilities</groupId>
+		<artifactId>utilities</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<groupId>top.geomatics.gazetteer.utilities.csv2gpkg</groupId>
+	<artifactId>csv2geopackage</artifactId>
+	<name>csv2gpkg</name>
+	<properties>
+		<ansj_version>5.1.6</ansj_version>
+	</properties>
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.ansj/ansj_seg -->
+		<dependency>
+			<groupId>org.ansj</groupId>
+			<artifactId>ansj_seg</artifactId>
+			<version>${ansj_version}</version>
+		</dependency>
+
+	</dependencies>
 </project>

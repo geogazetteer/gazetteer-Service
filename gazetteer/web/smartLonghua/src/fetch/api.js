@@ -36,7 +36,7 @@ export function fetch(method, url, params) {
 
 export default {
     //demo
-    getSrarchList(url) {
+    getSearchList(url) {
         return fetch('get', url)
     }
 };
