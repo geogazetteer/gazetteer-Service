@@ -1,8 +1,12 @@
 # Compiled class file
 *.class
+target/
+bin/
 
 # Log file
 *.log
+#Backup file
+*.bak
 
 # BlueJ files
 *.ctxt
@@ -23,8 +27,9 @@
 hs_err_pid*
 
 #eclipse workspace .metadata
-.metadata
-.idea
+.metadata/
+.idea/
+.settings/
 *.gitignore
 *.project
 
