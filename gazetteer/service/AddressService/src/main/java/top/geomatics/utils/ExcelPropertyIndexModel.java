@@ -1,25 +1,46 @@
-package top.geomatics.entity;
+package top.geomatics.utils;
 
 import java.sql.Date;
 
-public class Address {
+import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.metadata.BaseRowModel;
+
+public class ExcelPropertyIndexModel extends BaseRowModel {
+	@ExcelProperty(value = "地址标识", index = 0)
 	private String address_id; // 地址标识，数据库自动生成，示例：63EEDE6BA4206A3AE0538CC0C0C07BB0
+	@ExcelProperty(value = "地址编码", index = 1)
 	private String code; // 地址编码，唯一，由权威机构确定，示例：44030600960102T0117 000000 共25位
+	@ExcelProperty(value = "建筑标识", index = 2)
 	private String building_id; // 建筑标识，唯一，由权威机构确定，示例：44030600960102T0117 共19位
+	@ExcelProperty(value = "房屋标识", index = 3)
 	private String house_id; // 房屋标识
+	@ExcelProperty(value = "省", index = 4)
 	private String province; // 省名称，缺省：广东省
+	@ExcelProperty(value = "市", index = 5)
 	private String city; // 市名称，缺省：深圳市
+	@ExcelProperty(value = "区", index = 6)
 	private String district; // 区名称，缺省：龙华区
+	@ExcelProperty(value = "街道", index = 7)
 	private String street; // 街道名称
+	@ExcelProperty(value = "社区", index = 8)
 	private String community; // 社区名称
+	@ExcelProperty(value = "路", index = 9)
 	private String road; // 路名称
+	@ExcelProperty(value = "路牌", index = 10)
 	private String road_num; // 路牌编号
+	@ExcelProperty(value = "村", index = 11)
 	private String villige; // 村名称
+	@ExcelProperty(value = "建筑名称", index = 12)
 	private String building_name; // 建筑名称
+	@ExcelProperty(value = "楼层", index = 13)
 	private String floor; // 楼层
+	@ExcelProperty(value = "完整地址", index = 14)
 	private String address_name; // 完整的地址名称
+	@ExcelProperty(value = "地址更新日期", index = 15)
 	private Date update_date; // 地址更新日期
+	@ExcelProperty(value = "地址创建日期", index = 16)
 	private Date create_date; // 地址创建日期
+	@ExcelProperty(value = "地址是否已经发布", index = 17)
 	private boolean isPublished; // 地址是否已发布
 
 	public String getAddress_id() {

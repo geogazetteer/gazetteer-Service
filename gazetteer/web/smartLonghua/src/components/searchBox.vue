@@ -28,7 +28,7 @@
     <ul class="cardlist" v-if="showCard">
       <li v-for="(ca,index) in cardlist"  @click="posSite(ca.value,ca.coord)" class="flex_row">
         <span class="imgItem"></span>
-        <span>{{ca.value}}</span>
+        <span>{{ca.address}}</span>
       </li>
       <!--没有搜索结果-->
       <div v-if="cardlist.length==0" class="bottomDiv">
@@ -67,24 +67,12 @@
         needSpin:false,//显示spin
         showCard:false,
         cardlist:[
-          {id:0,value:'武汉市洪山区广八路',coord:[113.30,30.52]},
+          {id:0,address:'武汉市洪山区广八路',coord:[113.30,30.52]},
           {id:1,value:'武汉市洪山区广埠屯路',coord:[112.90,20,19]},
           {id:2,value:'武汉市洪山区八一路路',coord:[114.30,30.52]},
           {id:3,value:'武汉市洪山区广八路',coord:[114.90,34.66]},
-          {id:4,value:'武汉市洪山区广埠屯路',coord:[112.90,90.21]},
-          {id:5,value:'武汉市洪山区八一路路',coord:[114.4234,32.45]},
-          {id:6,value:'武汉市洪山区广八路',coord:[111.23,40.32]},
-          {id:7,value:'武汉市洪山区广埠屯路',coord:[114.78,45.43]},
-          {id:8,value:'武汉市洪山区八一路路',coord:[113.56,36.67]},
-          {id:9,value:'武汉市洪山区广八路',coord:[113.76,45.32]},
-          {id:10,value:'武汉市洪山区广埠屯路',coord:[111.234,34.233]},
-          {id:11,value:'武汉市洪山区八一路路',coord:[110.233,23.223]},
-          {id:12,value:'武汉市洪山区广八路',coord:[110.315,30.15]},
-          {id:13,value:'武汉市洪山区广埠屯路',coord:[113.22,52]},
-          {id:14,value:'武汉市洪山区八一路路',coord:[113.62,50.9]},
-          {id:15,value:'武汉市洪山区广八路',coord:[114.12,34.82]},
-          {id:16,value:'武汉市洪山区广埠屯路',coord:[114.12,43.12]},
-          {id:17,value:'武汉市洪山区八一路路',coord:[110.24,124]},
+         
+         
         ],
         //历史记录
         showHis:false,
@@ -113,17 +101,23 @@
         this.showHis = false;
         this.needSpin=false;
       },
-      //搜索结果
-      searchItems(){
-        if(this.searchContent){
-//          this.needSpin = true;
-          this.showHis = false;
-          this.showCard = true;
-        }else{
-          this.showCard=false;
-          this.showHis = true;
-        }
-      },
+//搜索结果
+searchItems(){
+var $this = this;
+if($this.searchContent){ 
+//获取接口数据get方法的demo
+var url='http://localhost:8000/address/select';
+$this.$api.getSearchList(url).then(function(res){
+$this.cardlist= res;
+//this.needSpin = true;
+$this.showHis = false;//隐藏历史记录
+$this.showCard = true;//显示搜索结 
+})
+}else{
+$this.showCard=false;
+$this.showHis = true;
+}
+},
       //搜索框获取焦点
       searchFocus(){
         if(!this.searchContent){
