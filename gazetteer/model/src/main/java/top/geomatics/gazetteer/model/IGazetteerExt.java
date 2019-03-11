@@ -2,28 +2,28 @@ package top.geomatics.gazetteer.model;
 
 public interface IGazetteerExt {
 
-	String getAdminName();
+    String getAdminName();
 
-	void setAdminName(String adminName);
+    void setAdminName(String adminName);
 
-	String getGeoName();
+    String getGeoName();
 
-	void setGeoName(String geoName);
+    void setGeoName(String geoName);
 
-	String getConvName();
+    String getConvName();
 
-	void setConvName(String convName);
+    void setConvName(String convName);
 
-	String getAbbrName();
+    String getAbbrName();
 
-	void setAbbrName(String abbrName);
+    void setAbbrName(String abbrName);
 
-	String getAlias();
+    String getAlias();
 
-	void setAlias(String alias);
+    void setAlias(String alias);
 
-	String getUsedNames();
+    String getUsedNames();
 
-	void setUsedNames(String usedNames);
+    void setUsedNames(String usedNames);
 
 }

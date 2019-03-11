@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/gazetteer/service/AddressService/.mvn/.mvn.iml" filepath="$PROJECT_DIR$/gazetteer/service/AddressService/.mvn/.mvn.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gazetteer/utilities/csv2geopackage/src/main/main.iml" filepath="$PROJECT_DIR$/gazetteer/utilities/csv2geopackage/src/main/main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gazetteer/model/src/main/main1.iml" filepath="$PROJECT_DIR$/gazetteer/model/src/main/main1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gazetteer/service/AddressService/src/main/main2.iml" filepath="$PROJECT_DIR$/gazetteer/service/AddressService/src/main/main2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gazetteer/service/AddressService/src/test/test.iml" filepath="$PROJECT_DIR$/gazetteer/service/AddressService/src/test/test.iml" />
+    </modules>
+  </component>
+</project>
