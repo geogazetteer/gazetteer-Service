@@ -1,12 +1,12 @@
 <template xmlns:v-bind="http://www.w3.org/1999/xhtml">
-  <div  class="leftView">
+  <div class="leftView">
     <!--搜索框-->
     <div class="searchbox flex_row">
 
-      <div  class="searchbox-content flex_row">
-        <input id="sole-input"  type="text" autocomplete="off"
+      <div class="searchbox-content flex_row">
+        <input id="sole-input" type="text" autocomplete="off"
                maxlength="256" placeholder="输入地名进行搜索" v-model="searchContent"
-               v-on:input="searchItems" v-on:keyup.enter="searchItems" @blur="" @focus="searchFocus"
+               v-on:input="getCardList" v-on:keyup.enter="searchItems" @blur="" @focus="searchFocus"
         />
 
         <div class="input-clear" title="清空" v-show="searchContent" @click="clearInput"></div>
@@ -16,73 +16,165 @@
       <button id="search-button" data-title="搜索" @click="searchItems"></button>
     </div>
 
-    <!--搜索结果-->
+
+
+    <!--搜索联想-->
+    <ul class="cardlist" v-if="showCard">
+      <li v-for="(ca,index) in cardList" @click="searchItems(ca.address)" class="flex_row">
+        <span class="imgItem"></span>
+        <span>{{ca.address}}</span>
+      </li>
+    </ul>
+
     <!--loading spin-->
     <div v-if="needSpin" class="spin-icon-load">
       <Spin fix>
         <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-        <div>搜索中……</div>
+        <div>正在搜索…</div>
       </Spin>
     </div>
 
-    <ul class="cardlist" v-if="showCard">
-      <li v-for="(ca,index) in cardlist"  @click="posSite(ca.value,ca.coord)" class="flex_row">
-        <span class="imgItem"></span>
-        <span>{{ca.address}}</span>
+
+
+    <!--搜索结果-->
+    <ul class="cardlist resultList" v-if="showResult">
+      <li v-for="(ca,index) in resultList" @click="showDetailList" class="flex_row">
+        <div class="imgItem" :style="{backgroundPosition:(-21*index)+'px 0'}"></div>
+        <div class="right flex_col">
+          <div class="address" v-html="ca.address"></div>
+          <div class="small">楼栋编码{{ca.code}}</div>
+          <div class="small detail">详细地址：{{ca.detail}}</div>
+        </div>
+
       </li>
+
       <!--没有搜索结果-->
-      <div v-if="cardlist.length==0" class="bottomDiv">
+      <div v-if="resultList.length==0&&showResult" class="bottomDiv">
         <!--<span class="imgItem">-->
-            <!--<img src="/static/images/map/search.png">-->
+        <!--<img src="/static/images/map/search.png">-->
         <!--</span>-->
         <span>--没有搜索结果--</span>
       </div>
     </ul>
+
+
+    <!--详情列表-->
+    <div v-if="showDetail" class="detailList">
+      <div class="back flex_row" @click="backResult">
+        <span class="img"></span>
+        <span>返回“{{searchContent}}”的搜索结果</span>
+      </div>
+
+      <div class="bottomDiv title flex_row" @click="hideDetail=!hideDetail">
+        <!--<span class="img"></span>-->
+        <span class="hisBottom">编码信息</span>
+        <span v-show="!hideDetail" class="hideHis">▲</span>
+        <span v-show="hideDetail" class="hideHis">▼</span>
+      </div>
+
+      <div class="content" v-show="!hideDetail">
+        <div class="line">
+          <span class="bold">{{detail.detailList[0].label}}:</span>
+          <span>{{detail.detailList[0].value}}</span>
+        </div>
+
+        <div class="line standard">
+          <span class="bold">标准地址</span>
+          <div class="standardCtx">
+            <div v-for="s in detail.standard" class="standardLine flex_row">
+              <div class="label flex_row">{{s.label}}</div>
+              <div class="value">{{s.value}}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="line" v-for="d in detail.detailList.slice(1)">
+          <span class="bold">{{d.label}}：</span>
+          <span>{{d.value}}</span>
+        </div>
+
+      </div>
+    </div>
+
+
     <!--历史记录-->
     <ul class="cardlist" v-if="showHis">
-      <li v-for="(ca,index) in hisList"  @click="posSite(ca.value,ca.coord)" class="flex_row">
+      <li v-for="(ca,index) in hisList" @click="searchItems(ca.address)" class="flex_row">
         <span class="imgItem"></span>
-        <span>{{ca.value}}</span>
+        <span>{{ca.address}}</span>
       </li>
       <div v-if="hisList.length>0" @click="clearHis" class="bottomDiv flex_row">
         <!--<span class="imgItem">-->
-            <!--<img src="/static/images/map/search.png">-->
+        <!--<img src="/static/images/map/search.png">-->
         <!--</span>-->
         <div class="hisBottom">--清空历史记录--</div>
         <div @click="hideHis" class="hideHis">▲</div>
       </div>
     </ul>
+
   </div>
 
 </template>
 
 
 <script>
+  import {RegularStr} from '../js/render.js'
   export default{
     name: 'searchBox',
     data() {
       return {
-        searchContent:'',
+        searchContent: '',
+        //搜索联想
+        showCard: false,//显示搜索联想
+        cardList: [//搜索联想结果
+          {id: 0, address: '搜索联想武汉市洪山区广八路'},
+          {id: 1, address: '搜索联想武汉市洪山区广埠屯路'},
+          {id: 2, address: '搜索联想武汉市洪山区八一路路'},
+          {id: 3, address: '搜索联想武汉市洪山区广八路'}
+        ],
+
         //搜索结果
-        needSpin:false,//显示spin
-        showCard:false,
-        cardlist:[
-          {id:0,address:'武汉市洪山区广八路',coord:[113.30,30.52]},
-          {id:1,value:'武汉市洪山区广埠屯路',coord:[112.90,20,19]},
-          {id:2,value:'武汉市洪山区八一路路',coord:[114.30,30.52]},
-          {id:3,value:'武汉市洪山区广八路',coord:[114.90,34.66]},
-         
-         
+        needSpin: false,//显示spin
+        showResult:false,//显示搜索结果
+        resultList:[
+
         ],
+
         //历史记录
-        showHis:false,
-        hisList:[
-          {id:0,value:'历史记录1',coord:[110.315,30.15]},
-          {id:1,value:'历史记录2',coord:[114.78,45.43]},
-          {id:2,value:'历史记录3',coord:[114.30,30.52]},
-          {id:3,value:'历史记录4',coord:[110.24,124]},
-          {id:4,value:'历史记录5',coord:[114.77,30.7]}
+        showHis: false,
+        hisList: [
+          {id: 0, address: '历史记录1'},
+          {id: 1, address: '历史记录2'},
+          {id: 2, address: '历史记录3'},
+          {id: 3, address: '历史记录4'},
+          {id: 4, address: '历史记录5'}
         ],
+
+        //详情列表
+        showDetail:false,
+        hideDetail:false,
+        detail:{
+            standard:[
+              {label:'省',value:'广东省'},
+              {label:'市',value:'深圳市'},
+              {label:'区',value:'南山区'},
+              {label:'街道',value:'粤海街道'},
+              {label:'社区',value:'深大社区'},
+              {label:'基础网格',value:'440305007015004'},
+              {label:'路',value:'白石路'},
+              {label:'路号',value:'3883号'},
+              {label:'小区',value:'深圳大学南校区'},
+              {label:'楼栋',value:'深圳大学医学院'},
+            ],
+          detailList: [
+            {label:'楼栋编码',value:'44030500700419000013'},
+            {label:'详细地址',value:'广东省深圳市南山区粤海街道深大社区白石路3833号深圳大学南校区深圳大学医学院'},
+            {label:'门楼号地址',value:'广东省深圳市南山区粤海街道深大社区白石路3833号深圳大学南校区深圳大学医学院'},
+            {label:'小学学区',value:''},
+            {label:'初级中学学区',value:''},
+            {label:'社区网格员ID',value:117847},
+          ]
+        }
       }
     },
     components: {},
@@ -96,52 +188,98 @@
     methods: {
       //清空搜索框
       clearInput(){
-        this.searchContent='';
-        this.showCard=false;
+        this.searchContent = '';
+        this.showCard = false;
         this.showHis = false;
-        this.needSpin=false;
+        this.needSpin = false;
+        this.showResult = false;
+        this.showDetail=false;
       },
-//搜索结果
-searchItems(){
-var $this = this;
-if($this.searchContent){ 
-//获取接口数据get方法的demo
-var url='http://localhost:8000/address/select';
-$this.$api.getSearchList(url).then(function(res){
-$this.cardlist= res;
-//this.needSpin = true;
-$this.showHis = false;//隐藏历史记录
-$this.showCard = true;//显示搜索结 
-})
-}else{
-$this.showCard=false;
-$this.showHis = true;
-}
-},
+      //获取搜索联想
+      getCardList(){
+        this.showResult = false;//隐藏搜索结果
+        this.showDetail=false;//隐藏详细信息
+        var str = RegularStr(this.searchContent);//输入的搜索内容(去除空格)
+        if(str){
+          //调用接口获取搜索联想
+          //this.cardList = res;//将接口获取的值传递到vue实例的data中
+          this.showCard = true;//显示搜索联想
+          this.showHis = false;//隐藏历史记录
+        }else{
+          //当输入为空时，显示历史记录
+          this.showCard = false;//隐藏搜索联想
+          this.showHis = true;//显示历史记录
+        }
+      },
+     //获取搜索结果
+      searchItems(curStr){
+        var $this = this;
+        var str = typeof curStr=='string'?curStr:RegularStr($this.searchContent);//输入的搜索内容(去除空格)
+        if (str) {
+          $this.searchContent = str;//更新搜索框的内容
+          $this.showResult = false;//隐藏结果
+          $this.showHis = false;//隐藏历史记录
+          $this.showCard = false;//隐藏联想
+          $this.needSpin = true;//显示spin
+/*          //测试数据
+          setTimeout(function () {
+            $this.resultList = [
+              {id: 0, address: '搜索结果武汉市洪山区广八路',code:4403050070041900013,detail:'广东省深圳市南山区粤海街道深' +
+              '大社区白石路3883号深圳大学南校区深圳大学医学院'},
+              {id: 0, address: '搜索结果武汉市洪山区广八路',code:4403050070041900013,detail:'广东省深圳市南山区粤海街道深' +
+              '大社区白石路3883号深圳大学南校区深圳大学医学院'},
+            ];
+            $this.showResult = true;//显示搜索结果
+            $this.needSpin = false;//隐藏spin
+          },500)*/
+          //获取接口数据get方法的demo
+          var url = 'http://localhost:8000/address/select';
+          $this.$api.getSearchList(url).then(function (res) {
+            debugger
+           $this.resultList = res;
+           $this.showResult = true;//显示搜索结果
+           $this.needSpin = false;//隐藏spin
+           })
+        } else {
+
+        }
+      },
+
+      //显示搜索详情
+      showDetailList(){
+        this.showResult = false;//隐藏搜索结果
+        this.showDetail = true;//显示详情
+        this.hideDetail  = false;
+        this.$emit('setMarkCoord', [114.30,30.52])
+      },
+      //返回搜索结果
+      backResult(){
+        this.showResult = true;//显示搜索结果
+        this.showDetail = false;//隐藏详情
+      },
+
+
+
       //搜索框获取焦点
       searchFocus(){
-        if(!this.searchContent){
+        if (!this.searchContent) {
           this.showHis = true;
-          this.showCard=false;
+          this.showCard = false;
         }
       },
       //失去焦点时清空结果
       searchBlur(){
-        this.searchContent='';
-        this.showCard=false;
+        this.searchContent = '';
+        this.showCard = false;
         this.showHis = false;
-        this.needSpin=false;
+        this.needSpin = false;
       },
       //收起历史记录
       hideHis(){
         this.showHis = false;
       },
       //清空历史记录
-      clearHis(){},
-      //定位搜索结果位置
-      posSite(val,coord){
-        this.searchContent=val;
-        this.$emit('setMarkCoord',coord)
+      clearHis(){
       }
     },
     beforedestroy(){
@@ -163,6 +301,7 @@ $this.showHis = true;
     left: 20px;
     top: 20px;
     z-index: 100;
+    height: 100%;
   }
 
   .searchbox .searchbox-content {
@@ -211,13 +350,14 @@ $this.showHis = true;
   }
 
   /*搜索结果*/
-  .spin-icon-load{
+  .spin-icon-load {
     background: #fff;
     width: 377px;
     position: relative;
     height: 50px;
     border-top: 1px solid #f2f2f2;
   }
+
   .cardlist {
     border-top: 1px solid #f2f2f2;
     height: auto;
@@ -235,21 +375,24 @@ $this.showHis = true;
     padding: 10px;
     font-size: 14px;
   }
-  .cardlist li:hover{
+
+  .cardlist li:hover {
     background: #3385ff;
     color: #fff;
   }
+
   .cardlist li .imgItem {
     margin-right: 10px;
-    background-image:url('../../static/images/map/search.png') ;
+    background-image: url('../../static/images/map/search.png');
     width: 14px;
     height: 14px;
     background-size: cover;
   }
 
   .cardlist li:hover .imgItem {
-    background-image:url('../../static/images/map/search_w.png') ;
+    background-image: url('../../static/images/map/search_w.png');
   }
+
   .bottomDiv {
     font-size: 14px;
     padding-top: 10px;
@@ -267,5 +410,123 @@ $this.showHis = true;
     flex-shrink: 0;
     color: #3385ff;
     cursor: pointer;
+  }
+
+
+  /*搜索结果*/
+  .resultList{
+    margin-top: 10px;
+  }
+  .resultList li{
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+  .resultList li .imgItem{
+    background-image: url('../../static/images/map/result_markers.png');
+    width: 21px;
+    height: 30px;
+    flex-shrink: 0;
+    background-size: auto;
+    margin-top:4px;
+  }
+  .resultList li .right{
+    align-items: flex-start;
+  }
+  .resultList li:hover{
+    background: rgba(0,0,0,0.1);
+    color: #000;
+  }
+  .resultList li:hover .imgItem{
+    background-image: url('../../static/images/map/result_markers_sel.png');
+  }
+  .resultList li .address{
+    color: #3385ff;
+  }
+  .resultList li .small{
+    font-size: 13px;
+    text-align: left;
+    line-height: 25px;
+  }
+
+
+  /*详细信息列表*/
+  /*返回搜索结果*/
+  .detailList{
+    width: 320px;
+    height: 100%;
+  }
+  .back{
+    background: #fff;
+    box-shadow: 1px 2px 1px rgba(0, 0, 0, .15);
+    border-radius: 2px 0 0 2px;
+    margin: 10px 0;
+    width: 100%;
+    height: 38px;
+    padding: 12px;
+    box-sizing: border-box;
+    cursor: pointer;
+    color: #3385ff;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+   justify-content: flex-start;
+  }
+  .back .img{
+    background: url('../../static/images/map/searchbox.png') no-repeat 0 -263px;
+    padding-left: 28px;
+    height: 38px;
+    width: 10px;
+  }
+  .detailList .content{
+    background: #fff;
+    box-shadow: 1px 2px 1px rgba(0, 0, 0, .15);
+    border-radius: 2px 0 0 2px;
+    width: 100%;
+    overflow-y: scroll;
+    max-height: 75%;
+  }
+  .detailList .title{
+    background: #3385ff;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 0;
+    cursor: pointer;
+  }
+  .detailList .title .hideHis{
+    color: #fff;
+  }
+  .detailList .content .line{
+    border-bottom: 2px solid #f2f2f2;
+    line-height: 25px;
+    padding: 5px 0;
+    margin: 0 20px;
+    text-align: left;
+  }
+  .detailList .content .line .bold{
+    font-weight: bold;
+  }
+  /*标准地址*/
+  .detailList .content .standard{
+    border:none;
+  }
+  .standardCtx{
+    width: 90%;
+    border: 1px solid #f2f2f2;
+    margin: 0 auto;
+  }
+  .standardLine{
+    height: 30px;
+    border-bottom: 2px solid #f2f2f2;
+  }
+  .standardLine .label{
+    background:#3385ff;
+    width: 100px;
+    height: 100%;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .standardLine .value{
+    padding-left: 10px;
+    width: 100%;
   }
 </style>

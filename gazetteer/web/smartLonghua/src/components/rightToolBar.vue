@@ -22,7 +22,8 @@
           width: '320px',
           position: 'absolute',
           top: '75px',
-          right: '20px'}"
+          right: '20px',
+          maxHeight:'80%'}"
           loading scrollable
         >
 
@@ -77,7 +78,9 @@
           width: '320px',
           position: 'absolute',
           top: '75px',
-          right: '20px'}"
+          right: '20px',
+           'overflow-y':'scroll',
+    'max-height':'85%'}"
           loading scrollable
         >
 
@@ -200,6 +203,10 @@
       //打开我要反馈窗口
       toggleAssumeModal(){
         this.showAssumeModal = !this.showAssumeModal
+      },
+      //提交反馈内容
+      submitAssume(){
+
       }
     },
     beforedestroy(){
