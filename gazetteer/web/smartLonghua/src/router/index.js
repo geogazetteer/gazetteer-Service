@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import home from '@/views/home.vue'
+import webService from '@/views/webService.vue'
 
 Vue.use(Router);
 
@@ -10,6 +11,11 @@ export default new Router({
       path: '/',
       name: 'home',
       component: home
-    }
+    },
+    {
+      path: '/AddressWebService',
+      name: 'webService',
+      component: webService
+    },
   ]
 })
