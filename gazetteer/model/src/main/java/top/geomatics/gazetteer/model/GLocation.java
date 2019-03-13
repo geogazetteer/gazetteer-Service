@@ -9,6 +9,7 @@ package top.geomatics.gazetteer.model;
 public abstract class GLocation implements IGLocation {
     private int coordType;        //坐标类型
     private double x;            //x坐标
+    private double y;            //y坐标
 
     /* (non-Javadoc)
      * @see top.geomatics.gazetteer.model.IGLocation#getCoordType()
@@ -52,6 +53,6 @@ public abstract class GLocation implements IGLocation {
         this.y = y;
     }
 
-    private double y;            //y坐标
+    
 
 }

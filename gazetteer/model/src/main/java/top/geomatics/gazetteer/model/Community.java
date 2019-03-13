@@ -4,8 +4,10 @@
 package top.geomatics.gazetteer.model;
 
 /**
+ * <!--社区,3位编码-->
+ * 
  * @author whudyj
- * 社区
+ * 
  */
 public class Community extends Town {
 

@@ -4,9 +4,11 @@
 package top.geomatics.gazetteer.model;
 
 /**
+ * <!--小区（含自然村），GB/T 23705-2009 ，4位-->
+ * 
  * @author whudyj
- * 小区（含自然村）
+ * 
  */
-public class Village extends Street {
+public class Village extends Gazetteer {
 
 }

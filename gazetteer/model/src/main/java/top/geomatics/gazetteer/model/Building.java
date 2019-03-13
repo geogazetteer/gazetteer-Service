@@ -4,8 +4,10 @@
 package top.geomatics.gazetteer.model;
 
 /**
+ * <!--建筑物，5位编码-->
+ * 
  * @author whudyj
- * 建筑物
+ * 
  */
 public class Building extends BasicGrid {
 

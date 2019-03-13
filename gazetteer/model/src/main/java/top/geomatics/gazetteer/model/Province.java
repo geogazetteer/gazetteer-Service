@@ -4,9 +4,11 @@
 package top.geomatics.gazetteer.model;
 
 /**
+ * <!--省（自治区、直辖市、特别行政区）级行政区，2位编码-->
+ * 
  * @author whudyj
- * 省（自治区、直辖市、特别行政区）级行政区
+ * 
  */
-public class Province extends GazetteerExt {
+public class Province extends Gazetteer {
 
 }

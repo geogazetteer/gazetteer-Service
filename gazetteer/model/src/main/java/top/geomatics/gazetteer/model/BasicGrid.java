@@ -4,8 +4,10 @@
 package top.geomatics.gazetteer.model;
 
 /**
+ * <!--基础网格,2位编码-->
+ * 
  * @author whudyj
- * 基础网格
+ * 
  */
 public class BasicGrid extends Community {
 

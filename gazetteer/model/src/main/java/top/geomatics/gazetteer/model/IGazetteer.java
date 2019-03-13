@@ -6,8 +6,8 @@ public interface IGazetteer {
 
     void setCode(String code);
 
-    String getName();
+    GazetteerName getName();
 
-    void setName(String name);
+    void setName(GazetteerName name);
 
 }
