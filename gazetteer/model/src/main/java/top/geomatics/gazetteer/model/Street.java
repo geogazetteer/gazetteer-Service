@@ -4,9 +4,10 @@
 package top.geomatics.gazetteer.model;
 
 /**
- * @author whudyj
- * 街巷
+ * <!--街巷，GB/T 23705-2009 ，4位-->
+ * 
+ * @author whudyj 
  */
-public class Street extends Road {
+public class Street extends Gazetteer {
 
 }

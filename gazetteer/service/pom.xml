@@ -5,13 +5,15 @@
 	<parent>
 		<groupId>top.geomatics.gazetteer</groupId>
 		<artifactId>gazetteer</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 
 	<groupId>top.geomatics.gazetteer.service</groupId>
 	<artifactId>gs-service</artifactId>
 	<name>gazetteer-service</name>
-	<description>gazetteer restful service using Jersey</description>
-
-
+	<description>gazetteer restful service using spring boot</description>
+	<packaging>pom</packaging>
+	<modules>
+		<module>AddressService</module>
+	</modules>
 </project>

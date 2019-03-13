@@ -1,6 +1,10 @@
 package top.geomatics.gazetteer.model;
 
-public interface IGazetteerExt {
+public interface IGazetteerName {
+	
+	String getName();
+
+    void setName(String adminName);
 
     String getAdminName();
 
