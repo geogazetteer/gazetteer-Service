@@ -12,6 +12,7 @@
 	<!-- 本模块Maven坐标 -->
 	<groupId>top.geomatics.gazetteer.service.address</groupId>
 	<artifactId>gs-address-service</artifactId>
+	<packaging>jar</packaging>
 	<name>Address Service</name>
 	<description>Address Service</description>
 
