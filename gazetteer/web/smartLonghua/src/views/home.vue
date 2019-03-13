@@ -2,10 +2,10 @@
   <div class="wrapper">
    <base-map :markerCoord="markerCoord"></base-map>
     <!--搜索框-->
-    <search-box @setMarkCoord="onGetMarkCoord"></search-box>
+    <search-box @setMarkCoord="onGetMarkCoord" @onSendEdit="onGetEdit"></search-box>
 
     <!--右侧工具栏-->
-    <right-tool></right-tool>
+    <right-tool  :showEdit=showEdit @onEditHasOpen="showEdit=false"></right-tool>
   </div>
 </template>
 
@@ -26,12 +26,17 @@ export default {
   },
   data () {
     return {
-      markerCoord:[]
+      markerCoord:[],
+      showEdit:false
     }
   },
   methods:{
     onGetMarkCoord(coordArr){
       this.markerCoord = coordArr
+    },
+    //打开编辑框
+    onGetEdit(){
+      this.showEdit = true;
     }
   }
 }

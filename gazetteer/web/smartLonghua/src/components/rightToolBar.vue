@@ -5,10 +5,10 @@
 
       <div class="toolscontainer flex_row">
         <!--编辑-->
-        <div class="itemBlock flex_row" @click="toggleEditModal">
+    <!--    <div class="itemBlock flex_row" @click="toggleEditModal">
           <img src="../../static/images/map/edit.png" class="imgItem">
           <span class="item">编辑</span>
-        </div>
+        </div>-->
 
         <!--编辑对话框-->
         <Modal
@@ -24,7 +24,7 @@
           top: '75px',
           right: '20px',
           maxHeight:'80%'}"
-          loading scrollable
+          loading scrollable :visible="editVisible"
         >
 
           <div v-for="(e,index) in editObj" class="editLine flex_row">
@@ -48,17 +48,17 @@
         </Modal>
 
         <!--导入-->
-        <div class="itemBlock flex_row">
+   <!--     <div class="itemBlock flex_row">
           <input type="file" class="fileInput" @change="setFilePath" multiple>
           <img src="../../static/images/map/input.png" class="imgItem">
           <span class="item">导入</span>
         </div>
 
-        <!--导出-->
+        &lt;!&ndash;导出&ndash;&gt;
         <div class="itemBlock flex_row" @click="outputFile">
           <img src="../../static/images/map/output.png" class="imgItem">
           <span class="item">导出</span>
-        </div>
+        </div>-->
 
         <!--我要反馈-->
         <div class="itemBlock flex_row" @click="toggleAssumeModal">
@@ -134,6 +134,7 @@
         showEditModal:false,//是否打开编辑浮云
 
         //编辑对象
+        editVisible:false,
         editObj:[
           {'label':'省份','disabled':true,value:'广东省','necessary':true,type:'text'},
           {'label':'城市','disabled':true,value:'深圳市','necessary':true,type:'text'},
@@ -166,7 +167,11 @@
     },
     components: {},
     computed: {},
-    props: {},
+    props: {
+      showEdit:{
+        type:Boolean
+      }
+    },
     created(){
     },
     mounted(){
@@ -183,12 +188,15 @@
       },
       //提交地址编辑
       submitEdit(){
-        console.log(this.editObj)
-        debugger;
+        var $this = this;
+        //console.log(this.editObj)
         var editObj = this.editObj;
         for (var i=0;i<editObj.length;i++){
 
-        }
+        };
+        setTimeout(function(){
+          $this.editVisible = false
+        },1000)
 
       },
       //存储获取的文件路径
@@ -206,18 +214,22 @@
       },
       //提交反馈内容
       submitAssume(){
-
       }
     },
     beforedestroy(){
 
     },
     watch: {
-      /*    currentBtn:{
-       handler:function (btn, oldVal) {
-       },
-       //immediate:true
-       }*/
+      showEdit: {
+        handler: function (val, oldVal) {
+          debugger
+          if(val){
+            this.showEditModal = val;
+            this.$emit('onEditHasOpen');
+          }
+        },
+        immediate:false
+      }
     }
   }
 </script>
@@ -228,7 +240,9 @@
     position: absolute;
     top: 20px;
     right: 10px;
-    width: 340px;
+    align-items: flex-end;
+    width:260px
+    /*width: 340px;*/
   }
   /*用户中心*/
   .user-center {
@@ -262,11 +276,12 @@
     padding: 8px 0;
   }
   .toolscontainer .itemBlock{
-    padding: 0 6px;
+    /*padding: 0 30px;*/
     border-right: 1px solid #f2f2f2;
     font-size: 12px;
     cursor: pointer;
     position: relative;
+    width: 100px;
   }
   /*隐藏选择文件按钮*/
   .toolscontainer .itemBlock .fileInput{
@@ -292,7 +307,7 @@
 
   /*个人中心*/
   .info-box {
-    width: 284px;
+    width: 100%;
     position: relative;
     margin-top: 24px;
   }

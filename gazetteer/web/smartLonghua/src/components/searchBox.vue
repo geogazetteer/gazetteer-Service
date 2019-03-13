@@ -42,10 +42,9 @@
         <div class="imgItem" :style="{backgroundPosition:(-21*index)+'px 0'}"></div>
         <div class="right flex_col">
           <div class="address" v-html="ca.address"></div>
-          <div class="small">楼栋编码{{ca.code}}</div>
+          <div class="small">楼栋编码：{{ca.code}}</div>
           <div class="small detail">详细地址：{{ca.detail}}</div>
         </div>
-
       </li>
 
       <!--没有搜索结果-->
@@ -65,11 +64,12 @@
         <span>返回“{{searchContent}}”的搜索结果</span>
       </div>
 
-      <div class="bottomDiv title flex_row" @click="hideDetail=!hideDetail">
+      <div class="bottomDiv title flex_row">
         <!--<span class="img"></span>-->
         <span class="hisBottom">编码信息</span>
-        <span v-show="!hideDetail" class="hideHis">▲</span>
-        <span v-show="hideDetail" class="hideHis">▼</span>
+        <span class="hideHis" @click="onEdit">编辑</span>
+        <span v-show="!hideDetail" class="hideHis" @click="hideDetail=!hideDetail">▲</span>
+        <span v-show="hideDetail" class="hideHis" @click="hideDetail=!hideDetail">▼</span>
       </div>
 
       <div class="content" v-show="!hideDetail">
@@ -98,7 +98,7 @@
 
 
     <!--历史记录-->
-    <ul class="cardlist" v-if="showHis">
+    <ul class="cardlist hislist" v-if="showHis">
       <li v-for="(ca,index) in hisList" @click="searchItems(ca.address)" class="flex_row">
         <span class="imgItem"></span>
         <span>{{ca.address}}</span>
@@ -221,7 +221,7 @@
           $this.showHis = false;//隐藏历史记录
           $this.showCard = false;//隐藏联想
           $this.needSpin = true;//显示spin
-/*          //测试数据
+          //测试数据
           setTimeout(function () {
             $this.resultList = [
               {id: 0, address: '搜索结果武汉市洪山区广八路',code:4403050070041900013,detail:'广东省深圳市南山区粤海街道深' +
@@ -231,15 +231,15 @@
             ];
             $this.showResult = true;//显示搜索结果
             $this.needSpin = false;//隐藏spin
-          },500)*/
+          },500)
           //获取接口数据get方法的demo
           var url = 'http://localhost:8000/address/select';
-          $this.$api.getSearchList(url).then(function (res) {
+         /* $this.$api.getSearchList(url).then(function (res) {
             debugger
            $this.resultList = res;
            $this.showResult = true;//显示搜索结果
            $this.needSpin = false;//隐藏spin
-           })
+           })*/
         } else {
 
         }
@@ -257,7 +257,10 @@
         this.showResult = true;//显示搜索结果
         this.showDetail = false;//隐藏详情
       },
-
+      //点击编辑
+      onEdit(){
+        this.$emit('onSendEdit')
+      },
 
 
       //搜索框获取焦点
@@ -364,7 +367,7 @@
     max-height: 396px;
     /*overflow-y: scroll;*/
     overflow-x: hidden;
-    width: 377px;
+    width: 320px;
     background: #fff;
     padding-bottom: 12px;
   }
@@ -397,6 +400,7 @@
     font-size: 14px;
     padding-top: 10px;
     border-top: 1px solid #f2f2f2;
+    text-align: center;
   }
 
   .bottomDiv .hisBottom {
@@ -420,11 +424,12 @@
   .resultList li{
     justify-content: flex-start;
     align-items: flex-start;
+    position: relative;
   }
   .resultList li .imgItem{
     background-image: url('../../static/images/map/result_markers.png');
     width: 21px;
-    height: 30px;
+    height: 31px;
     flex-shrink: 0;
     background-size: auto;
     margin-top:4px;
@@ -447,6 +452,8 @@
     text-align: left;
     line-height: 25px;
   }
+
+
 
 
   /*详细信息列表*/
@@ -528,5 +535,13 @@
   .standardLine .value{
     padding-left: 10px;
     width: 100%;
+  }
+
+  /*历史记录*/
+  .hislist li .imgItem{
+    background-image: url('../../static/images/map/his.png');
+  }
+  .hislist li:hover .imgItem{
+    background-image: url('../../static/images/map/his_sel.png');
   }
 </style>
