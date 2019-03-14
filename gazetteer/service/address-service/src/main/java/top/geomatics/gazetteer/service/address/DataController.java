@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.ApiOperation;
-import top.geomatics.utils.ExcelUtil;
+import  top.geomatics.gazetteer.service.utils.ExcelUtil;
 
 //数据导入导出
 @RestController

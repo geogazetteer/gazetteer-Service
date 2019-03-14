@@ -3,13 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<!-- 引入Spring boot框架 -->
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.3.RELEASE</version>
-		<relativePath /> <!-- lookup parent from repository -->
-	</parent>
+	
 	<!-- 项目顶级POM -->
 	<groupId>top.geomatics.gazetteer</groupId>
 	<artifactId>gazetteer</artifactId>
@@ -24,11 +18,11 @@
 
 	<!-- 项目包含的模块 -->
 	<modules>
+		<module>model</module>
+		<module>database</module>
 		<module>web</module>
 		<module>service</module>
-		<module>database</module>
 		<module>utilities</module>
-		<module>model</module>
 		<module>segment</module>
 	</modules>
 	<!-- 依赖第三方库的版本 -->

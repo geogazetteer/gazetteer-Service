@@ -6,7 +6,6 @@ package top.geomatics.gazetteer.database;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
-import org.checkerframework.common.value.qual.StaticallyExecutable;
 
 import top.geomatics.gazetteer.model.AddressRow;
 

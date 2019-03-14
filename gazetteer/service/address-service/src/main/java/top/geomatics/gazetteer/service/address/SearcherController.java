@@ -3,6 +3,7 @@ package top.geomatics.gazetteer.service.address;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.ibatis.session.SqlSession;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
@@ -20,55 +21,66 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 import com.alibaba.fastjson.JSON;
 
 import io.swagger.annotations.ApiOperation;
-import top.geomatics.utils.IndexUtil;
-import top.geomatics.utils.SqlliteUtil;
+import top.geomatics.gazetteer.database.AddressMapper;
+import top.geomatics.gazetteer.database.DatabaseHelper;
+import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.service.utils.IndexUtil;
+import top.geomatics.gazetteer.service.utils.SqlliteUtil;
 
-//搜索服务
+
+/**
+ * SearcherController 
+ * 
+ * @author whudyj
+ *
+ */
 @Controller
-@RequestMapping("/address")
+@RequestMapping("/")
 public class SearcherController {
 
 	// 创建数据库连接
-	SqlliteUtil sqlliteUtil = new SqlliteUtil();
-
-	@ApiOperation(value = "列出所有服务", notes = "列出所有服务")
-	@GetMapping("/services")
-	public String services() {
-		// 利用模板引擎直接返回html页面
-		return "services";
-	}
+	//SqlliteUtil sqlliteUtil = new SqlliteUtil();
+	private static DatabaseHelper helper = new DatabaseHelper();
+	private static SqlSession session=helper.getSession();
+	private static AddressMapper mapper=session.getMapper(AddressMapper.class);
 
 	@ApiOperation(value = "查询全部数据（测试前10条）", notes = "查询全部数据（测试前10条）")
-	@GetMapping("/select")
-	public @ResponseBody String select() {
+	@GetMapping("/address")
+	public @ResponseBody String address() {
 		// 测试前10条数据
-		String sql = "select * from dmdz limit 10";
-		List list = sqlliteUtil.selectAll(sql);
+		//String sql = "select * from dmdz limit 10";
+		//List list = sqlliteUtil.selectAll(sql);
+		List<AddressRow> rows = null;
+		try {
+			rows = mapper.selectAddressById("4403060080011800284");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		// 使用阿里巴巴的fastjson
-		String json = JSON.toJSONString(list);
+		String json = JSON.toJSONString(rows);
 		System.out.println(json);
 		return json;
 	}
 
-	@ApiOperation(value = "根据详细地址address查询", notes = "根据详细地址address查询")
-	@GetMapping("/selectByAddress")
-	public @ResponseBody String selectByAddress(@RequestParam String address) {
-		// 广东省深圳市龙华区民治街道龙塘社区上塘农贸建材市场L25号铁皮房
-		List list = sqlliteUtil.selectByAddress("dmdz", address);
-		String json = JSON.toJSONString(list);
-		System.out.println(json);
-		return json;
-	}
-
-	@ApiOperation(value = "根据地理编码code查询", notes = "根据地理编码code查询")
-	@GetMapping("/selectByCode")
-	public @ResponseBody String selectByCode(@RequestParam String code) {
-		// 44030600960102T0117
-		List list = sqlliteUtil.selectByCode("dmdz", code);
-		String json = JSON.toJSONString(list);
-		System.out.println(json);
-		return json;
-	}
+//	@ApiOperation(value = "根据详细地址address查询", notes = "根据详细地址address查询")
+//	@GetMapping("/selectByAddress")
+//	public @ResponseBody String selectByAddress(@RequestParam String address) {
+//		// 广东省深圳市龙华区民治街道龙塘社区上塘农贸建材市场L25号铁皮房
+//		List list = sqlliteUtil.selectByAddress("dmdz", address);
+//		String json = JSON.toJSONString(list);
+//		System.out.println(json);
+//		return json;
+//	}
+//
+//	@ApiOperation(value = "根据地理编码code查询", notes = "根据地理编码code查询")
+//	@GetMapping("/selectByCode")
+//	public @ResponseBody String selectByCode(@RequestParam String code) {
+//		// 44030600960102T0117
+//		List list = sqlliteUtil.selectByCode("dmdz", code);
+//		String json = JSON.toJSONString(list);
+//		System.out.println(json);
+//		return json;
+//	}
 
 //	@ApiOperation(value = "根据关键词查询", notes = "根据关键词查询")
 //	@GetMapping("/selectByKeyword")
@@ -118,40 +130,40 @@ public class SearcherController {
 
 	}
 
-	@ApiOperation(value = "返回所有街道", notes = "返回所有街道")
-	@GetMapping("/streets")
-	public @ResponseBody String streets() {
-		List list = sqlliteUtil.selectstreets();
-		String json = JSON.toJSONString(list);
-		System.out.println(json);
-		return json;
-	}
-
-	@ApiOperation(value = "返回所有社区", notes = "返回所有社区")
-	@GetMapping("/communities")
-	public @ResponseBody String communities() {
-		List list = sqlliteUtil.selectcommunities();
-		String json = JSON.toJSONString(list);
-		System.out.println(json);
-		return json;
-	}
-
-	@ApiOperation(value = "返回所有建筑物", notes = "返回所有建筑物")
-	@GetMapping("/buildings")
-	public @ResponseBody String buildings() {
-		List list = sqlliteUtil.selectbuildings();
-		String json = JSON.toJSONString(list);
-		System.out.println(json);
-		return json;
-	}
-
-	@ApiOperation(value = "返回所有房屋", notes = "返回所有房屋")
-	@GetMapping("/houses")
-	public @ResponseBody String houses() {
-		List list = sqlliteUtil.selecthouses();
-		String json = JSON.toJSONString(list);
-		System.out.println(json);
-		return json;
-	}
+//	@ApiOperation(value = "返回所有街道", notes = "返回所有街道")
+//	@GetMapping("/streets")
+//	public @ResponseBody String streets() {
+//		List list = sqlliteUtil.selectstreets();
+//		String json = JSON.toJSONString(list);
+//		System.out.println(json);
+//		return json;
+//	}
+//
+//	@ApiOperation(value = "返回所有社区", notes = "返回所有社区")
+//	@GetMapping("/communities")
+//	public @ResponseBody String communities() {
+//		List list = sqlliteUtil.selectcommunities();
+//		String json = JSON.toJSONString(list);
+//		System.out.println(json);
+//		return json;
+//	}
+//
+//	@ApiOperation(value = "返回所有建筑物", notes = "返回所有建筑物")
+//	@GetMapping("/buildings")
+//	public @ResponseBody String buildings() {
+//		List list = sqlliteUtil.selectbuildings();
+//		String json = JSON.toJSONString(list);
+//		System.out.println(json);
+//		return json;
+//	}
+//
+//	@ApiOperation(value = "返回所有房屋", notes = "返回所有房屋")
+//	@GetMapping("/houses")
+//	public @ResponseBody String houses() {
+//		List list = sqlliteUtil.selecthouses();
+//		String json = JSON.toJSONString(list);
+//		System.out.println(json);
+//		return json;
+//	}
 
 }

@@ -2,6 +2,8 @@ package top.geomatics.gazetteer.service.utils;
 
 import org.springframework.stereotype.Component;
 
+import top.geomatics.gazetteer.model.AddressRow;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -36,7 +38,7 @@ public class SqlliteUtil {
         }
     }
 
-    public  List fuzzyQuery(String keyWord) {
+    public  List<AddressRow> fuzzyQuery(String keyWord) {
         return selectAll("select ADDRESS from dmdz where ADDRESS like '%"+keyWord+"%' limit 0,10");
     }
 
@@ -65,8 +67,8 @@ public class SqlliteUtil {
 
     }
 
-    public List selectAll(String sql) {
-        List results = new ArrayList();
+    public List<AddressRow> selectAll(String sql) {
+        List results = new ArrayList<AddressRow>();
         try {
             pstat = connection.prepareStatement(sql);
             rst = pstat.executeQuery();

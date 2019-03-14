@@ -4,10 +4,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<!-- 父POM -->
+	<!--
 	<parent>
 		<groupId>top.geomatics.gazetteer.service</groupId>
 		<artifactId>gs-service</artifactId>
 		<version>0.0.2-SNAPSHOT</version>
+	</parent>
+	-->
+	<!-- 引入Spring boot框架 -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.3.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<!-- 本模块Maven坐标 -->
 	<groupId>top.geomatics.gazetteer.service.address</groupId>
@@ -15,12 +24,22 @@
 	<packaging>jar</packaging>
 	<name>Address Service</name>
 	<description>Address Service</description>
+	<version>0.0.2-SNAPSHOT</version>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<gazetteer.version>0.0.2-SNAPSHOT</gazetteer.version>
+	</properties>
 
 	<dependencies>
 		<!-- 增加对model模块的依赖 -->
 		<dependency>
 			<groupId>top.geomatics.gazetteer.model</groupId>
 			<artifactId>gs-model</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>top.geomatics.gazetteer.database</groupId>
+			<artifactId>gs-database</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -144,7 +163,12 @@
 			<dependency>
 				<groupId>top.geomatics.gazetteer.model</groupId>
 				<artifactId>gs-model</artifactId>
-				<version>0.0.2-SNAPSHOT</version>
+				<version>${gazetteer.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>top.geomatics.gazetteer.database</groupId>
+				<artifactId>gs-database</artifactId>
+				<version>${gazetteer.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
