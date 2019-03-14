@@ -41,6 +41,7 @@
 		<opencsv_version>4.5</opencsv_version>
 		<geotools.version>22-SNAPSHOT</geotools.version>
 		<sqlite_jdbc.version>3.25.2</sqlite_jdbc.version>
+		<mybatis.version>3.5.0</mybatis.version>
 		<commons_text.version>1.5</commons_text.version>
 	</properties>
 	<!-- 软件仓库位置 -->
@@ -157,6 +158,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+		</dependency>
+
 
 	</dependencies>
 
@@ -227,6 +234,11 @@
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-simple</artifactId>
 				<version>${slf4j_version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mybatis</groupId>
+				<artifactId>mybatis</artifactId>
+				<version>${mybatis.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

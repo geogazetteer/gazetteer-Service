@@ -13,4 +13,34 @@
 	<artifactId>database</artifactId>
 	<packaging>jar</packaging>
 	<name>gazetteer database</name>
+
+	<dependencies>
+		<!-- 增加对model模块的依赖 -->
+		<dependency>
+			<groupId>top.geomatics.gazetteer.model</groupId>
+			<artifactId>gs-model</artifactId>
+		</dependency>
+	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>top.geomatics.gazetteer.model</groupId>
+				<artifactId>gs-model</artifactId>
+				<version>0.0.2-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>/resources</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
+
+
 </project>
