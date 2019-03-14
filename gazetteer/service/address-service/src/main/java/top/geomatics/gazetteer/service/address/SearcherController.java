@@ -44,6 +44,9 @@ public class SearcherController {
 	private static SqlSession session=helper.getSession();
 	private static AddressMapper mapper=session.getMapper(AddressMapper.class);
 
+	/**
+	 * @return
+	 */
 	@ApiOperation(value = "查询全部数据（测试前10条）", notes = "查询全部数据（测试前10条）")
 	@GetMapping("/address")
 	public @ResponseBody String address() {
@@ -52,7 +55,7 @@ public class SearcherController {
 		//List list = sqlliteUtil.selectAll(sql);
 		List<AddressRow> rows = null;
 		try {
-			rows = mapper.selectAddressById("4403060080011800284");
+			rows = mapper.selectAddress();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

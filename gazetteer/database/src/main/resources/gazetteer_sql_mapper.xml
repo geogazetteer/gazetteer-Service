@@ -4,4 +4,7 @@
      <select id="selectAddressById" parameterType="String" resultType="AddressRow">
         select * from dmdz where building_id = #{id,javaType=String,jdbcType=VARCHAR}
     </select>
+    <select id="selectAddress" resultType="AddressRow">
+        select * from dmdz limit 10
+    </select>
 </mapper>
