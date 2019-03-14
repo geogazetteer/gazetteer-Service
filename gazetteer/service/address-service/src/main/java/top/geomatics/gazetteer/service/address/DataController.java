@@ -5,12 +5,14 @@ import java.io.IOException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import top.geomatics.gazetteer.service.utils.ExcelUtil;
+import io.swagger.annotations.ApiOperation;
+import top.geomatics.utils.ExcelUtil;
 
+//数据导入导出
 @RestController
 @RequestMapping("/data")
 public class DataController {
-	// 将数据导出到excel表
+	@ApiOperation(value = "将数据导出到excel表", notes = "将数据导出到excel表")
 	@RequestMapping("/output")
 	public String output() {
 		ExcelUtil excelUtil = new ExcelUtil();
@@ -23,7 +25,7 @@ public class DataController {
 		return "数据导出成功";
 	}
 
-	// 导入数据
+	@ApiOperation(value = "导出数据", notes = "导出数据")
 	@RequestMapping("/input")
 	public String input() {
 
