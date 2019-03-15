@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import com.alibaba.fastjson.JSON;
@@ -27,83 +28,73 @@ import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.service.utils.IndexUtil;
 import top.geomatics.gazetteer.service.utils.SqlliteUtil;
 
-
 /**
  * SearcherController 
- * 
  * @author whudyj
- *
  */
-@Controller
-@RequestMapping("/")
+@RestController
+@RequestMapping("/address")
 public class SearcherController {
 
-	// 创建数据库连接
-	//SqlliteUtil sqlliteUtil = new SqlliteUtil();
 	private static DatabaseHelper helper = new DatabaseHelper();
 	private static SqlSession session=helper.getSession();
 	private static AddressMapper mapper=session.getMapper(AddressMapper.class);
+//	private SqlliteUtil sqlliteUtil;
 
-	@ApiOperation(value = "查询全部数据（测试前10条）", notes = "查询全部数据（测试前10条）")
-	@GetMapping("/address")
-	public @ResponseBody String address() {
-		// 测试前10条数据
-		//String sql = "select * from dmdz limit 10";
-		//List list = sqlliteUtil.selectAll(sql);
-		List<AddressRow> rows = null;
-		try {
-			rows = mapper.selectAddressById("4403060080011800284");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		// 使用阿里巴巴的fastjson
+//	@ApiOperation(value = "鏌ヨ鍏ㄩ儴鏁版嵁锛堟祴璇曞墠10鏉★級", notes = "鏌ヨ鍏ㄩ儴鏁版嵁锛堟祴璇曞墠10鏉★級")
+//	@GetMapping("/selectById")
+//	public String selectById(@RequestParam String id) {
+//		// 娴嬭瘯鍓�10鏉℃暟鎹�
+//		List<AddressRow> rows = null;
+//		try {
+//			rows = mapper.selectAddressById("4403060080011800284");
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		// 浣跨敤闃块噷宸村反鐨刦astjson
+//		String json = JSON.toJSONString(rows);
+//		System.out.println(json);
+//		return json;
+//	}
+
+	@ApiOperation(value = "鏍规嵁璇︾粏鍦板潃address鏌ヨ", notes = "鏍规嵁璇︾粏鍦板潃address鏌ヨ")
+	@GetMapping("/selectByAddress")
+	public String selectByAddress(@RequestParam String address) {
+		List<AddressRow> rows = mapper.selectByAddress(address);
 		String json = JSON.toJSONString(rows);
 		System.out.println(json);
 		return json;
 	}
 
-//	@ApiOperation(value = "根据详细地址address查询", notes = "根据详细地址address查询")
-//	@GetMapping("/selectByAddress")
-//	public @ResponseBody String selectByAddress(@RequestParam String address) {
-//		// 广东省深圳市龙华区民治街道龙塘社区上塘农贸建材市场L25号铁皮房
-//		List list = sqlliteUtil.selectByAddress("dmdz", address);
-//		String json = JSON.toJSONString(list);
-//		System.out.println(json);
-//		return json;
-//	}
-//
-//	@ApiOperation(value = "根据地理编码code查询", notes = "根据地理编码code查询")
-//	@GetMapping("/selectByCode")
-//	public @ResponseBody String selectByCode(@RequestParam String code) {
-//		// 44030600960102T0117
-//		List list = sqlliteUtil.selectByCode("dmdz", code);
-//		String json = JSON.toJSONString(list);
-//		System.out.println(json);
-//		return json;
-//	}
-
-//	@ApiOperation(value = "根据关键词查询", notes = "根据关键词查询")
-//	@GetMapping("/selectByKeyword")
-//	public @ResponseBody String selectByKeyword(@RequestParam String keyword) {
-//		List list = sqlliteUtil.selectByKeyword("dmdz", keyword);
-//		String json = JSON.toJSONString(list);
-//		System.out.println(json);
-//		return json;
-//	}
-
-	// （测试上芬社区龙屋新村三巷8号508）1270毫秒
-	@ApiOperation(value = "模糊查询", notes = "模糊查询")
-	@GetMapping("/selectByAddressLike")
-	public String selectByAddressLike(@RequestParam(value = "keyWord") String keyWord) {
-		SqlliteUtil sqlliteUtil = new SqlliteUtil();
-		long start = System.currentTimeMillis();
-		String s = JSON.toJSONString(sqlliteUtil.fuzzyQuery(keyWord));
-		long end = System.currentTimeMillis();
-		System.out.println("直接模糊搜索共经历的时间：毫秒  " + (end - start));
-		return s;
+	@ApiOperation(value = "鏍规嵁鍦扮悊缂栫爜code鏌ヨ", notes = "鏍规嵁鍦扮悊缂栫爜code鏌ヨ")
+	@GetMapping("/selectByCode")
+	public  String selectByCode(@RequestParam(value="code") String code) {
+		List<AddressRow> rows = mapper.selectByCode(code);
+		String json = JSON.toJSONString(rows);
+		System.out.println(json);
+		return json;
 	}
 
-	@ApiOperation(value = "根据lucene索引进行查询", notes = "根据lucene索引进行查询")
+	@ApiOperation(value = "鏍规嵁鍏抽敭璇嶆煡璇�", notes = "鏍规嵁鍏抽敭璇嶆煡璇�")
+	@GetMapping("/selectByKeyword")
+	public String selectByKeyword(@RequestParam String keyword) {
+		List<AddressRow> rows = mapper.selectByKeyword(keyword);
+		String json = JSON.toJSONString(rows);
+		System.out.println(json);
+		return json;
+	}
+
+	 
+//	@ApiOperation(value = "妯＄硦鏌ヨ", notes = "妯＄硦鏌ヨ")
+//	@GetMapping("/selectByAddressLike")
+//	public String selectByAddressLike(@RequestParam(value = "keyWord") String keyWord) {
+//		List<AddressRow> rows = mapper.fuzzyQuery(keyword);
+//		String json = JSON.toJSONString(rows);
+//		System.out.println(json);
+//		return json;
+//	}
+
+	@ApiOperation(value = "鏍规嵁lucene绱㈠紩杩涜鏌ヨ", notes = "鏍规嵁lucene绱㈠紩杩涜鏌ヨ")
 	@GetMapping("/selectAddressBylucene")
 	public String selectAddressBylucene(@RequestParam(value = "keyWord") String keyWord) {
 		String json = null;
@@ -116,7 +107,7 @@ public class SearcherController {
 			Long start = System.currentTimeMillis();
 			TopDocs topDocs = indexSearcher.search(query, 10);
 			Long end = System.currentTimeMillis();
-			System.out.println("lucene搜索共经历的时间：毫秒  " + (end - start));
+			System.out.println("lucene鎼滅储鍏辩粡鍘嗙殑鏃堕棿锛氭绉�  " + (end - start));
 			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 				Document doc = indexSearcher.doc(scoreDoc.doc);
 				list.add(doc.get("address"));
@@ -130,40 +121,40 @@ public class SearcherController {
 
 	}
 
-//	@ApiOperation(value = "返回所有街道", notes = "返回所有街道")
-//	@GetMapping("/streets")
-//	public @ResponseBody String streets() {
-//		List list = sqlliteUtil.selectstreets();
-//		String json = JSON.toJSONString(list);
-//		System.out.println(json);
-//		return json;
-//	}
-//
-//	@ApiOperation(value = "返回所有社区", notes = "返回所有社区")
-//	@GetMapping("/communities")
-//	public @ResponseBody String communities() {
-//		List list = sqlliteUtil.selectcommunities();
-//		String json = JSON.toJSONString(list);
-//		System.out.println(json);
-//		return json;
-//	}
-//
-//	@ApiOperation(value = "返回所有建筑物", notes = "返回所有建筑物")
-//	@GetMapping("/buildings")
-//	public @ResponseBody String buildings() {
-//		List list = sqlliteUtil.selectbuildings();
-//		String json = JSON.toJSONString(list);
-//		System.out.println(json);
-//		return json;
-//	}
-//
-//	@ApiOperation(value = "返回所有房屋", notes = "返回所有房屋")
-//	@GetMapping("/houses")
-//	public @ResponseBody String houses() {
-//		List list = sqlliteUtil.selecthouses();
-//		String json = JSON.toJSONString(list);
-//		System.out.println(json);
-//		return json;
-//	}
+	@ApiOperation(value = "杩斿洖鎵�鏈夎閬�", notes = "杩斿洖鎵�鏈夎閬�")
+	@GetMapping("/streets")
+	public  String streets() {
+		List<AddressRow> rows= mapper.selectstreets();
+		String json = JSON.toJSONString(rows);
+		System.out.println(json);
+		return json;
+	}
+
+	@ApiOperation(value = "杩斿洖鎵�鏈夌ぞ鍖�", notes = "杩斿洖鎵�鏈夌ぞ鍖�")
+	@GetMapping("/communities")
+	public  String communities() {
+		List<AddressRow> rows= mapper.selectcommunities();
+		String json = JSON.toJSONString(rows);
+		System.out.println(json);
+		return json;
+	}
+
+	@ApiOperation(value = "杩斿洖鎵�鏈夊缓绛戠墿", notes = "杩斿洖鎵�鏈夊缓绛戠墿")
+	@GetMapping("/buildings")
+	public  String buildings() {
+		List<AddressRow> rows = mapper.selectbuildings();
+		String json = JSON.toJSONString(rows);
+		System.out.println(json);
+		return json;
+	}
+
+	@ApiOperation(value = "杩斿洖鎵�鏈夋埧灞�", notes = "杩斿洖鎵�鏈夋埧灞�")
+	@GetMapping("/houses")
+	public  String houses() {
+		List<AddressRow> rows = mapper.selecthouses();
+		String json = JSON.toJSONString(rows);
+		System.out.println(json);
+		return json;
+	}
 
 }

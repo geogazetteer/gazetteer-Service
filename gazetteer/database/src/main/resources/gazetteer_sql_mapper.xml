@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="top.geomatics.gazetteer.database.AddressMapper">
-     <select id="selectAddressById" parameterType="String" resultType="AddressRow">
-        select * from dmdz where building_id = #{id,javaType=String,jdbcType=VARCHAR}
+    
+    
+    <select id="selectByAddress" parameterType="String" resultType="AddressRow">
+        select * from dmdz where address = #{address}
+    </select>
+    
+    <select id="selectByCode" parameterType="String" resultType="AddressRow">
+        select * from dmdz where code = #{code}
+    </select>
+    
+    <select id="selectstreets"  resultType="AddressRow">
+        select distinct street from dmdz 
+    </select>
+    
+    <select id="selectcommunities"  resultType="AddressRow">
+        select distinct community from dmdz 
+    </select>
+    
+    <select id="selectbuildings"  resultType="AddressRow">
+        select distinct building from dmdz 
+    </select>
+    <select id="selecthouses"  resultType="AddressRow">
+        select distinct house_id from dmdz 
     </select>
 </mapper>

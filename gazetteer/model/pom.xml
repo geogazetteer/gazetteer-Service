@@ -3,8 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<!-- 父POM -->
-	<!-- <parent> <groupId>top.geomatics.gazetteer</groupId> <artifactId>gazetteer</artifactId> 
-		<version>0.0.2-SNAPSHOT</version> </parent> -->
+	<parent>
+		<groupId>top.geomatics.gazetteer</groupId>
+		<artifactId>gazetteer</artifactId>
+		<version>0.0.2-SNAPSHOT</version>
+	</parent>
+	
 	<!-- 模型模块 -->
 	<groupId>top.geomatics.gazetteer.model</groupId>
 	<artifactId>gs-model</artifactId>

@@ -28,7 +28,7 @@ public class SqlliteUtil {
         try {
             Class.forName("org.sqlite.JDBC");
             // 本地测试，注意修改sqlite数据库文件的地址
-            connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\peiyuyu\\Desktop\\11\\data\\dmdz_sqlite.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\chenfa\\Desktop\\dmdz_sqlite.db");
             System.out.println("[SQL LITE]: 获取到sqlite的jdbc连接： " + connection);
         } catch (Exception e) {
             System.err.println("[SQL LITE]: 获取sqlite的jdbc连接失败");

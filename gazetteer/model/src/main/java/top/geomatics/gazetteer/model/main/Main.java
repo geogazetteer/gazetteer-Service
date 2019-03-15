@@ -59,7 +59,8 @@ public class Main {
 		name.setAdminName("23号");
 		abBuilding.setName(name);
 		abBuilding.setCode("4403060080041400023");
-
+		
+		System.out.println(name);
 		// 6位的房屋编码没有
 
 	}
