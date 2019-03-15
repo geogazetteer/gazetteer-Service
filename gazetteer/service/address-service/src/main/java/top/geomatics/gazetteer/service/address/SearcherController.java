@@ -40,10 +40,7 @@ public class SearcherController {
 	private static SqlSession session=helper.getSession();
 	private static AddressMapper mapper=session.getMapper(AddressMapper.class);
 
-
-
-
-	@ApiOperation(value = "鏍规嵁璇︾粏鍦板潃address鏌ヨ", notes = "鏍规嵁璇︾粏鍦板潃address鏌ヨ")
+	@ApiOperation(value = "根据地址查询", notes = "根据地址查询")
 	@GetMapping("/selectByAddress")
 	public String selectByAddress(@RequestParam String address) {
 		List<AddressRow> rows = mapper.selectByAddress(address);
@@ -53,7 +50,7 @@ public class SearcherController {
 		return json;
 	}
 
-	@ApiOperation(value = "鏍规嵁鍦扮悊缂栫爜code鏌ヨ", notes = "鏍规嵁鍦扮悊缂栫爜code鏌ヨ")
+	@ApiOperation(value = "根据地理编码查询", notes = "根据地理编码查询")
 	@GetMapping("/selectByCode")
 	public  String selectByCode(@RequestParam(value="code") String code) {
 		List<AddressRow> rows = mapper.selectByCode(code);
@@ -62,7 +59,7 @@ public class SearcherController {
 		return json;
 	}
 
-	@ApiOperation(value = "鏍规嵁鍏抽敭璇嶆煡璇�", notes = "鏍规嵁鍏抽敭璇嶆煡璇�")
+	@ApiOperation(value = "根据关键词查询", notes = "根据关键词查询")
 	@GetMapping("/selectByKeyword")
 	public String selectByKeyword(@RequestParam String keyword) {
 		List<AddressRow> rows = mapper.selectByKeyword(keyword);
@@ -72,7 +69,7 @@ public class SearcherController {
 	}
 
 
-	@ApiOperation(value = "鏍规嵁lucene绱㈠紩杩涜鏌ヨ", notes = "鏍规嵁lucene绱㈠紩杩涜鏌ヨ")
+	@ApiOperation(value = "根据lucene索引查询", notes = "根据lucene索引查询")
 	@GetMapping("/selectAddressBylucene")
 	public String selectAddressBylucene(@RequestParam(value = "keyWord") String keyWord) {
 		String json = null;
@@ -85,7 +82,7 @@ public class SearcherController {
 			Long start = System.currentTimeMillis();
 			TopDocs topDocs = indexSearcher.search(query, 10);
 			Long end = System.currentTimeMillis();
-			System.out.println("lucene鎼滅储鍏辩粡鍘嗙殑鏃堕棿锛氭绉�  " + (end - start));
+			System.out.println("lucene耗时" + (end - start));
 			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 				Document doc = indexSearcher.doc(scoreDoc.doc);
 				list.add(doc.get("address"));
@@ -99,7 +96,7 @@ public class SearcherController {
 
 	}
 
-	@ApiOperation(value = "杩斿洖鎵�鏈夎閬�", notes = "杩斿洖鎵�鏈夎閬�")
+	@ApiOperation(value = "获取街道", notes = "获取街道")
 	@GetMapping("/streets")
 	public  String streets() {
 		List<AddressRow> rows= mapper.selectstreets();
@@ -108,7 +105,7 @@ public class SearcherController {
 		return json;
 	}
 
-	@ApiOperation(value = "杩斿洖鎵�鏈夌ぞ鍖�", notes = "杩斿洖鎵�鏈夌ぞ鍖�")
+	@ApiOperation(value = "获取社区", notes = "获取社区")
 	@GetMapping("/communities")
 	public  String communities() {
 		List<AddressRow> rows= mapper.selectcommunities();
@@ -117,7 +114,7 @@ public class SearcherController {
 		return json;
 	}
 
-	@ApiOperation(value = "杩斿洖鎵�鏈夊缓绛戠墿", notes = "杩斿洖鎵�鏈夊缓绛戠墿")
+	@ApiOperation(value = "获取建筑物", notes = "获取建筑物")
 	@GetMapping("/buildings")
 	public  String buildings() {
 		List<AddressRow> rows = mapper.selectbuildings();
@@ -126,7 +123,7 @@ public class SearcherController {
 		return json;
 	}
 
-	@ApiOperation(value = "杩斿洖鎵�鏈夋埧灞�", notes = "杩斿洖鎵�鏈夋埧灞�")
+	@ApiOperation(value = "获取房屋信息", notes = "获取房屋信息")
 	@GetMapping("/houses")
 	public  String houses() {
 		List<AddressRow> rows = mapper.selecthouses();
