@@ -1,15 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>top.geomatics.gazetteer</groupId>
-    <artifactId>gazetteer</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
-  </parent>
-  <groupId>top.geomatics.gazetteer.utilities</groupId>
-  <artifactId>utilities</artifactId>
-  <packaging>pom</packaging>
-  <name>gazetteer utilities</name>
-  <modules>
-  	<module>csv2geopackage</module>
-  </modules>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<!-- <parent> <groupId>top.geomatics.gazetteer</groupId> <artifactId>gazetteer</artifactId> 
+		<version>0.0.2-SNAPSHOT</version> </parent> -->
+	<groupId>top.geomatics.gazetteer.utilities</groupId>
+	<artifactId>gs-utilities</artifactId>
+	<packaging>pom</packaging>
+	<name>gazetteer utilities</name>
+	<version>0.0.2-SNAPSHOT</version>
+	<url>https://github.com/geogazetteer/gazetteer-Service</url>
+	<modules>
+		<module>addressUtils</module>
+		<module>databaseUtils</module>
+	</modules>
 </project>

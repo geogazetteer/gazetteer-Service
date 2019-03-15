@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>top.geomatics.gazetteer.utilities</groupId>
+		<artifactId>gs-utilities</artifactId>
+		<version>0.0.2-SNAPSHOT</version>
+	</parent>
+	<groupId>top.geomatics.gazetteer.utilities.address</groupId>
+	<artifactId>gs-addressUtils</artifactId>
+	<name>addressUtils</name>
+	<description>gazetteer utilities for database</description>
+	<url>https://github.com/geogazetteer/gazetteer-Service</url>
+	<packaging>jar</packaging>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<commons_text.version>1.5</commons_text.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+		</dependency>
+	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-text</artifactId>
+				<version>${commons_text.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>
