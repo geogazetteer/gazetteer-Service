@@ -12,7 +12,7 @@ import top.geomatics.gazetteer.model.AddressRow;
  *
  */
 public interface AddressMapper {
-	//public List<AddressRow> selectAddressById(String id);
+
 	//根据详细地址查询
 	public List<AddressRow> selectByAddress(String address);
 	//根据地理编码查询
@@ -29,6 +29,8 @@ public interface AddressMapper {
 	public List<AddressRow> selectbuildings();
 	public List<AddressRow> selecthouses();
 	
+	public List<AddressRow> selectAddressForDictionary() throws Exception;
+
 
 		
 }

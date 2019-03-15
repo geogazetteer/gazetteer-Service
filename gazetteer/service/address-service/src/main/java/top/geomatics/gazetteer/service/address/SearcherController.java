@@ -39,28 +39,15 @@ public class SearcherController {
 	private static DatabaseHelper helper = new DatabaseHelper();
 	private static SqlSession session=helper.getSession();
 	private static AddressMapper mapper=session.getMapper(AddressMapper.class);
-//	private SqlliteUtil sqlliteUtil;
 
-//	@ApiOperation(value = "鏌ヨ鍏ㄩ儴鏁版嵁锛堟祴璇曞墠10鏉★級", notes = "鏌ヨ鍏ㄩ儴鏁版嵁锛堟祴璇曞墠10鏉★級")
-//	@GetMapping("/selectById")
-//	public String selectById(@RequestParam String id) {
-//		// 娴嬭瘯鍓�10鏉℃暟鎹�
-//		List<AddressRow> rows = null;
-//		try {
-//			rows = mapper.selectAddressById("4403060080011800284");
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		// 浣跨敤闃块噷宸村反鐨刦astjson
-//		String json = JSON.toJSONString(rows);
-//		System.out.println(json);
-//		return json;
-//	}
+
+
 
 	@ApiOperation(value = "鏍规嵁璇︾粏鍦板潃address鏌ヨ", notes = "鏍规嵁璇︾粏鍦板潃address鏌ヨ")
 	@GetMapping("/selectByAddress")
 	public String selectByAddress(@RequestParam String address) {
 		List<AddressRow> rows = mapper.selectByAddress(address);
+		// 使用阿里巴巴的fastjson
 		String json = JSON.toJSONString(rows);
 		System.out.println(json);
 		return json;
@@ -84,15 +71,6 @@ public class SearcherController {
 		return json;
 	}
 
-	 
-//	@ApiOperation(value = "妯＄硦鏌ヨ", notes = "妯＄硦鏌ヨ")
-//	@GetMapping("/selectByAddressLike")
-//	public String selectByAddressLike(@RequestParam(value = "keyWord") String keyWord) {
-//		List<AddressRow> rows = mapper.fuzzyQuery(keyword);
-//		String json = JSON.toJSONString(rows);
-//		System.out.println(json);
-//		return json;
-//	}
 
 	@ApiOperation(value = "鏍规嵁lucene绱㈠紩杩涜鏌ヨ", notes = "鏍规嵁lucene绱㈠紩杩涜鏌ヨ")
 	@GetMapping("/selectAddressBylucene")

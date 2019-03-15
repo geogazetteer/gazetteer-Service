@@ -1,39 +1,125 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>top.geomatics.gazetteer</groupId>
-    <artifactId>gazetteer</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
-  </parent>
-  <groupId>top.geomatics.gazetteer.segment</groupId>
-  <artifactId>segment</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>segment</name>
-  <url>http://maven.apache.org</url>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    
-  <dependency>
-    <groupId>org.ansj</groupId>
-    <artifactId>ansj_seg</artifactId>
-    <version>5.1.5</version>
-  </dependency>
-  
-  <dependency>
-    <groupId>com.hankcs</groupId>
-    <artifactId>hanlp</artifactId>
-    <version>portable-1.7.2</version>
-</dependency>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<!-- <parent> <groupId>top.geomatics.gazetteer</groupId> <artifactId>gazetteer</artifactId> 
+		<version>0.0.2-SNAPSHOT</version> </parent> -->
+	<groupId>top.geomatics.gazetteer.segment</groupId>
+	<artifactId>gs-segment</artifactId>
+	<version>0.0.2-SNAPSHOT</version>
+	<name>gazetteer word segment</name>
 
-  </dependencies>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<gazetteer.version>0.0.2-SNAPSHOT</gazetteer.version>
+		<ansj_seg.version>5.1.5</ansj_seg.version>
+		<hanlp.version>portable-1.7.2</hanlp.version>
+		<opencsv_version>4.5</opencsv_version>
+	</properties>
+	<dependencies>
+		<!-- 增加对model模块的依赖 -->
+		<dependency>
+			<groupId>top.geomatics.gazetteer.model</groupId>
+			<artifactId>gs-model</artifactId>
+		</dependency>
+		<!-- 增加对database模块的依赖 -->
+		<dependency>
+			<groupId>top.geomatics.gazetteer.database</groupId>
+			<artifactId>gs-database</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.ansj</groupId>
+			<artifactId>ansj_seg</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hankcs</groupId>
+			<artifactId>hanlp</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-lang3</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>top.geomatics.gazetteer.model</groupId>
+				<artifactId>gs-model</artifactId>
+				<version>${gazetteer.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.ansj</groupId>
+				<artifactId>ansj_seg</artifactId>
+				<version>${ansj_seg.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hankcs</groupId>
+				<artifactId>hanlp</artifactId>
+				<version>${hanlp.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>top.geomatics.gazetteer.database</groupId>
+				<artifactId>gs-database</artifactId>
+				<version>${gazetteer.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.opencsv</groupId>
+				<artifactId>opencsv</artifactId>
+				<version>${opencsv_version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources/library</directory>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/*.dic</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>top.geomatics.gazetteer.segment.DictionaryCreator</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
