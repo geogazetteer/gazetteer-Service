@@ -66,6 +66,7 @@ public class SHP2GPKG {
 	 */
 	public static void main(String[] args) {
 		if (args.length != 2) {
+			System.out.println("Usage: java -jar XXX.jar H:\\projects\\gazetteer\\data\\深圳龙华地名地址\\建筑物\\龙华区楼栋2000\\龙华区楼栋.shp d:\\data\\LH_gazetteer.gpkg");
 			System.exit(0);
 		}
 		readShapefile(args[0]);

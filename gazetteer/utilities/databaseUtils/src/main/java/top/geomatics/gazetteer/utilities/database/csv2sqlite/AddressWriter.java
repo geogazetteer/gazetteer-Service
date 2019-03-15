@@ -46,7 +46,10 @@ public class AddressWriter implements Runnable {
             sqlString = "drop table if exists " + tableName;// 如果表已经存在，则先删除
             statement.executeUpdate(sqlString);
             sqlString = "create table " + tableName + "(";
-            String insertString = "insert into " + tableName + " values(";
+            //id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sqlString += "id INTEGER PRIMARY KEY AUTOINCREMENT, ";
+            //String insertString = "insert into " + tableName + " values(";
+            String insertString = "insert into " + tableName + " values(?,";
             for (int i = 0; i < schema.getFieldLength(); i++) {
                 sqlString += schema.getFields()[i];
                 insertString += "?";
@@ -83,8 +86,9 @@ public class AddressWriter implements Runnable {
             }
             if (null != record) {
                 try {
+                	pstmt.setNull(1, 1);
                     for (int i = 0; i < record.getFieldLength(); i++) {
-                        pstmt.setString(i + 1, record.getValues()[i]);
+                        pstmt.setString(i + 2, record.getValues()[i]);
                     }
                     pstmt.addBatch();
                     count++;

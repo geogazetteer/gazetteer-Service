@@ -14,6 +14,8 @@ public class CSV2SQLITE {
     public static void main(String[] args) {
         // 判断命令行参数是否为2
         if (args.length != 2) {
+        	System.out.println("Usage:java -jar XXX.jar " + 
+        "H:\\projects\\gazetteer\\data\\csv\\dmdz.csv D:\\data\\LH_gazetteer.gpkg");
             System.exit(0);
         }
 

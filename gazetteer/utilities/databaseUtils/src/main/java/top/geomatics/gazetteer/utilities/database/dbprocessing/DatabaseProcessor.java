@@ -30,6 +30,7 @@ public class DatabaseProcessor {
     public static void main(String[] args) {
         // 判断命令行参数是否为1
         if (args.length != 1) {
+        	System.out.println("Usage: java -jar XXX.jar d:\\data\\LH_gazetteer.gpkg");
             System.exit(0);
         }
         strConn += args[0];
@@ -72,7 +73,7 @@ public class DatabaseProcessor {
         ResultSet rs = null;
         String tName = "district";
         String dropString = "drop table if exists " + tName;// 如果表已经存在，则先删除
-        String createString = "create table " + tName + "(street string)";
+        String createString = "create table " + tName + "(ID INTEGER PRIMARY KEY   AUTOINCREMENT, street string)";
         try {
             rs = statement.executeQuery(slqString);
             while (rs.next()) {
@@ -85,14 +86,15 @@ public class DatabaseProcessor {
             if (streetMap.size() < 1) {
                 return;
             }
-            // 创建表LH_district
+            // 创建表district
             System.out.println("创建数据表：" + tName + "......");
             statement.executeUpdate(dropString);
             statement.executeUpdate(createString);
-            String insertString = "insert into " + tName + " values(?)";
+            String insertString = "insert into " + tName + " values(?,?)";
             pstmt = connection.prepareStatement(insertString);
             for (String keyString : streetMap.keySet()) {
-                pstmt.setString(1, keyString);
+            	pstmt.setNull(1, 1);
+                pstmt.setString(2, keyString);
                 pstmt.addBatch();
             }
             pstmt.executeBatch();
@@ -117,7 +119,7 @@ public class DatabaseProcessor {
             ResultSet rs = null;
             String tName = keyString;
             String dropString = "drop table if exists " + tName;// 如果表已经存在，则先删除
-            String createString = "create table " + tName + " (community string)";
+            String createString = "create table " + tName + " (ID INTEGER PRIMARY KEY   AUTOINCREMENT, community string)";
             try {
                 rs = statement.executeQuery(slqString);
                 while (rs.next()) {
@@ -134,10 +136,11 @@ public class DatabaseProcessor {
                 System.out.println("创建数据表：" + tName + "......");
                 statement.executeUpdate(dropString);
                 statement.executeUpdate(createString);
-                String insertString = "insert into " + tName + " values(?)";
+                String insertString = "insert into " + tName + " values(?,?)";
                 pstmt = connection.prepareStatement(insertString);
                 for (String cString : communityMap.keySet()) {
-                    pstmt.setString(1, cString);
+                	pstmt.setNull(1, 1);
+                    pstmt.setString(2, cString);
                     pstmt.addBatch();
                 }
                 pstmt.executeBatch();
@@ -183,22 +186,23 @@ public class DatabaseProcessor {
                     tName = tName.replace("(" , "_");
                     tName = tName.replace(")" , "_");
                     String dropString = "drop table if exists " + tName;// 如果表已经存在，则先删除
-                    String createString = "create table " + tName
-                            + " (code string ,building_id string ,village string,building string,address string)";
+                    String createString = "create table " + tName 
+                            + " (ID INTEGER PRIMARY KEY   AUTOINCREMENT, code string ,building_id string ,village string,building string,address string)";
                     // 创建表
                     System.out.println("创建数据表：" + tName + "......");
                     statement.executeUpdate(dropString);
                     statement.executeUpdate(createString);
                     rs2 = statement.executeQuery(slq3);
-                    String insertString = "insert into " + tName + " values(?,?,?,?,?)";
+                    String insertString = "insert into " + tName + " values(?,?,?,?,?,?)";
                     pstmt = connection.prepareStatement(insertString);
                     while (rs2.next()) {
-                        pstmt.setString(1, rs2.getString(1));
-                        pstmt.setString(2, rs2.getString(2));
-                        pstmt.setString(3, rs2.getString(3));
-                        pstmt.setString(4, rs2.getString(4));
-                        pstmt.setString(5, rs2.getString(5));
-                        // pstmt.setString(6, rs2.getString(6));
+                    	pstmt.setNull(1, 1);
+                        pstmt.setString(2, rs2.getString(1));
+                        pstmt.setString(3, rs2.getString(2));
+                        pstmt.setString(4, rs2.getString(3));
+                        pstmt.setString(5, rs2.getString(4));
+                        pstmt.setString(6, rs2.getString(5));
+                        // pstmt.setString(7, rs2.getString(6));
                         pstmt.addBatch();
                     }
                     pstmt.executeBatch();
