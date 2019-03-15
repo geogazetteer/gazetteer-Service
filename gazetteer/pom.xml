@@ -19,11 +19,11 @@
 	<!-- 项目包含的模块 -->
 	<modules>
 		<module>model</module>
+		<module>utilities</module>
+		<module>segment</module>
 		<module>database</module>
 		<module>web</module>
 		<module>service</module>
-		<module>utilities</module>
-		<module>segment</module>
 	</modules>
 	<!-- 依赖第三方库的版本 -->
 	<properties>

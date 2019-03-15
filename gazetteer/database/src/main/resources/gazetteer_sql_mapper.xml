@@ -7,4 +7,7 @@
     <select id="selectAddress" resultType="AddressRow">
         select * from dmdz limit 10
     </select>
+    <select id="selectAddressForDictionary" resultType="AddressRow">
+        select street,community,road,road_num,village,building,address from dmdz
+    </select>
 </mapper>

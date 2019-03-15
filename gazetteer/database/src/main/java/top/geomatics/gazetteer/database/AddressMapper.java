@@ -14,5 +14,6 @@ import top.geomatics.gazetteer.model.AddressRow;
 public interface AddressMapper {
 	public List<AddressRow> selectAddressById(String id) throws Exception;
 	public List<AddressRow> selectAddress() throws Exception;
+	public List<AddressRow> selectAddressForDictionary() throws Exception;
 
 }
