@@ -3,8 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<!-- 父POM -->
-	<!-- <parent> <groupId>top.geomatics.gazetteer</groupId> <artifactId>gazetteer</artifactId> 
-		<version>0.0.2-SNAPSHOT</version> </parent> -->
+	<parent>
+		<groupId>top.geomatics.gazetteer</groupId>
+		<artifactId>gazetteer</artifactId>
+		<version>0.0.2-SNAPSHOT</version>
+	</parent>
+
 	<!-- 本模块Maven坐标 -->
 	<groupId>top.geomatics.gazetteer.database</groupId>
 	<artifactId>gs-database</artifactId>
@@ -14,15 +18,13 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<sqlite_jdbc.version>3.25.2</sqlite_jdbc.version>
-		<mybatis.version>3.5.0</mybatis.version>
 	</properties>
 
 	<dependencies>
-		<!-- 增加对model模块的依赖 -->
 		<dependency>
 			<groupId>top.geomatics.gazetteer.model</groupId>
 			<artifactId>gs-model</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.xerial</groupId>
@@ -31,47 +33,43 @@
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>
+			<version>3.5.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<version>3.25.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.47</version>
+		</dependency>
+		
 	</dependencies>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>top.geomatics.gazetteer.model</groupId>
-				<artifactId>gs-model</artifactId>
-				<version>0.0.2-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>org.xerial</groupId>
-				<artifactId>sqlite-jdbc</artifactId>
-				<version>${sqlite_jdbc.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mybatis</groupId>
-				<artifactId>mybatis</artifactId>
-				<version>${mybatis.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+
 
 	<build>
-		<resources>  
-            <resource>  
-                <directory>src/main/resources</directory>  
-                <includes>  
-                    <include>**/*.properties</include>  
-                    <include>**/*.xml</include>  
-                 </includes>  
-                <filtering>false</filtering>  
-            </resource>  
-            <resource>  
-                <directory>src/main/java</directory>  
-                <includes>  
-                    <include>**/*.properties</include>  
-                    <include>**/*.xml</include>  
-                </includes>  
-                <filtering>false</filtering>  
-            </resource>  
-        </resources>  
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
 	</build>
 
 </project>

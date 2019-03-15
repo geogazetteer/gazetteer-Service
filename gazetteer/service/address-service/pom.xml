@@ -4,13 +4,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<!-- 父POM -->
-	<!--
-	<parent>
-		<groupId>top.geomatics.gazetteer.service</groupId>
-		<artifactId>gs-service</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
-	</parent>
-	-->
+	<!-- <parent> <groupId>top.geomatics.gazetteer.service</groupId> <artifactId>gs-service</artifactId> 
+		<version>0.0.2-SNAPSHOT</version> </parent> -->
 	<!-- 引入Spring boot框架 -->
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -25,7 +20,7 @@
 	<name>Address Service</name>
 	<description>Address Service</description>
 	<version>0.0.2-SNAPSHOT</version>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gazetteer.version>0.0.2-SNAPSHOT</gazetteer.version>
@@ -52,11 +47,29 @@
 			<scope>test</scope>
 		</dependency>
 
+
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.25</version>
+			<scope>test</scope>
+		</dependency>
+
+
 		<!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
 		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
+			<version>3.25.2</version>
 		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-core -->
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
