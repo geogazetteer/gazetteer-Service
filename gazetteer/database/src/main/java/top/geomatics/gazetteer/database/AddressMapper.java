@@ -4,6 +4,9 @@
 package top.geomatics.gazetteer.database;
 
 import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
 
 import top.geomatics.gazetteer.model.AddressRow;
 
@@ -13,6 +16,10 @@ import top.geomatics.gazetteer.model.AddressRow;
  */
 public interface AddressMapper {
 
+	//搜索所有地址
+	public List<AddressRow> selectAllAddress();
+	//搜索所有地址，返回limit个结果
+	public List<AddressRow> selectAllAddressWithLimit(int limit);
 	//根据详细地址查询
 	public List<AddressRow> selectByAddress(String address);
 	//根据地理编码查询
@@ -30,6 +37,9 @@ public interface AddressMapper {
 	public List<AddressRow> selecthouses();
 	
 	public List<AddressRow> selectAddressForDictionary() throws Exception;
+	
+	public List<AddressRow> findEquals(Map<String, Object> map);
+	public List<AddressRow> findLike(Map<String, Object> map);
 
 
 		

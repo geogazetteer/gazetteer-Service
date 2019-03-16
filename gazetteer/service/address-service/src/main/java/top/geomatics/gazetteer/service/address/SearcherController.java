@@ -29,7 +29,8 @@ import top.geomatics.gazetteer.service.utils.IndexUtil;
 import top.geomatics.gazetteer.service.utils.SqlliteUtil;
 
 /**
- * SearcherController 
+ * SearcherController
+ * 
  * @author whudyj
  */
 @RestController
@@ -37,8 +38,38 @@ import top.geomatics.gazetteer.service.utils.SqlliteUtil;
 public class SearcherController {
 
 	private static DatabaseHelper helper = new DatabaseHelper();
-	private static SqlSession session=helper.getSession();
-	private static AddressMapper mapper=session.getMapper(AddressMapper.class);
+	private static SqlSession session = helper.getSession();
+	private static AddressMapper mapper = session.getMapper(AddressMapper.class);
+
+	@GetMapping("/all")
+	public String selectAllAddress() {
+		List<AddressRow> rows = mapper.selectAllAddress();
+		// 使用阿里巴巴的fastjson
+		return JSON.toJSONString(rows);
+	}
+
+	@GetMapping("/page")
+	public String selectAllAddressWithLimit(@RequestParam(value="limit",required = true) int limit) {
+		List<AddressRow> rows = mapper.selectAllAddressWithLimit(limit);
+		return JSON.toJSONString(rows);
+	}
+
+	// 任意给定一组关键词进行搜索
+	@GetMapping("/searcher/all")
+	public String selectAllAddressWithKeywords(@RequestParam(value="keyword",required = true) String keywords) {
+		List<AddressRow> rows = mapper.selectAllAddress();
+		// 关键词匹配，?key=<关键词>;<关键词>……
+		return JSON.toJSONString(rows);
+	}
+
+	// 任意给定一组关键词进行搜索
+	@GetMapping("/searcher/page")
+	public String selectAllAddressWithKeywordsAndLimit(@RequestParam(value="keyword",required = true)
+			String keywords,@RequestParam(value="limit",required = true) int limit) {
+		List<AddressRow> rows = mapper.selectAllAddressWithLimit(limit);
+		// 关键词匹配，?key=<关键词>;<关键词>……
+		return JSON.toJSONString(rows);
+	}
 
 	@ApiOperation(value = "根据地址查询", notes = "根据地址查询")
 	@GetMapping("/selectByAddress")
@@ -52,7 +83,7 @@ public class SearcherController {
 
 	@ApiOperation(value = "根据地理编码查询", notes = "根据地理编码查询")
 	@GetMapping("/selectByCode")
-	public  String selectByCode(@RequestParam(value="code") String code) {
+	public String selectByCode(@RequestParam(value = "code") String code) {
 		List<AddressRow> rows = mapper.selectByCode(code);
 		String json = JSON.toJSONString(rows);
 		System.out.println(json);
@@ -67,7 +98,6 @@ public class SearcherController {
 		System.out.println(json);
 		return json;
 	}
-
 
 	@ApiOperation(value = "根据lucene索引查询", notes = "根据lucene索引查询")
 	@GetMapping("/selectAddressBylucene")
@@ -98,8 +128,8 @@ public class SearcherController {
 
 	@ApiOperation(value = "获取街道", notes = "获取街道")
 	@GetMapping("/streets")
-	public  String streets() {
-		List<AddressRow> rows= mapper.selectstreets();
+	public String streets() {
+		List<AddressRow> rows = mapper.selectstreets();
 		String json = JSON.toJSONString(rows);
 		System.out.println(json);
 		return json;
@@ -107,8 +137,8 @@ public class SearcherController {
 
 	@ApiOperation(value = "获取社区", notes = "获取社区")
 	@GetMapping("/communities")
-	public  String communities() {
-		List<AddressRow> rows= mapper.selectcommunities();
+	public String communities() {
+		List<AddressRow> rows = mapper.selectcommunities();
 		String json = JSON.toJSONString(rows);
 		System.out.println(json);
 		return json;
@@ -116,7 +146,7 @@ public class SearcherController {
 
 	@ApiOperation(value = "获取建筑物", notes = "获取建筑物")
 	@GetMapping("/buildings")
-	public  String buildings() {
+	public String buildings() {
 		List<AddressRow> rows = mapper.selectbuildings();
 		String json = JSON.toJSONString(rows);
 		System.out.println(json);
@@ -125,7 +155,7 @@ public class SearcherController {
 
 	@ApiOperation(value = "获取房屋信息", notes = "获取房屋信息")
 	@GetMapping("/houses")
-	public  String houses() {
+	public String houses() {
 		List<AddressRow> rows = mapper.selecthouses();
 		String json = JSON.toJSONString(rows);
 		System.out.println(json);
