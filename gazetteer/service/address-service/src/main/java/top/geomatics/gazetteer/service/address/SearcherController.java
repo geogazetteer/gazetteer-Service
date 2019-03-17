@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.websocket.server.PathParam;
 
+import org.apache.ibatis.javassist.expr.NewArray;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -29,6 +30,7 @@ import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
 import top.geomatics.gazetteer.database.AddressMapper;
 import top.geomatics.gazetteer.database.DatabaseHelper;
+
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.service.utils.IndexUtil;
 import top.geomatics.gazetteer.service.utils.SqlliteUtil;
@@ -409,6 +411,8 @@ public class SearcherController {
 //	@ApiOperation(value = "根据lucene索引查询", notes = "根据lucene索引查询")
 //	@GetMapping("/selectAddressBylucene")
 //	public String selectAddressBylucene(@RequestParam(value = "keyWord") String keyWord) {
+//		LuceneUtil luceneUtil=new	LuceneUtil();
+//		return luceneUtil.selectAddressBylucene(keyWord);
 //		String json = null;
 //		try {
 //			List<String> list = new ArrayList<String>();
