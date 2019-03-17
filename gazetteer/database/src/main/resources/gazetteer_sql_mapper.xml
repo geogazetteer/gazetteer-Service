@@ -160,43 +160,43 @@
         FROM ${sql_tablename} 
         <where> 
             <if test="province != null">
-                province = #{province}
+                province LIKE #{province}
             </if>
             <if test="city != null">
-                AND city = #{city}
+                AND city LIKE #{city}
             </if> 
             <if test="district != null">
-                AND district = #{district}
+                AND district LIKE #{district}
             </if> 
             <if test="street != null">
-                AND street = #{street}
+                AND street LIKE #{street}
             </if> 
             <if test="community != null">
-                AND community = #{community}
+                AND community LIKE #{community}
             </if> 
             <if test="address != null">
                 AND address LIKE #{address}
             </if>
             <if test="address_id != null">
-                AND address_id = #{address_id}
+                AND address_id LIKE #{address_id}
             </if>
             <if test="building != null">
                 AND building LIKE #{building}
             </if>
             <if test="building_id != null">
-                AND building_id = #{building_id}
+                AND building_id LIKE #{building_id}
             </if>
             <if test="code != null">
-                AND code = #{code}
+                AND code LIKE #{code}
             </if>     
             <if test="road != null">
                 AND road LIKE #{road}
             </if> 
             <if test="road_num != null">
-                AND road_num = #{road_num}
+                AND road_num LIKE #{road_num}
             </if>
             <if test="village != null">
-                AND village = #{village}
+                AND village LIKE #{village}
             </if>  
         </where>
         <if test="sql_orderBy != null">

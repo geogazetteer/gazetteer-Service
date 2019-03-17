@@ -27,7 +27,7 @@ public class Test {
 //		map.put("sql_limit", "3");
 		map.put("sql_orderBy", "id DESC");
 		
-		List<AddressRow> list=mapper.findLike(map);
+		List<AddressRow> list=mapper.findEquals(map);
 		String json = JSON.toJSONString(list);
 		System.out.println(json);
 	}

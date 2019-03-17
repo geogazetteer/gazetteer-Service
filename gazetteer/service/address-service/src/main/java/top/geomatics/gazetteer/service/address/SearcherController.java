@@ -1,7 +1,11 @@
 package top.geomatics.gazetteer.service.address;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.websocket.server.PathParam;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.lucene.document.Document;
@@ -13,6 +17,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.util.Version;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,125 +46,391 @@ public class SearcherController {
 	private static SqlSession session = helper.getSession();
 	private static AddressMapper mapper = session.getMapper(AddressMapper.class);
 
-	@GetMapping("/all")
-	public String selectAllAddress() {
-		List<AddressRow> rows = mapper.selectAllAddress();
-		// 使用阿里巴巴的fastjson
-		return JSON.toJSONString(rows);
-	}
+	private static Map<String, Object> getRequestMap(String fields, String tablename, AddressRow row, String orderby,
+			int limit) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("sql_fields", fields);
+		map.put("sql_tablename", tablename);
+		if (null != row) {
+			// 13个字段
+			String province = row.getProvince();
+			String city = row.getCity();
+			String district = row.getDistrict();
+			String street = row.getStreet();
+			String community = row.getCommunity();
+			String address = row.getAddress();
+			String address_id = row.getAddress_id();
+			String building = row.getBuilding();
+			String building_id = row.getBuilding_id();
+			String code = row.getCode();
+			String road = row.getRoad();
+			String road_num = row.getRoad_num();
+			String village = row.getVillage();
 
-	@GetMapping("/page")
-	public String selectAllAddressWithLimit(@RequestParam(value="limit",required = true) int limit) {
-		List<AddressRow> rows = mapper.selectAllAddressWithLimit(limit);
-		return JSON.toJSONString(rows);
-	}
-
-	// 任意给定一组关键词进行搜索
-	@GetMapping("/searcher/all")
-	public String selectAllAddressWithKeywords(@RequestParam(value="keyword",required = true) String keywords) {
-		List<AddressRow> rows = mapper.selectAllAddress();
-		// 关键词匹配，?key=<关键词>;<关键词>……
-		return JSON.toJSONString(rows);
-	}
-
-	// 任意给定一组关键词进行搜索
-	@GetMapping("/searcher/page")
-	public String selectAllAddressWithKeywordsAndLimit(@RequestParam(value="keyword",required = true)
-			String keywords,@RequestParam(value="limit",required = true) int limit) {
-		List<AddressRow> rows = mapper.selectAllAddressWithLimit(limit);
-		// 关键词匹配，?key=<关键词>;<关键词>……
-		return JSON.toJSONString(rows);
-	}
-
-	@ApiOperation(value = "根据地址查询", notes = "根据地址查询")
-	@GetMapping("/selectByAddress")
-	public String selectByAddress(@RequestParam String address) {
-		List<AddressRow> rows = mapper.selectByAddress(address);
-		// 使用阿里巴巴的fastjson
-		String json = JSON.toJSONString(rows);
-		System.out.println(json);
-		return json;
-	}
-
-	@ApiOperation(value = "根据地理编码查询", notes = "根据地理编码查询")
-	@GetMapping("/selectByCode")
-	public String selectByCode(@RequestParam(value = "code") String code) {
-		List<AddressRow> rows = mapper.selectByCode(code);
-		String json = JSON.toJSONString(rows);
-		System.out.println(json);
-		return json;
-	}
-
-	@ApiOperation(value = "根据关键词查询", notes = "根据关键词查询")
-	@GetMapping("/selectByKeyword")
-	public String selectByKeyword(@RequestParam String keyword) {
-		List<AddressRow> rows = mapper.selectByKeyword(keyword);
-		String json = JSON.toJSONString(rows);
-		System.out.println(json);
-		return json;
-	}
-
-	@ApiOperation(value = "根据lucene索引查询", notes = "根据lucene索引查询")
-	@GetMapping("/selectAddressBylucene")
-	public String selectAddressBylucene(@RequestParam(value = "keyWord") String keyWord) {
-		String json = null;
-		try {
-			List<String> list = new ArrayList<String>();
-			IndexSearcher indexSearcher = IndexUtil.init();
-			QueryParser queryParser = new QueryParser(Version.LUCENE_47, "address", new IKAnalyzer(true));
-//          String q="select ADDRESS from dmdz where ADDRESS like '%"+keyWord+"%' limit 0,10";
-			Query query = queryParser.parse(keyWord);
-			Long start = System.currentTimeMillis();
-			TopDocs topDocs = indexSearcher.search(query, 10);
-			Long end = System.currentTimeMillis();
-			System.out.println("lucene耗时" + (end - start));
-			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-				Document doc = indexSearcher.doc(scoreDoc.doc);
-				list.add(doc.get("address"));
-			}
-			json = JSON.toJSONString(list);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			return json;
+			if (province != null && !province.isEmpty())
+				map.put("province", province);
+			if (city != null && !city.isEmpty())
+				map.put("city", city);
+			if (district != null && !district.isEmpty())
+				map.put("district", district);
+			if (street != null && !street.isEmpty())
+				map.put("street", street);
+			if (community != null && !community.isEmpty())
+				map.put("community", community);
+			if (address != null && !address.isEmpty())
+				map.put("address", address);
+			if (address_id != null && !address_id.isEmpty())
+				map.put("address_id", address_id);
+			if (building != null && !building.isEmpty())
+				map.put("building", building);
+			if (building_id != null && !building_id.isEmpty())
+				map.put("building_id", building_id);
+			if (code != null && !code.isEmpty())
+				map.put("code", code);
+			if (road != null && !road.isEmpty())
+				map.put("road", road);
+			if (road_num != null && !road_num.isEmpty())
+				map.put("road_num", road_num);
+			if (village != null && !village.isEmpty())
+				map.put("village", village);
 		}
 
+		if (orderby != null && !orderby.isEmpty())
+			map.put("sql_orderBy", orderby);
+		if (limit > 0)
+			map.put("sql_limit", limit);
+		return map;
 	}
 
-	@ApiOperation(value = "获取街道", notes = "获取街道")
-	@GetMapping("/streets")
-	public String streets() {
-		List<AddressRow> rows = mapper.selectstreets();
-		String json = JSON.toJSONString(rows);
-		System.out.println(json);
-		return json;
+	/**
+	 * url:/all?fields={field}&tablename={tablename}&orderby={orderby}&limit={limit}
+	 * examples: /all/?fields=id,address&tablename=民治社区
+	 * 
+	 * @return
+	 */
+	@GetMapping("/all")
+	public String selectAll(@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "dmdz") String tablename,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit, AddressRow row) {
+		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
+		List<AddressRow> rows = mapper.findEquals(map);
+		// 使用阿里巴巴的fastjson
+		return JSON.toJSONString(rows);
 	}
 
-	@ApiOperation(value = "获取社区", notes = "获取社区")
-	@GetMapping("/communities")
-	public String communities() {
-		List<AddressRow> rows = mapper.selectcommunities();
-		String json = JSON.toJSONString(rows);
-		System.out.println(json);
-		return json;
+	/**
+	 * url:/{district}/{street}?fields={field}&orderby={orderby}&limit={limit}
+	 * examples: http://localhost:8080/address/龙华区/民治街道?limit=5
+	 * 
+	 * @return
+	 */
+	@GetMapping("/{district}/{street}")
+	public String selectByStreetNode(@PathVariable(value = "district", required = false) String path_district,
+			@PathVariable(value = "street", required = true) String path_street,
+			// @PathVariable(value ="community",required = true) String path_community,
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			// @RequestParam(value = "tablename", required = false, defaultValue = "dmdz")
+			// String tablename,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
+		// Map<String, Object> map = getRequestMap(fields, tablename, null, orderby,
+		// limit);
+		Map<String, Object> map = getRequestMap(fields, path_street, null, orderby, limit);
+		List<AddressRow> rows = mapper.findEquals(map);
+		// 使用阿里巴巴的fastjson
+		return JSON.toJSONString(rows);
 	}
 
-	@ApiOperation(value = "获取建筑物", notes = "获取建筑物")
-	@GetMapping("/buildings")
-	public String buildings() {
-		List<AddressRow> rows = mapper.selectbuildings();
-		String json = JSON.toJSONString(rows);
-		System.out.println(json);
-		return json;
+	/**
+	 * url:/{district}/{street}/{community}?fields={field}&orderby={orderby}&limit={limit}
+	 * examples: http://localhost:8080/address/龙华区/民治街道/民治社区?limit=5
+	 * 
+	 * @return
+	 */
+	@GetMapping("/{district}/{street}/{community}")
+	public String selectByCommunityNode(@PathVariable(value = "district", required = false) String path_district,
+			@PathVariable(value = "street", required = false) String path_street,
+			@PathVariable(value = "community", required = true) String path_community,
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			// @RequestParam(value = "tablename", required = false, defaultValue = "dmdz")
+			// String tablename,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
+		// Map<String, Object> map = getRequestMap(fields, tablename, null, orderby,
+		// limit);
+		Map<String, Object> map = getRequestMap(fields, path_community, null, orderby, limit);
+		List<AddressRow> rows = mapper.findEquals(map);
+		// 使用阿里巴巴的fastjson
+		return JSON.toJSONString(rows);
 	}
 
-	@ApiOperation(value = "获取房屋信息", notes = "获取房屋信息")
-	@GetMapping("/houses")
-	public String houses() {
-		List<AddressRow> rows = mapper.selecthouses();
-		String json = JSON.toJSONString(rows);
-		System.out.println(json);
-		return json;
+	/**
+	 * url:/searcher?fields={field}&tablename={tablename} \
+	 * &address={address}&code={code}... \ &orderby={orderby}&limit={limit}
+	 * examples:
+	 * /searcher/?fields=id,address&tablename=民治社区&address=广东省深圳市龙华区民治街道民治社区沙吓村六巷7栋
+	 * 
+	 * @return
+	 */
+	@GetMapping("/searcher")
+	public String selectWithConditions(
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "dmdz") String tablename,
+			@RequestParam(value = "province", required = false, defaultValue = "") String province,
+			@RequestParam(value = "city", required = false, defaultValue = "") String city,
+			@RequestParam(value = "district", required = false, defaultValue = "") String district,
+			@RequestParam(value = "street", required = false, defaultValue = "") String street,
+			@RequestParam(value = "community", required = false, defaultValue = "") String community,
+			@RequestParam(value = "address", required = false, defaultValue = "") String address,
+			@RequestParam(value = "address_id", required = false, defaultValue = "") String address_id,
+			@RequestParam(value = "building", required = false, defaultValue = "") String building,
+			@RequestParam(value = "building_id", required = false, defaultValue = "") String building_id,
+			@RequestParam(value = "code", required = false, defaultValue = "") String code,
+			@RequestParam(value = "road", required = false, defaultValue = "") String road,
+			@RequestParam(value = "road_num", required = false, defaultValue = "") String road_num,
+			@RequestParam(value = "village", required = false, defaultValue = "") String village,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
+		AddressRow row = new AddressRow();
+		row.setProvince(province);
+		row.setCity(city);
+		row.setDistrict(district);
+		row.setStreet(street);
+		row.setCommunity(community);
+		row.setAddress(address);
+		row.setAddress_id(address_id);
+		row.setBuilding(building);
+		row.setBuilding_id(building_id);
+		row.setCode(code);
+		row.setRoad(road);
+		row.setRoad_num(road_num);
+		row.setVillage(village);
+		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
+		List<AddressRow> rows = mapper.findEquals(map);
+		return JSON.toJSONString(rows);
 	}
+
+	/**
+	 * url:/searcher?fields={field}&tablename={tablename} \
+	 * &address={address}&code={code}... \ &orderby={orderby}&limit={limit}
+	 * examples: /searcher/?fields=id,address&tablename=民治社区&address=%沙吓村六巷7栋%
+	 * 
+	 * @return
+	 */
+	@GetMapping("/fuzzysearcher")
+	public String fuzzySelectWithConditions(
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "dmdz") String tablename,
+			@RequestParam(value = "province", required = false, defaultValue = "") String province,
+			@RequestParam(value = "city", required = false, defaultValue = "") String city,
+			@RequestParam(value = "district", required = false, defaultValue = "") String district,
+			@RequestParam(value = "street", required = false, defaultValue = "") String street,
+			@RequestParam(value = "community", required = false, defaultValue = "") String community,
+			@RequestParam(value = "address", required = false, defaultValue = "") String address,
+			@RequestParam(value = "address_id", required = false, defaultValue = "") String address_id,
+			@RequestParam(value = "building", required = false, defaultValue = "") String building,
+			@RequestParam(value = "building_id", required = false, defaultValue = "") String building_id,
+			@RequestParam(value = "code", required = false, defaultValue = "") String code,
+			@RequestParam(value = "road", required = false, defaultValue = "") String road,
+			@RequestParam(value = "road_num", required = false, defaultValue = "") String road_num,
+			@RequestParam(value = "village", required = false, defaultValue = "") String village,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit,
+			@RequestParam(value = "simtype", required = false, defaultValue = "0") int simtype,
+			@RequestParam(value = "similarity", required = false, defaultValue = "0.0") double similarity) {
+		AddressRow row = new AddressRow();
+		row.setProvince(province);
+		row.setCity(city);
+		row.setDistrict(district);
+		row.setStreet(street);
+		row.setCommunity(community);
+		row.setAddress(address);
+		row.setAddress_id(address_id);
+		row.setBuilding(building);
+		row.setBuilding_id(building_id);
+		row.setCode(code);
+		row.setRoad(road);
+		row.setRoad_num(road_num);
+		row.setVillage(village);
+		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
+		List<AddressRow> rows = mapper.findLike(map);
+		// 计算相似性
+		if (0 != simtype && similarity > 0.0) {
+
+		}
+		return JSON.toJSONString(rows);
+	}
+
+	/**
+	 * examples:
+	 * 
+	 * @param address
+	 * @return
+	 */
+	@ApiOperation(value = "根据地址ID查询", notes = "获取对应地址的信息")
+	@GetMapping("/id/{address_id}")
+	public String selectByAddressId(@PathVariable(value = "address_id", required = true) String address_id,
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "dmdz") String tablename,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
+		AddressRow aRow = new AddressRow();
+		aRow.setAddress_id(address_id);
+
+		return selectAll(fields, tablename, orderby, limit, aRow);
+	}
+
+	/**
+	 * examples:http://localhost:8080/address/code/44030600960102T0117?limit=5
+	 * 
+	 * @param code
+	 * @return
+	 */
+	@ApiOperation(value = "根据地址编码查询", notes = "获取对应地址的信息")
+	@GetMapping("/code/{code}")
+	public String selectByCode(@PathVariable(value = "code", required = true) String code,
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "dmdz") String tablename,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
+		AddressRow aRow = new AddressRow();
+		aRow.setCode(code);
+		return selectAll(fields, tablename, orderby, limit, aRow);
+	}
+
+	/**
+	 * examples:http://localhost:8080/address/street/民治街道?limit=5
+	 * 
+	 * @return
+	 */
+	@ApiOperation(value = "根据街道名称查询", notes = "获取对应街道的所有地址信息")
+	@GetMapping("/street/{street}")
+	public String selectByStreet(@PathVariable(value = "street", required = true) String street,
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "dmdz") String tablename,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
+		AddressRow aRow = new AddressRow();
+		aRow.setStreet(street);
+		return selectAll(fields, tablename, orderby, limit, aRow);
+	}
+
+	/**
+	 * examples:http://localhost:8080/address/community/龙塘社区?limit=5
+	 * 
+	 * @param community
+	 * @return
+	 */
+	@ApiOperation(value = "根据社区名称查询", notes = "获取对应社区的所有地址信息")
+	@GetMapping("/community/{community}")
+	public String selectByCommunity(@PathVariable(value = "community", required = true) String community,
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "dmdz") String tablename,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
+		AddressRow aRow = new AddressRow();
+		aRow.setCommunity(community);
+		return selectAll(fields, tablename, orderby, limit, aRow);
+	}
+
+	/**
+	 * examples:http://localhost:8080/address/buildingID/44030600960102T0117?limit=5
+	 * 
+	 * @param building_id
+	 * @return
+	 */
+	@ApiOperation(value = "根据建筑物ID查询", notes = "获取对应建筑物的所有地址信息")
+	@GetMapping("/buildingID/{building_id}")
+	public String selectByBuildingId(@PathVariable(value = "building_id", required = true) String building_id,
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "dmdz") String tablename,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
+		AddressRow aRow = new AddressRow();
+		aRow.setBuilding_id(building_id);
+		return selectAll(fields, tablename, orderby, limit, aRow);
+	}
+
+	/**
+	 * examples:http://localhost:8080/address/building/L25号铁皮房?limit=5
+	 * 
+	 * @param building
+	 * @return
+	 */
+	@ApiOperation(value = "根据建筑物名称查询", notes = "获取对应建筑物的所有地址信息")
+	@GetMapping("/building/{building}")
+	public String selectByBuilding(@PathVariable(value = "building", required = true) String building,
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "dmdz") String tablename,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
+		AddressRow aRow = new AddressRow();
+		aRow.setBuilding(building);
+		return selectAll(fields, tablename, orderby, limit, aRow);
+	}
+
+	/**
+	 * examples:http://localhost:8080/address/village/上塘农贸建材市场?limit=5
+	 * 
+	 * @param village
+	 * @return
+	 */
+	@ApiOperation(value = "根据村名称查询", notes = "获取对应村名的所有地址信息")
+	@GetMapping("/village/{village}")
+	public String selectByVillage(@PathVariable(value = "village", required = true) String village,
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "dmdz") String tablename,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
+		AddressRow aRow = new AddressRow();
+		aRow.setVillage(village);
+		return selectAll(fields, tablename, orderby, limit, aRow);
+	}
+
+	/**
+	 * examples:http://localhost:8080/address/road/下围工业二路?limit=5
+	 * 
+	 * @param road
+	 * @return
+	 */
+	@ApiOperation(value = "根据道路名称查询", notes = "获取对应道路的所有地址信息")
+	@GetMapping("/road/{road}")
+	public String selectByRoad(@PathVariable(value = "road", required = true) String road,
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "dmdz") String tablename,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
+		AddressRow aRow = new AddressRow();
+		aRow.setRoad(road);
+		return selectAll(fields, tablename, orderby, limit, aRow);
+	}
+
+//	@ApiOperation(value = "根据lucene索引查询", notes = "根据lucene索引查询")
+//	@GetMapping("/selectAddressBylucene")
+//	public String selectAddressBylucene(@RequestParam(value = "keyWord") String keyWord) {
+//		String json = null;
+//		try {
+//			List<String> list = new ArrayList<String>();
+//			IndexSearcher indexSearcher = IndexUtil.init();
+//			QueryParser queryParser = new QueryParser(Version.LUCENE_47, "address", new IKAnalyzer(true));
+////          String q="select ADDRESS from dmdz where ADDRESS like '%"+keyWord+"%' limit 0,10";
+//			Query query = queryParser.parse(keyWord);
+//			Long start = System.currentTimeMillis();
+//			TopDocs topDocs = indexSearcher.search(query, 10);
+//			Long end = System.currentTimeMillis();
+//			System.out.println("lucene耗时" + (end - start));
+//			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+//				Document doc = indexSearcher.doc(scoreDoc.doc);
+//				list.add(doc.get("address"));
+//			}
+//			json = JSON.toJSONString(list);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			return json;
+//		}
+//
+//	}
 
 }
