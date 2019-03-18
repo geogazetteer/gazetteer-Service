@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -5,7 +6,7 @@
 	<!-- 父POM -->
 	<parent>
 		<groupId>top.geomatics.gazetteer</groupId>
-		<artifactId>gazetteer</artifactId>
+		<artifactId>gs-gazetteer</artifactId>
 		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 	
@@ -14,7 +15,6 @@
 	<artifactId>gs-model</artifactId>
 	<name>gazetteer-model</name>
 	<packaging>jar</packaging>
-	<version>0.0.2-SNAPSHOT</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
