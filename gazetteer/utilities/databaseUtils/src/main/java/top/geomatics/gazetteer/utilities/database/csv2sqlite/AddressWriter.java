@@ -75,6 +75,7 @@ public class AddressWriter implements Runnable {
      */
     public void run() {
         boolean isRunning = true;
+        long startTime=System.currentTimeMillis();   //获取开始时间
         while (isRunning) {
             AddressRecord record = null;
             try {
@@ -108,6 +109,8 @@ public class AddressWriter implements Runnable {
             pstmt.close();
             connection.close();
             System.out.println("提交数据结束！记录数：" + count);
+            long endTime=System.currentTimeMillis(); //获取结束时间
+            System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
         } catch (SQLException e) {
             e.printStackTrace();
         }

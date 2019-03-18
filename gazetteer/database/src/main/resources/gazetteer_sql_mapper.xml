@@ -238,4 +238,116 @@
         select street,community,road,road_num,village,building,address from dmdz
     </select>
     -->
+
+    <!--drop table-->
+    <update id="dropTable" parameterType="String">  
+        DROP TABLE IF EXISTS ${_parameter} 
+    </update>  
+    
+    <!--create table-->
+    <update id="createAddressTable" parameterType="String">  
+        CREATE TABLE ${_parameter} (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          address_id TEXT,
+          code TEXT,
+          building_id TEXT,
+          house_id TEXT,
+          province TEXT,
+          city TEXT,
+          district TEXT,
+          street TEXT,
+          community TEXT,
+          road TEXT,
+          road_num TEXT,
+          village TEXT,
+          building TEXT,
+          floor TEXT,
+          address TEXT,
+          update_address_date TEXT,
+          publish TEXT,
+          create_address_date TEXT
+          ) 
+    </update> 
+    
+    <!--insert into table-->
+    <insert id="insertAddress" parameterType="map">
+        insert into ${sql_tablename}
+        (
+          address_id ,
+          code ,
+          building_id ,
+          house_id ,
+          province ,
+          city ,
+          district ,
+          street ,
+          community ,
+          road ,
+          road_num ,
+          village ,
+          building ,
+          floor ,
+          address ,
+          update_address_date ,
+          publish ,
+          create_address_date 
+        )
+        values
+        (
+            #{address_id} ,
+            #{code} ,
+            #{building_id} ,
+            #{house_id} ,
+            #{province} ,
+            #{city} ,
+            #{district} ,
+            #{street} ,
+            #{community} ,
+            #{road} ,
+            #{road_num} ,
+            #{village} ,
+            #{building} ,
+            #{floor} ,
+            #{address} ,
+            #{update_address_date} ,
+            #{publish} ,
+            #{create_address_date}
+         )
+    </insert>
+
+    <update id="createDistrictTable" parameterType="String">  
+        CREATE TABLE ${_parameter} (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          street TEXT
+          ) 
+    </update> 
+    
+    <insert id="insertDistrict" parameterType="map">
+        insert into ${sql_tablename}
+        (
+          street 
+        )
+        values
+        (
+            #{street}
+         )
+    </insert>
+    <update id="createStreetTable" parameterType="String">  
+        CREATE TABLE ${_parameter} (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          community TEXT
+          ) 
+    </update> 
+    
+    <insert id="insertStreet" parameterType="map">
+        insert into ${sql_tablename}
+        (
+          community 
+        )
+        values
+        (
+            #{community}
+         )
+    </insert>
+
 </mapper>

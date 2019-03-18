@@ -41,6 +41,15 @@ public interface AddressMapper {
 	public List<AddressRow> findEquals(Map<String, Object> map);
 	public List<AddressRow> findLike(Map<String, Object> map);
 
-
+	//创建更新数据库表
+	public void dropTable(String tableName);
+	public void createAddressTable(String tableName);
+	public void insertAddress(Map<String, Object> map);
+	
+	public void createDistrictTable(String tableName);
+	public void insertDistrict(Map<String, Object> map);
+	
+	public void createStreetTable(String tableName);
+	public void insertStreet(Map<String, Object> map);
 		
 }

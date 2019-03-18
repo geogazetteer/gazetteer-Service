@@ -3,9 +3,11 @@
 <configuration>
     <!-- 引入外部配置文件 -->
     <properties resource="sqlite.properties"></properties>
+    <!--
     <settings>
-        <setting name="logImpl" value="STDOUT_LOGGING" />
+       <setting name="logImpl" value="STDOUT_LOGGING" /> 
     </settings>
+    -->
     <typeAliases>
         <typeAlias type="top.geomatics.gazetteer.model.AddressRow" alias="AddressRow"/>
     </typeAliases>
