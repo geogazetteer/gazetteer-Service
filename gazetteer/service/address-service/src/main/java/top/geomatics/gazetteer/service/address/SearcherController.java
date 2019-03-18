@@ -33,6 +33,7 @@ import top.geomatics.gazetteer.database.DatabaseHelper;
 
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.service.utils.IndexUtil;
+import top.geomatics.gazetteer.service.utils.LuceneUtil;
 import top.geomatics.gazetteer.service.utils.SqlliteUtil;
 
 /**
@@ -408,33 +409,11 @@ public class SearcherController {
 		return selectAll(fields, tablename, orderby, limit, aRow);
 	}
 
-//	@ApiOperation(value = "根据lucene索引查询", notes = "根据lucene索引查询")
-//	@GetMapping("/selectAddressBylucene")
-//	public String selectAddressBylucene(@RequestParam(value = "keyWord") String keyWord) {
-//		LuceneUtil luceneUtil=new	LuceneUtil();
-//		return luceneUtil.selectAddressBylucene(keyWord);
-//		String json = null;
-//		try {
-//			List<String> list = new ArrayList<String>();
-//			IndexSearcher indexSearcher = IndexUtil.init();
-//			QueryParser queryParser = new QueryParser(Version.LUCENE_47, "address", new IKAnalyzer(true));
-////          String q="select ADDRESS from dmdz where ADDRESS like '%"+keyWord+"%' limit 0,10";
-//			Query query = queryParser.parse(keyWord);
-//			Long start = System.currentTimeMillis();
-//			TopDocs topDocs = indexSearcher.search(query, 10);
-//			Long end = System.currentTimeMillis();
-//			System.out.println("lucene耗时" + (end - start));
-//			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-//				Document doc = indexSearcher.doc(scoreDoc.doc);
-//				list.add(doc.get("address"));
-//			}
-//			json = JSON.toJSONString(list);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		} finally {
-//			return json;
-//		}
-//
-//	}
+	@ApiOperation(value = "根据lucene索引查询", notes = "根据lucene索引查询")
+	@GetMapping("/selectAddressBylucene")
+	public String selectAddressBylucene(@RequestParam(value = "keyWord") String keyWord) {
+		LuceneUtil luceneUtil=new LuceneUtil();
+		return luceneUtil.selectAddressBylucene(keyWord);
+	}
 
 }

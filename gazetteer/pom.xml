@@ -22,7 +22,7 @@
 		<module>database</module>
 		<module>web</module>
 		<module>service</module>
-    <module>gs-lucene</module>
+        <module>gs-lucene</module>
   </modules>
 	<!-- 依赖第三方库的版本 -->
 	<properties>

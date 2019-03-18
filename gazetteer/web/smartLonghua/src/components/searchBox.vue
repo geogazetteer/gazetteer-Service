@@ -43,7 +43,7 @@
         <div class="right flex_col">
           <div class="address" v-html="ca.address"></div>
           <div class="small">楼栋编码：{{ca.code}}</div>
-          <div class="small detail">详细地址：{{ca.detail}}</div>
+          <div class="small detail">详细地址：{{ca.address}}</div>
         </div>
       </li>
 
@@ -222,24 +222,24 @@
           $this.showCard = false;//隐藏联想
           $this.needSpin = true;//显示spin
           //测试数据
-          setTimeout(function () {
-            $this.resultList = [
-              {id: 0, address: '搜索结果武汉市洪山区广八路',code:4403050070041900013,detail:'广东省深圳市南山区粤海街道深' +
-              '大社区白石路3883号深圳大学南校区深圳大学医学院'},
-              {id: 0, address: '搜索结果武汉市洪山区广八路',code:4403050070041900013,detail:'广东省深圳市南山区粤海街道深' +
-              '大社区白石路3883号深圳大学南校区深圳大学医学院'},
-            ];
-            $this.showResult = true;//显示搜索结果
-            $this.needSpin = false;//隐藏spin
-          },500)
-          //获取接口数据get方法的demo
-          var url = 'http://localhost:8000/address/select';
-         /* $this.$api.getSearchList(url).then(function (res) {
-            debugger
+          // setTimeout(function () {
+          //   $this.resultList = [
+          //     {id: 0, address: '搜索结果武汉市洪山区广八路',code:4403050070041900013,detail:'广东省深圳市南山区粤海街道深' +
+          //     '大社区白石路3883号深圳大学南校区深圳大学医学院'},
+          //     {id: 0, address: '搜索结果武汉市洪山区广八路',code:4403050070041900013,detail:'广东省深圳市南山区粤海街道深' +
+          //     '大社区白石路3883号深圳大学南校区深圳大学医学院'},
+          //   ];
+          //   $this.showResult = true;//显示搜索结果
+          //   $this.needSpin = false;//隐藏spin
+          // },500)
+          //获取接口数据get方法的demo 测试通过地理编码查询
+          var url = 'http://localhost:8080/address/code/'+this.searchContent;
+          $this.$api.getSearchList(url).then(function (res) {
+           debugger
            $this.resultList = res;
            $this.showResult = true;//显示搜索结果
            $this.needSpin = false;//隐藏spin
-           })*/
+           })
         } else {
 
         }
