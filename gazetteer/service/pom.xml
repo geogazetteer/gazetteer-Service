@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>top.geomatics.gazetteer</groupId>
-		<artifactId>gazetteer</artifactId>
+		<artifactId>gs-gazetteer</artifactId>
 		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 

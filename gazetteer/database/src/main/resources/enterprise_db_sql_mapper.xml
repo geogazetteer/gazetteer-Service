@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="top.geomatics.gazetteer.database.EnterpriseAddressMapper">
+    <!--drop table-->
+    <update id="dropTable" parameterType="String">  
+        DROP TABLE IF EXISTS ${_parameter} 
+    </update>  
+    
+    <!--create table-->
+    <update id="createAddressTable" parameterType="String">  
+        CREATE TABLE ${_parameter} (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          code TEXT,
+          name TEXT,
+          street TEXT,
+          owner TEXT,
+          address TEXT,
+          longitude double,
+          latitude double,
+          status int,
+          modifier TEXT,
+          update_date Date,
+          update_address TEXT,
+          update_address_id TEXT
+          ) 
+    </update> 
+    
+    <!--insert into table-->
+    <insert id="insertAddress" parameterType="map">
+        insert into ${sql_tablename}
+        (
+          code ,
+          name ,
+          street ,
+          owner ,
+          address ,
+          longitude ,
+          latitude ,
+          status ,
+          modifier ,
+          update_date ,
+          update_address ,
+          update_address_id
+        )
+        values
+        (
+            #{code} ,
+            #{name} ,
+            #{street} ,
+            #{owner} ,
+            #{address} ,
+            #{longitude} ,
+            #{latitude} ,
+            #{status} ,
+            #{modifier} ,
+            #{update_date} ,
+            #{update_address} ,
+            #{update_address_id} 
+         )
+    </insert>
+
+    <update  id="updateAddressModifier"  parameterType="map"  flushCache="true" 
+         statementType="PREPARED"  timeout="20">
+         update ${sql_tablename} set
+            status = #{status},
+            modifier = #{modifier},
+            update_date = #{update_date},
+            update_address = #{update_address}
+            update_address_id = #{update_address_id}
+        where code = #{code}
+    </update>
+    
+    <!--动态SQL-->
+    <select id="findEquals" resultType="EnterpriseRow">
+        SELECT ${sql_fields}
+        FROM ${sql_tablename}  
+        <where> 
+            <if test="code != null">
+                code = #{code}
+            </if>
+            <if test="name != null">
+                AND name = #{name}
+            </if> 
+            <if test="street != null">
+                AND street = #{street}
+            </if> 
+            <if test="owner != null">
+                AND owner = #{owner}
+            </if> 
+            <if test="address != null">
+                AND address = #{address}
+            </if> 
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="modifier != null">
+                AND modifier = #{modifier}
+            </if>
+            <if test="update_date != null">
+                AND update_date = #{update_date}
+            </if>
+        </where>
+        <if test="sql_orderBy != null">
+                ORDER BY  ${sql_orderBy}
+        </if>
+        <if test="sql_limit != null">
+                LIMIT  #{sql_limit}
+        </if>
+    </select>
+    <select id="findLike" resultType="EnterpriseRow">
+        SELECT ${sql_fields}
+        FROM ${sql_tablename} 
+        <where> 
+            <if test="code != null">
+                code LIKE #{code}
+            </if>
+            <if test="name != null">
+                AND name LIKE #{name}
+            </if> 
+            <if test="street != null">
+                AND street LIKE #{street}
+            </if> 
+            <if test="owner != null">
+                AND owner LIKE #{owner}
+            </if> 
+            <if test="address != null">
+                AND address LIKE #{address}
+            </if>
+            <if test="status != null">
+                AND status LIKE #{status}
+            </if>
+            <if test="modifier != null">
+                AND modifier LIKE #{modifier}
+            </if>
+            <if test="update_address != null">
+                AND update_address LIKE #{update_address}
+            </if>
+            <if test="update_address_id != null">
+                AND update_address_id LIKE #{update_address_id}
+            </if>     
+        </where>
+        <if test="sql_orderBy != null">
+                ORDER BY  ${sql_orderBy}
+        </if>
+        <if test="sql_limit != null">
+                LIMIT  #{sql_limit}
+        </if>
+    </select>
+ 
+</mapper>

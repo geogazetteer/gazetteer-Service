@@ -5,7 +5,7 @@
 	<!-- 父POM -->
 	<parent>
 		<groupId>top.geomatics.gazetteer</groupId>
-		<artifactId>gazetteer</artifactId>
+		<artifactId>gs-gazetteer</artifactId>
 		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 
@@ -14,7 +14,6 @@
 	<artifactId>gs-database</artifactId>
 	<packaging>jar</packaging>
 	<name>gazetteer database</name>
-	<version>0.0.2-SNAPSHOT</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -27,27 +26,20 @@
 			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.xerial</groupId>
-			<artifactId>sqlite-jdbc</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>
-			<version>3.5.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.25.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
-			<version>1.2.47</version>
 		</dependency>
-		
+
 	</dependencies>
 
 
@@ -72,4 +64,23 @@
 		</resources>
 	</build>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.mybatis</groupId>
+				<artifactId>mybatis</artifactId>
+				<version>3.5.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.xerial</groupId>
+				<artifactId>sqlite-jdbc</artifactId>
+				<version>3.25.2</version>
+			</dependency>
+			<dependency>
+				<groupId>com.alibaba</groupId>
+				<artifactId>fastjson</artifactId>
+				<version>1.2.47</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
