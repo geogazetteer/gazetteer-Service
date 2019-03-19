@@ -22,8 +22,8 @@
 		<module>segment</module>
 		<module>web</module>
 		<module>service</module>
-        <module>lucene</module>
-  </modules>
+ 		<module>lucene</module>
+	</modules>
 	<!-- 依赖第三方库的版本 -->
 	<properties>
 		<java.version>11</java.version>

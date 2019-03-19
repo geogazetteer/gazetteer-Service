@@ -8,6 +8,6 @@ public class Test {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-		System.out.println("Äã¹þ");
+		System.out.println("ï¿½ï¿½ï¿½");
 	}
 }

@@ -1,5 +1,11 @@
 package top.geomatics.gazetteer.lucene;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -17,92 +23,79 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import com.alibaba.fastjson.JSON;
 
 import top.geomatics.gazetteer.service.utils.SqlliteUtil;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.file.Paths;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.management.Query;
-
-
-
 //@Component
 public class LuceneUtil {
-    @Value("${index.path}")
-    public static String INDEX_PATH;
-    private Directory dir;
+	@Value("${index.path}")
+	public static String INDEX_PATH;
+	private Directory dir;
 
-    /**
-     * »ñÈ¡IndexWriterÊµÀý
-     *
-     * @return
-     * @throws Exception
-     */
-    private IndexWriter getWriter() throws Exception {
-        Analyzer analyzer = new IKAnalyzer(true); // µÚÈý·½·Ö´ÊÆ÷  °´×î´ó´Ê³¤½øÐÐ»®·Ö
-        IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_47,analyzer);
-        iwc.setRAMBufferSizeMB(16);
-        IndexWriter writer = new IndexWriter(dir, iwc);
-        return writer;
-    }
+	/**
+	 * ï¿½ï¿½È¡IndexWriterÊµï¿½ï¿½
+	 *
+	 * @return
+	 * @throws Exception
+	 */
+	private IndexWriter getWriter() throws Exception {
+		Analyzer analyzer = new IKAnalyzer(true); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ê³ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½
+		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_47, analyzer);
+		iwc.setRAMBufferSizeMB(16);
+		IndexWriter writer = new IndexWriter(dir, iwc);
+		return writer;
+	}
 
-    /**
-     * ¶¨Ê±¸üÐÂË÷Òý£¨Ã¿ÔÂ1ºÅ8µã¸üÐÂÒ»´ÎË÷Òý£©
-     *
-     * @throws Exception
-     */
+	/**
+	 * ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½1ï¿½ï¿½8ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 *
+	 * @throws Exception
+	 */
 
-    @Scheduled(cron = "0 0 8 1 * ? ")
-    public void updateIndex() throws Exception {
-        dir = FSDirectory.open(new File("D:\\lucene_index"));
-        IndexWriter writer = getWriter();
-        writer.deleteAll();
+	@Scheduled(cron = "0 0 8 1 * ? ")
+	public void updateIndex() throws Exception {
+		dir = FSDirectory.open(new File("D:\\lucene_index"));
+		IndexWriter writer = getWriter();
+		writer.deleteAll();
 
-        ResultSet resultSet = new SqlliteUtil().getResultSet();
-        while (resultSet.next()) {
-            Document doc = new Document();
-            doc.add(new StringField("code",resultSet.getString("CODE"),Field.Store.YES));
-            doc.add(new TextField("address" , resultSet.getString("ADDRESS"), Field.Store.YES));
-            writer.addDocument(doc); // Ìí¼ÓÎÄµµ
-        }
-        writer.close();
-    }
+		ResultSet resultSet = new SqlliteUtil().getResultSet();
+		while (resultSet.next()) {
+			Document doc = new Document();
+			doc.add(new StringField("code", resultSet.getString("CODE"), Field.Store.YES));
+			doc.add(new TextField("address", resultSet.getString("ADDRESS"), Field.Store.YES));
+			writer.addDocument(doc); // ï¿½ï¿½ï¿½ï¿½Äµï¿½
+		}
+		writer.close();
+	}
 
-    private IndexSearcher init() throws IOException {
-        IndexSearcher indexSearcher = null;
-        if (indexSearcher == null) {
-            // 1¡¢´´½¨Directory
-            Directory directory = FSDirectory.open(new File("E:\\lucene_index"));
-            // 2¡¢´´½¨IndexReader
-            DirectoryReader directoryReader = DirectoryReader.open(directory);
-            // 3¡¢¸ù¾ÝIndexReader´´½¨IndexSearch
-            indexSearcher = new IndexSearcher(directoryReader);
-        }
-        return indexSearcher;
-    }
+	private IndexSearcher init() throws IOException {
+		IndexSearcher indexSearcher = null;
+		if (indexSearcher == null) {
+			// 1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Directory
+			Directory directory = FSDirectory.open(new File("E:\\lucene_index"));
+			// 2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IndexReader
+			DirectoryReader directoryReader = DirectoryReader.open(directory);
+			// 3ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IndexReaderï¿½ï¿½ï¿½ï¿½IndexSearch
+			indexSearcher = new IndexSearcher(directoryReader);
+		}
+		return indexSearcher;
+	}
 
-    public String selectAddressBylucene( String keyWord) {
+	public String selectAddressBylucene(String keyWord) {
 		String json = null;
 		try {
 			List<String> list = new ArrayList<String>();
 			IndexSearcher indexSearcher = init();
 			QueryParser queryParser = new QueryParser(Version.LUCENE_47, "address", new IKAnalyzer(true));
-//          String q="select ADDRESS from dmdz where ADDRESS like '%"+keyWord+"%' limit 0,10";
+//        String q="select ADDRESS from dmdz where ADDRESS like '%"+keyWord+"%' limit 0,10";
 			org.apache.lucene.search.Query query = queryParser.parse(keyWord);
 			Long start = System.currentTimeMillis();
 			TopDocs topDocs = indexSearcher.search(query, 10);
 			Long end = System.currentTimeMillis();
-			System.out.println("luceneºÄÊ±" + (end - start));
+			System.out.println("luceneï¿½ï¿½Ê±" + (end - start));
 			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 				Document doc = indexSearcher.doc(scoreDoc.doc);
 				list.add(doc.get("address"));
@@ -113,8 +106,7 @@ public class LuceneUtil {
 		} finally {
 			return json;
 		}
-		
-    }
-    
-  
+
+	}
+
 }
