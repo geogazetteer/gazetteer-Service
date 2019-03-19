@@ -48,28 +48,6 @@
 		</dependency>
 
 
-		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.25</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.25</version>
-			<scope>test</scope>
-		</dependency>
-
-
-		<!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
-		<dependency>
-			<groupId>org.xerial</groupId>
-			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.25.2</version>
-		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-core -->
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
@@ -119,11 +97,8 @@
 			<artifactId>fastjson</artifactId>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>top.geomatics.gazetteer</groupId>
-			<artifactId>gs-lucene</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>top.geomatics.gazetteer</groupId> <artifactId>gs-lucene</artifactId> 
+			<version>0.0.2-SNAPSHOT</version> </dependency> -->
 	</dependencies>
 
 	<dependencyManagement>
@@ -190,4 +165,24 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<configuration>
+						<archive>
+							<manifest>
+								<mainClass>top.geomatics.gazetteer.service.address.AddressServiceApplication</mainClass>
+								<addClasspath>true</addClasspath>
+							</manifest>
+						</archive>
+						<classesDirectory>
+						</classesDirectory>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 </project>
