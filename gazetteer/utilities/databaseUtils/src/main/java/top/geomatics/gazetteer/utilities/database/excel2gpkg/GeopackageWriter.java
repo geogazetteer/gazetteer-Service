@@ -210,6 +210,7 @@ public class GeopackageWriter implements Runnable {
 				isRunning = false;
 				try {
 					geopkg.add(entry, new ListFeatureCollection(sfType, features));
+					geopkg.createSpatialIndex(entry);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
