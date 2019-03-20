@@ -78,9 +78,6 @@
             <if test="address != null">
                 AND address = #{address}
             </if> 
-            <if test="status != null">
-                AND status = #{status}
-            </if>
             <if test="modifier != null">
                 AND modifier = #{modifier}
             </if>
@@ -112,10 +109,7 @@
             <if test="status != null">
                 AND status = #{status}
             </if>
-            <if test="modifier != null">
-                AND modifier = #{modifier}
-            </if>
-            <if test="update_date != null">
+             <if test="update_date != null">
                 AND update_date = #{update_date}
             </if>
         </where>
@@ -145,9 +139,6 @@
             <if test="modifier != null">
                 AND modifier = #{modifier}
             </if>
-            <if test="update_date != null">
-                AND update_date = #{update_date}
-            </if>
         </where>
     </update>
     <update  id="updateAddress"  parameterType="map" >
@@ -165,9 +156,6 @@
             </if> 
             <if test="owner != null">
                 AND owner = #{owner}
-            </if> 
-            <if test="address != null">
-                AND address = #{address}
             </if> 
             <if test="status != null">
                 AND status = #{status}
@@ -233,16 +221,7 @@
             <if test="address != null">
                 AND address = #{address}
             </if> 
-            <if test="status != null">
-                AND status = #{status}
-            </if>
-            <if test="modifier != null">
-                AND modifier = #{modifier}
-            </if>
-            <if test="update_date != null">
-                AND update_date = #{update_date}
-            </if>
-        </where>
+      </where>
     </update>
     
     <!--动态SQL-->

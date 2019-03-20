@@ -18,19 +18,19 @@ public interface EnterpriseAddressMapper {
 
 	public void createAddressTable(String tableName);
 
-	public void insertAddress(Map<String, Object> map);
+	public Integer insertAddress(Map<String, Object> map);
 
-	public void updateStatus(Map<String, Object> map);
+	public Integer updateStatus(Map<String, Object> map);
 
-	public void updateModifier(Map<String, Object> map);
+	public Integer updateModifier(Map<String, Object> map);
 
-	public void updateDate(Map<String, Object> map);
+	public Integer updateDate(Map<String, Object> map);
 
-	public void updateAddress(Map<String, Object> map);
+	public Integer updateAddress(Map<String, Object> map);
 
-	public void updateAddressId(Map<String, Object> map);
+	public Integer updateAddressId(Map<String, Object> map);
 
-	public void updateAll(Map<String, Object> map);
+	public Integer updateAll(Map<String, Object> map);
 
 	// 查询数据库表
 	public List<EnterpriseRow> findEquals(Map<String, Object> map);

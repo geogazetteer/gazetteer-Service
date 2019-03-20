@@ -85,8 +85,9 @@ public class EditorController {
 	}
 
 	/**
-	 * url:/all?fields={field}&tablename={tablename}&orderby={orderby}&limit={limit}
-	 * examples: /all/?fields=id,address&tablename=民治社区
+	 * 
+	 * examples:
+	 * http://localhost:8080/editor/all?fields=code,name,address&tablename=enterprise1&limit=10
 	 * 
 	 * @return
 	 */
@@ -103,10 +104,9 @@ public class EditorController {
 	}
 
 	/**
-	 * url:/query?fields={field}&tablename={tablename} \
-	 * &address={address}&code={code}... \ &orderby={orderby}&limit={limit}
+	 * 
 	 * examples:
-	 * /query/?fields=fid,address&tablename=enterprise1&address=深圳市龙华区龙华街道东环一路天汇大厦B座906室
+	 * http://localhost:8080/editor/query?fields=code,name,address&tablename=enterprise1&address=深圳市龙华区龙华街道东环一路天汇大厦B座906室
 	 * 
 	 * @return
 	 */
@@ -143,10 +143,9 @@ public class EditorController {
 	}
 
 	/**
-	 * url:/fuzzyquery?fields={field}&tablename={tablename} \
-	 * &address={address}&code={code}... \ &orderby={orderby}&limit={limit}
+	 * 
 	 * examples:
-	 * /fuzzyquery?fields=id,address&tablename=enterprise1&address=%天汇大厦B座906室%
+	 * http://localhost:8080/editor/fuzzyquery?fields=code,name&tablename=enterprise1&address=%25天汇大厦B座906室%25&limit=10
 	 * 
 	 * @return
 	 */
@@ -219,7 +218,7 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/street/龙华
+	 * examples:http://localhost:8080/editor/street/龙华?limit=10
 	 * 
 	 * @param street
 	 * @return
@@ -309,14 +308,14 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/update/status/0?code=91440300MA5DK2PU7P&
+	 * examples:http://localhost:8080/editor/update/status/0?code=91440300MA5DK2PU7P
 	 * 
 	 * @param status
 	 * @return
 	 */
 	@ApiOperation(value = "更新状态", notes = "更新对应状态的数据")
 	@GetMapping("/update/status/{status}")
-	public void updateStatus(@PathVariable(value = "status", required = true) int status,
+	public String updateStatus(@PathVariable(value = "status", required = true) Integer status,
 			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
 			@RequestParam(value = "code", required = false, defaultValue = "") String code,
 			@RequestParam(value = "name", required = false, defaultValue = "") String name,
@@ -336,26 +335,27 @@ public class EditorController {
 		row.setModifier(modifier);
 
 		Map<String, Object> map = getRequestMap(null, tablename, row, null, 0);
-		mapper.updateStatus(map);
-		return;
+		Integer updatedRows = mapper.updateStatus(map);
+		session.commit(true);
+		return "Ok,updated rows:" + updatedRows;
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/update/status/0?code=91440300MA5DK2PU7P&
+	 * examples:http://localhost:8080/editor/update/modifier/Admin?code=91440300MA5DK2PU7P
 	 * 
 	 * @param modifier
 	 * @return
 	 */
 	@ApiOperation(value = "更新编辑者", notes = "更新对应编辑者的数据")
 	@GetMapping("/update/modifier/{modifier}")
-	public void updateModifier(@PathVariable(value = "modifier", required = true) String modifier,
+	public String updateModifier(@PathVariable(value = "modifier", required = true) String modifier,
 			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
 			@RequestParam(value = "code", required = false, defaultValue = "") String code,
 			@RequestParam(value = "name", required = false, defaultValue = "") String name,
 			@RequestParam(value = "street", required = false, defaultValue = "") String street,
 			@RequestParam(value = "owner", required = false, defaultValue = "") String owner,
 			@RequestParam(value = "address", required = false, defaultValue = "") String address,
-			@RequestParam(value = "status", required = false, defaultValue = "") int status,
+			@RequestParam(value = "status", required = false, defaultValue = "") Integer status,
 			@RequestParam(value = "update_date", required = false, defaultValue = "") String update_date) {
 		EnterpriseRow row = new EnterpriseRow();
 		row.setModifier(modifier);
@@ -367,8 +367,9 @@ public class EditorController {
 		row.setStatus(status);
 
 		Map<String, Object> map = getRequestMap(null, tablename, row, null, 0);
-		mapper.updateModifier(map);
-		return;
+		Integer updatedRows = mapper.updateModifier(map);
+		session.commit(true);
+		return "Ok,updated rows:" + updatedRows;
 	}
 
 	/**
@@ -379,14 +380,14 @@ public class EditorController {
 	 */
 	@ApiOperation(value = "更新编辑日期", notes = "更新对应编辑日期的数据")
 	@GetMapping("/update/update_date/{update_date}")
-	public void updateDate(@PathVariable(value = "update_date", required = true) String update_date,
+	public String updateDate(@PathVariable(value = "update_date", required = true) String update_date,
 			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
 			@RequestParam(value = "code", required = false, defaultValue = "") String code,
 			@RequestParam(value = "name", required = false, defaultValue = "") String name,
 			@RequestParam(value = "street", required = false, defaultValue = "") String street,
 			@RequestParam(value = "owner", required = false, defaultValue = "") String owner,
 			@RequestParam(value = "address", required = false, defaultValue = "") String address,
-			@RequestParam(value = "status", required = false, defaultValue = "") int status,
+			@RequestParam(value = "status", required = false, defaultValue = "") Integer status,
 			@RequestParam(value = "modifier", required = false, defaultValue = "") String modifier) {
 		EnterpriseRow row = new EnterpriseRow();
 		row.setUpdate_date(new Date());// 暂时用系统日期
@@ -399,8 +400,9 @@ public class EditorController {
 		row.setModifier(modifier);
 
 		Map<String, Object> map = getRequestMap(null, tablename, row, null, 0);
-		mapper.updateDate(map);
-		return;
+		Integer updatedRows = mapper.updateDate(map);
+		session.commit(true);
+		return "Ok,updated rows:" + updatedRows;
 	}
 
 	/**
@@ -411,14 +413,14 @@ public class EditorController {
 	 */
 	@ApiOperation(value = "更新地址", notes = "更新对应地址的数据")
 	@GetMapping("/update/update_address/{update_address}")
-	public void updateAddress(@PathVariable(value = "update_address", required = true) String update_address,
+	public String updateAddress(@PathVariable(value = "update_address", required = true) String update_address,
 			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
 			@RequestParam(value = "code", required = false, defaultValue = "") String code,
 			@RequestParam(value = "name", required = false, defaultValue = "") String name,
 			@RequestParam(value = "street", required = false, defaultValue = "") String street,
 			@RequestParam(value = "owner", required = false, defaultValue = "") String owner,
 			@RequestParam(value = "address", required = false, defaultValue = "") String address,
-			@RequestParam(value = "status", required = false, defaultValue = "") int status,
+			@RequestParam(value = "status", required = false, defaultValue = "") Integer status,
 			@RequestParam(value = "modifier", required = false, defaultValue = "") String modifier) {
 		EnterpriseRow row = new EnterpriseRow();
 		row.setUpdate_address(update_address);
@@ -431,8 +433,9 @@ public class EditorController {
 		row.setModifier(modifier);
 
 		Map<String, Object> map = getRequestMap(null, tablename, row, null, 0);
-		mapper.updateAddress(map);
-		return;
+		Integer updatedRows = mapper.updateAddress(map);
+		session.commit(true);
+		return "Ok,updated rows:" + updatedRows;
 	}
 
 	/**
@@ -443,14 +446,14 @@ public class EditorController {
 	 */
 	@ApiOperation(value = "更新地址编码", notes = "更新对应地址编码的数据")
 	@GetMapping("/update/update_address_id/{update_address_id}")
-	public void updateAddressId(@PathVariable(value = "update_address_id", required = true) String update_address_id,
+	public String updateAddressId(@PathVariable(value = "update_address_id", required = true) String update_address_id,
 			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
 			@RequestParam(value = "code", required = false, defaultValue = "") String code,
 			@RequestParam(value = "name", required = false, defaultValue = "") String name,
 			@RequestParam(value = "street", required = false, defaultValue = "") String street,
 			@RequestParam(value = "owner", required = false, defaultValue = "") String owner,
 			@RequestParam(value = "address", required = false, defaultValue = "") String address,
-			@RequestParam(value = "status", required = false, defaultValue = "") int status,
+			@RequestParam(value = "status", required = false, defaultValue = "") Integer status,
 			@RequestParam(value = "modifier", required = false, defaultValue = "") String modifier) {
 		EnterpriseRow row = new EnterpriseRow();
 		row.setUpdate_address_id(update_address_id);
@@ -463,8 +466,9 @@ public class EditorController {
 		row.setModifier(modifier);
 
 		Map<String, Object> map = getRequestMap(null, tablename, row, null, 0);
-		mapper.updateAddress(map);
-		return;
+		Integer updatedRows = mapper.updateAddress(map);
+		session.commit(true);
+		return "Ok,updated rows:" + updatedRows;
 	}
 
 }
