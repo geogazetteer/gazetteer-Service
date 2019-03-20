@@ -315,7 +315,7 @@ public class EditorController {
 	 * @return
 	 */
 	@ApiOperation(value = "更新状态", notes = "更新对应状态的数据")
-	@GetMapping("/status/{status}")
+	@GetMapping("/update/status/{status}")
 	public void updateStatus(@PathVariable(value = "status", required = true) int status,
 			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
 			@RequestParam(value = "code", required = false, defaultValue = "") String code,
@@ -347,7 +347,7 @@ public class EditorController {
 	 * @return
 	 */
 	@ApiOperation(value = "更新编辑者", notes = "更新对应编辑者的数据")
-	@GetMapping("/modifier/{modifier}")
+	@GetMapping("/update/modifier/{modifier}")
 	public void updateModifier(@PathVariable(value = "modifier", required = true) String modifier,
 			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
 			@RequestParam(value = "code", required = false, defaultValue = "") String code,
@@ -367,7 +367,7 @@ public class EditorController {
 		row.setStatus(status);
 
 		Map<String, Object> map = getRequestMap(null, tablename, row, null, 0);
-		mapper.updateStatus(map);
+		mapper.updateModifier(map);
 		return;
 	}
 
@@ -378,7 +378,7 @@ public class EditorController {
 	 * @return
 	 */
 	@ApiOperation(value = "更新编辑日期", notes = "更新对应编辑日期的数据")
-	@GetMapping("/update_date/{update_date}")
+	@GetMapping("/update/update_date/{update_date}")
 	public void updateDate(@PathVariable(value = "update_date", required = true) String update_date,
 			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
 			@RequestParam(value = "code", required = false, defaultValue = "") String code,
@@ -410,7 +410,7 @@ public class EditorController {
 	 * @return
 	 */
 	@ApiOperation(value = "更新地址", notes = "更新对应地址的数据")
-	@GetMapping("/update_address/{update_address}")
+	@GetMapping("/update/update_address/{update_address}")
 	public void updateAddress(@PathVariable(value = "update_address", required = true) String update_address,
 			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
 			@RequestParam(value = "code", required = false, defaultValue = "") String code,
@@ -442,7 +442,7 @@ public class EditorController {
 	 * @return
 	 */
 	@ApiOperation(value = "更新地址编码", notes = "更新对应地址编码的数据")
-	@GetMapping("/update_address_id/{update_address_id}")
+	@GetMapping("/update/update_address_id/{update_address_id}")
 	public void updateAddressId(@PathVariable(value = "update_address_id", required = true) String update_address_id,
 			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
 			@RequestParam(value = "code", required = false, defaultValue = "") String code,
