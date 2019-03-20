@@ -3,7 +3,7 @@
  */
 package top.geomatics.gazetteer.model;
 
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * @author whudyj

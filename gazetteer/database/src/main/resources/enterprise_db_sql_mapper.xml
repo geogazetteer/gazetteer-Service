@@ -59,15 +59,190 @@
          )
     </insert>
 
-    <update  id="updateAddressModifier"  parameterType="map"  flushCache="true" 
-         statementType="PREPARED"  timeout="20">
+    <update  id="updateStatus"  parameterType="map" >
+         update ${sql_tablename} set
+            status = #{status}
+         <where> 
+            <if test="code != null">
+                code = #{code}
+            </if>
+            <if test="name != null">
+                AND name = #{name}
+            </if> 
+            <if test="street != null">
+                AND street = #{street}
+            </if> 
+            <if test="owner != null">
+                AND owner = #{owner}
+            </if> 
+            <if test="address != null">
+                AND address = #{address}
+            </if> 
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="modifier != null">
+                AND modifier = #{modifier}
+            </if>
+            <if test="update_date != null">
+                AND update_date = #{update_date}
+            </if>
+        </where>
+    </update>
+
+    <update  id="updateModifier"  parameterType="map" >
+         update ${sql_tablename} set
+            modifier = #{modifier}
+       <where> 
+            <if test="code != null">
+                code = #{code}
+            </if>
+            <if test="name != null">
+                AND name = #{name}
+            </if> 
+            <if test="street != null">
+                AND street = #{street}
+            </if> 
+            <if test="owner != null">
+                AND owner = #{owner}
+            </if> 
+            <if test="address != null">
+                AND address = #{address}
+            </if> 
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="modifier != null">
+                AND modifier = #{modifier}
+            </if>
+            <if test="update_date != null">
+                AND update_date = #{update_date}
+            </if>
+        </where>
+    </update>
+    <update  id="updateDate"  parameterType="map" >
+         update ${sql_tablename} set
+            update_date = #{update_date}
+        <where> 
+            <if test="code != null">
+                code = #{code}
+            </if>
+            <if test="name != null">
+                AND name = #{name}
+            </if> 
+            <if test="street != null">
+                AND street = #{street}
+            </if> 
+            <if test="owner != null">
+                AND owner = #{owner}
+            </if> 
+            <if test="address != null">
+                AND address = #{address}
+            </if> 
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="modifier != null">
+                AND modifier = #{modifier}
+            </if>
+            <if test="update_date != null">
+                AND update_date = #{update_date}
+            </if>
+        </where>
+    </update>
+    <update  id="updateAddress"  parameterType="map" >
+         update ${sql_tablename} set
+            update_address = #{update_address}
+         <where> 
+            <if test="code != null">
+                code = #{code}
+            </if>
+            <if test="name != null">
+                AND name = #{name}
+            </if> 
+            <if test="street != null">
+                AND street = #{street}
+            </if> 
+            <if test="owner != null">
+                AND owner = #{owner}
+            </if> 
+            <if test="address != null">
+                AND address = #{address}
+            </if> 
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="modifier != null">
+                AND modifier = #{modifier}
+            </if>
+            <if test="update_date != null">
+                AND update_date = #{update_date}
+            </if>
+        </where>
+    </update>
+    <update  id="updateAddressId"  parameterType="map" >
+         update ${sql_tablename} set
+            update_address_id = #{update_address_id}
+         <where> 
+            <if test="code != null">
+                code = #{code}
+            </if>
+            <if test="name != null">
+                AND name = #{name}
+            </if> 
+            <if test="street != null">
+                AND street = #{street}
+            </if> 
+            <if test="owner != null">
+                AND owner = #{owner}
+            </if> 
+            <if test="address != null">
+                AND address = #{address}
+            </if> 
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="modifier != null">
+                AND modifier = #{modifier}
+            </if>
+            <if test="update_date != null">
+                AND update_date = #{update_date}
+            </if>
+        </where>
+    </update>
+    <update  id="updateAll"  parameterType="map" >
          update ${sql_tablename} set
             status = #{status},
             modifier = #{modifier},
             update_date = #{update_date},
-            update_address = #{update_address}
+            update_address = #{update_address},
             update_address_id = #{update_address_id}
-        where code = #{code}
+         <where> 
+            <if test="code != null">
+                code = #{code}
+            </if>
+            <if test="name != null">
+                AND name = #{name}
+            </if> 
+            <if test="street != null">
+                AND street = #{street}
+            </if> 
+            <if test="owner != null">
+                AND owner = #{owner}
+            </if> 
+            <if test="address != null">
+                AND address = #{address}
+            </if> 
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="modifier != null">
+                AND modifier = #{modifier}
+            </if>
+            <if test="update_date != null">
+                AND update_date = #{update_date}
+            </if>
+        </where>
     </update>
     
     <!--动态SQL-->
