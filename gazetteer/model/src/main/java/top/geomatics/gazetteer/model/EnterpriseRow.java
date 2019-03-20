@@ -13,8 +13,8 @@ public class EnterpriseRow extends AddressModifier{
 	private String street;// 所在街道
 	private String owner;// 法定代表人
 	private String address;// JYCS
-	private double longitude;// 经度
-	private double latitude;// 经度
+	private Double longitude;// 经度
+	private Double latitude;// 经度
 
 	public String getCode() {
 		return code;
@@ -56,19 +56,19 @@ public class EnterpriseRow extends AddressModifier{
 		this.address = address;
 	}
 
-	public double getLongitude() {
+	public Double getLongitude() {
 		return longitude;
 	}
 
-	public void setLongitude(double longitude) {
+	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
 
-	public double getLatitude() {
+	public Double getLatitude() {
 		return latitude;
 	}
 
-	public void setLatitude(double latitude) {
+	public void setLatitude(Double latitude) {
 		this.latitude = latitude;
 	}
 

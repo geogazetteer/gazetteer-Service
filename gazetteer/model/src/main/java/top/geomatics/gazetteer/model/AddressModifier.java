@@ -10,7 +10,7 @@ import java.util.Date;
  *
  */
 public class AddressModifier {
-	private int status;// 状态，0表示未修改，1表示已经修改，2表示无法修改
+	private Integer status;// 状态，0表示未修改，1表示已经修改，2表示无法修改
 	private String modifier;// 修改者
 	private Date update_date;// 修改时间
 	private String update_address;// 修改后的地址
@@ -32,11 +32,11 @@ public class AddressModifier {
 		this.update_date = update_date;
 	}
 
-	public int getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 
