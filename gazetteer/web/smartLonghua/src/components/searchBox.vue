@@ -67,7 +67,6 @@
       <div class="bottomDiv title flex_row">
         <!--<span class="img"></span>-->
         <span class="hisBottom">编码信息</span>
-        <span class="hideHis" @click="onEdit">编辑</span>
         <span v-show="!hideDetail" class="hideHis" @click="hideDetail=!hideDetail">▲</span>
         <span v-show="hideDetail" class="hideHis" @click="hideDetail=!hideDetail">▼</span>
       </div>
@@ -222,24 +221,23 @@
           $this.showCard = false;//隐藏联想
           $this.needSpin = true;//显示spin
           //测试数据
-          // setTimeout(function () {
-          //   $this.resultList = [
-          //     {id: 0, address: '搜索结果武汉市洪山区广八路',code:4403050070041900013,detail:'广东省深圳市南山区粤海街道深' +
-          //     '大社区白石路3883号深圳大学南校区深圳大学医学院'},
-          //     {id: 0, address: '搜索结果武汉市洪山区广八路',code:4403050070041900013,detail:'广东省深圳市南山区粤海街道深' +
-          //     '大社区白石路3883号深圳大学南校区深圳大学医学院'},
-          //   ];
-          //   $this.showResult = true;//显示搜索结果
-          //   $this.needSpin = false;//隐藏spin
-          // },500)
+           setTimeout(function () {
+             $this.resultList = [
+               {id: 0, address: '搜索结果武汉市洪山区广八路',code:4403050070041900013,detail:'广东省深圳市南山区粤海街道深' +
+               '大社区白石路3883号深圳大学南校区深圳大学医学院'},
+               {id: 0, address: '搜索结果武汉市洪山区广八路',code:4403050070041900013,detail:'广东省深圳市南山区粤海街道深' +
+               '大社区白石路3883号深圳大学南校区深圳大学医学院'},
+             ];
+             $this.showResult = true;//显示搜索结果
+             $this.needSpin = false;//隐藏spin
+           },500)
           //获取接口数据get方法的demo 测试通过地理编码查询
-          var url = 'http://localhost:8080/address/code/'+this.searchContent;
+/*          var url = 'http://localhost:8080/address/code/'+this.searchContent;
           $this.$api.getSearchList(url).then(function (res) {
-           debugger
            $this.resultList = res;
            $this.showResult = true;//显示搜索结果
            $this.needSpin = false;//隐藏spin
-           })
+           })*/
         } else {
 
         }
@@ -258,9 +256,9 @@
         this.showDetail = false;//隐藏详情
       },
       //点击编辑
-      onEdit(){
-        this.$emit('onSendEdit')
-      },
+//      onEdit(){
+//        this.$emit('onSendEdit')
+//      },
 
 
       //搜索框获取焦点
@@ -299,13 +297,7 @@
 </script>
 
 <style scoped>
-  .leftView {
-    position: absolute;
-    left: 20px;
-    top: 20px;
-    z-index: 100;
-    height: 100%;
-  }
+
 
   .searchbox .searchbox-content {
     pointer-events: auto;
@@ -490,7 +482,7 @@
     border-radius: 2px 0 0 2px;
     width: 100%;
     overflow-y: scroll;
-    max-height: 75%;
+    max-height: 485px;
   }
   .detailList .title{
     background: #3385ff;

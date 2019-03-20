@@ -1,3 +1,6 @@
+/*
+*地图组件
+*/
 <template xmlns:v-bind="http://www.w3.org/1999/xhtml">
 
   <div class='baseMapWrapper'>
@@ -14,6 +17,7 @@
   import * as maptalks from 'maptalks';
   //marker图标
   import marker from './red_cursor.png'
+  import mapboxgl from 'mapbox-gl'
   export default{
     name: 'baseMap',
     data() {
@@ -36,7 +40,8 @@
       initMap(){
         var $this = this;
 
-        //地点marker
+
+        /*//地点marker
         var siteMarker = new maptalks.Marker([0,0],{
           cursor:'pointer',
           "symbol":{
@@ -65,9 +70,63 @@
         });
         //setCoordinates
         $this.baseMap = map;
-        $this.siteMarker = siteMarker;
+        $this.siteMarker = siteMarker;*/
+        var map = new mapboxgl.Map({
+          container: 'baseMap',
+          style: {
+            "version": 8,
+//            "scheme": "xyz",
+            "sources": {
+              //龙华房屋面
+              "longhua": {
+                "type": "vector",
+                "scheme": "tms",
+                "tiles": ["http://localhost:9093/ProxyServlet/proxyHandler?url=http://localhost:9010/geoserver/gwc/service/tms/1.0.0/shenzhen:longhuabuilding/epsg:4326:512@pbf/{z}/{x}/{y}.pbf"],
+                "tileSize": 512
+              }
+            },
+            "layers": [
+              {
+                "id": "border",
+                "type": "line",
+                "source-layer": "longhuabuilding",
+                "source": "longhua",
+                "layout": {
+                  "line-join": "round",
+                  "line-cap": "round"
+                },
+                "paint": {
+                  "line-color": '#666666',
+                  "line-width": 2
+                },
+              },
+              {
+                "id": "region",
+                "type": "fill",
+                "source-layer": "longhuabuilding",
+                "source": "longhua",
+                "layout": {
 
+                },
+                "paint": {
+                  'fill-opacity':0
+                },
+              }
+            ]
+          },
+          center: [0, 0],
+          minZoom: 0,
+          maxZoom: 18,
+          zoom: 2
+        });
 
+        map.on('load',function(){
+          map.on('click','region',function(e){
+            var p = e.features[0].properties;
+            debugger
+            console.log(JSON.stringify(p))
+          })
+        })
       },
 
     },

@@ -1,7 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import home from '@/views/home.vue'
-import webService from '@/views/webService.vue'
 
 Vue.use(Router);
 
@@ -10,12 +8,22 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: home
+      component: resolve => require(['@/views/home'], resolve)
     },
+    {
+      path: '/siteSearch',
+      name: 'siteSearch',
+      component: resolve => require(['@/views/siteSearch'], resolve)
+    },
+    {
+      path: '/siteEdit',
+      name: 'siteEdit',
+      component: resolve => require(['@/views/siteEdit'], resolve)
+},
     {
       path: '/AddressWebService',
       name: 'webService',
-      component: webService
+      component:  resolve => require(['@/views/webService'], resolve)
     },
   ]
 })
