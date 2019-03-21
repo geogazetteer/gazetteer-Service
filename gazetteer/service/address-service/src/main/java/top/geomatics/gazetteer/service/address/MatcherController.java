@@ -29,6 +29,7 @@ import top.geomatics.gazetteer.utilities.address.AddressSimilarity;
 @RestController
 @RequestMapping("/matcher")
 public class MatcherController {
+	private WordSegmenter seg = new WordSegmenter();
 
 	/**
 	 * 
@@ -48,7 +49,8 @@ public class MatcherController {
 		String tablename = "dmdz";
 		row.setAddress(keywords);
 		// <分词>
-		List<WordEntry> words = WordSegmenter.segment(keywords);
+
+		List<WordEntry> words = seg.segment(keywords);
 		for (WordEntry entry : words) {
 			if (0 == entry.getNature().compareToIgnoreCase("comm")) {// 按社区来查询，减少查询范围
 				tablename = entry.getName();
