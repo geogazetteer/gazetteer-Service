@@ -56,9 +56,9 @@ export default {
 .leftView {
   position: absolute;
   left: 20px;
-  top: 20px;
+  top: 0;
   z-index: 100;
-  /*height: 100%;*/
+  height: 100%;
 }
 .rightView {
   z-index: 100;

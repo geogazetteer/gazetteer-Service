@@ -41,7 +41,7 @@
         var $this = this;
 
 
-        /*//地点marker
+        //地点marker
         var siteMarker = new maptalks.Marker([0,0],{
           cursor:'pointer',
           "symbol":{
@@ -70,8 +70,8 @@
         });
         //setCoordinates
         $this.baseMap = map;
-        $this.siteMarker = siteMarker;*/
-        var map = new mapboxgl.Map({
+        $this.siteMarker = siteMarker;
+       /* var map = new mapboxgl.Map({
           container: 'baseMap',
           style: {
             "version": 8,
@@ -126,7 +126,7 @@
             debugger
             console.log(JSON.stringify(p))
           })
-        })
+        })*/
       },
 
     },
