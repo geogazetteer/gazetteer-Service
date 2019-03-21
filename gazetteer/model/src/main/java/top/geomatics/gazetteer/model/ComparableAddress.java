@@ -37,7 +37,7 @@ public class ComparableAddress implements Comparable<Object> {
 	public int compareTo(Object o) {
 		if(o instanceof ComparableAddress){
 			ComparableAddress address = (ComparableAddress) o;
-            return this.similarity.compareTo(address.getSimilarity());//换相似性升序排序
+            return address.getSimilarity().compareTo(this.similarity);//换相似性升序排序
         }
         throw new ClassCastException("unable cast to ComparableAddress...");
 	}
