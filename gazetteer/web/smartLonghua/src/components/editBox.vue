@@ -217,10 +217,10 @@
 
 <style scoped>
 .listView{
-  width: 320px;
+  width: 360px;
 }
 .listView .selector{
-  margin-top: 10px;
+  margin-top: 20px;
   width: 100%;
   background: #3385ff;
   color: #fff;

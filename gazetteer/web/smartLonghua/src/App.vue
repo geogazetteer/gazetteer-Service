@@ -8,8 +8,8 @@
 export default {
   name: 'App',
   created(){
-//    this.$router.push("/siteSearch");//跳转地名搜索
-    this.$router.push("/siteEdit");//跳转到地名编辑
+    this.$router.push("/siteSearch");//跳转地名搜索
+//    this.$router.push("/siteEdit");//跳转到地名编辑
   }
 }
 </script>

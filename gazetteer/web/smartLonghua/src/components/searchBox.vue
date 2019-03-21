@@ -38,12 +38,12 @@
 
     <!--搜索结果-->
     <ul class="cardlist resultList" v-if="showResult">
-      <li v-for="(ca,index) in resultList" @click="showDetailList" class="flex_row">
+      <li v-for="(ca,index) in resultList" @click="showDetailList(index)" class="flex_row">
         <div class="imgItem" :style="{backgroundPosition:(-21*index)+'px 0'}"></div>
         <div class="right flex_col">
-          <div class="address" v-html="ca.address"></div>
-          <div class="small">楼栋编码：{{ca.code}}</div>
+          <div class="address" v-html="ca.village"></div>
           <div class="small detail">详细地址：{{ca.address}}</div>
+          <div class="small">楼栋编码：{{ca.code}}</div>
         </div>
       </li>
 
@@ -118,6 +118,7 @@
 
 <script>
   import {RegularStr} from '../js/render.js'
+  import {URLCFG} from '../js/config'
   export default{
     name: 'searchBox',
     data() {
@@ -136,7 +137,25 @@
         needSpin: false,//显示spin
         showResult:false,//显示搜索结果
         resultList:[
-
+          {
+            "address": "广东省深圳市龙华区观湖街道观城社区横坑河东村329号",
+            "building": "329号",
+            "building_id": "4403060100035000115",
+            "city": "深圳市",
+            "code": "4403060100035000115",
+            "community": "观城社区",
+            "create_address_date": "2018/7/3 20:30:11",
+            "district": "龙华区",
+            "floor": "",
+            "house_id": "",
+            "province": "广东省",
+            "publish": "1",
+            "road": "",
+            "road_num": "",
+            "street": "观湖街道",
+            "update_address_date": "2017/2/9 17:38:24",
+            "village": "横坑河东村"
+          }
         ],
 
         //历史记录
@@ -220,45 +239,57 @@
           $this.showHis = false;//隐藏历史记录
           $this.showCard = false;//隐藏联想
           $this.needSpin = true;//显示spin
-          //测试数据
-           setTimeout(function () {
-             $this.resultList = [
-               {id: 0, address: '搜索结果武汉市洪山区广八路',code:4403050070041900013,detail:'广东省深圳市南山区粤海街道深' +
-               '大社区白石路3883号深圳大学南校区深圳大学医学院'},
-               {id: 0, address: '搜索结果武汉市洪山区广八路',code:4403050070041900013,detail:'广东省深圳市南山区粤海街道深' +
-               '大社区白石路3883号深圳大学南校区深圳大学医学院'},
-             ];
-             $this.showResult = true;//显示搜索结果
-             $this.needSpin = false;//隐藏spin
-           },500)
-          //获取接口数据get方法的demo 测试通过地理编码查询
-/*          var url = 'http://localhost:8080/address/code/'+this.searchContent;
-          $this.$api.getSearchList(url).then(function (res) {
+
+          var url = URLCFG['searchAddressUrl'];
+          $this.$api.getSearchList(url,{keyWord:curStr}).then(function (res) {
            $this.resultList = res;
            $this.showResult = true;//显示搜索结果
            $this.needSpin = false;//隐藏spin
-           })*/
+           })
         } else {
 
         }
       },
 
       //显示搜索详情
-      showDetailList(){
+      showDetailList(index){
         this.showResult = false;//隐藏搜索结果
+
+        var listData = this.resultList[index];
+        var detail = {
+          standard: [
+            {label: '省', value: listData['province']},
+            {label: '市', value: listData['city']},
+            {label: '区', value: listData['district']},
+            {label: '街道', value: listData['street']},
+            {label: '社区', value: listData['community']},
+            {label: '基础网格', value: ''},
+            {label: '路', value: listData['road']},
+            {label: '路号', value: listData['road_num']},
+            {label: '小区', value: listData['village']},
+            {label: '楼栋', value: listData['building']},
+          ],
+          detailList: [
+            {label: '楼栋编码', value: listData['building_id']},
+            {label: '详细地址', value: listData['address']},
+            {label: '门楼号地址', value: ''},
+            {label: '小学学区', value: ''},
+            {label: '初级中学学区', value: ''},
+            {label: '社区网格员ID', value: ''},
+          ]
+        };
+        this.detail = detail;
+
         this.showDetail = true;//显示详情
         this.hideDetail  = false;
-        this.$emit('setMarkCoord', [114.30,30.52])
+        //this.$emit('setMarkCoord', [114.30,30.52]);//地图定位
       },
       //返回搜索结果
       backResult(){
         this.showResult = true;//显示搜索结果
         this.showDetail = false;//隐藏详情
       },
-      //点击编辑
-//      onEdit(){
-//        this.$emit('onSendEdit')
-//      },
+
 
 
       //搜索框获取焦点
@@ -287,11 +318,6 @@
 
     },
     watch: {
-      /*    currentBtn:{
-       handler:function (btn, oldVal) {
-       },
-       //immediate:true
-       }*/
     }
   }
 </script>
@@ -308,6 +334,7 @@
     border-radius: 2px 0 0 2px;
     background: #fff;
     justify-content: flex-start;
+    margin-top: 20px;
   }
 
   .searchbox-content #sole-input {
@@ -333,6 +360,7 @@
 
   /*搜索按钮*/
   .searchbox #search-button {
+    margin-top: 20px;
     pointer-events: auto;
     background: url('../../static/images/map/searchbox.png') no-repeat 0 -76px #3385ff;
     width: 57px;
@@ -362,6 +390,7 @@
     width: 320px;
     background: #fff;
     padding-bottom: 12px;
+    max-height: 80%;
   }
 
   .cardlist li {
