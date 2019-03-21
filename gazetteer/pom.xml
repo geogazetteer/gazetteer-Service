@@ -74,21 +74,5 @@
 	</repositories>
 
 	<!-- 项目依赖 -->
-	<dependencies>
-		<dependency>
-			<groupId>top.geomatics.gazetteer.segment</groupId>
-			<artifactId>gs-segment</artifactId>
-		</dependency>
 
-	</dependencies>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>top.geomatics.gazetteer.segment</groupId>
-				<artifactId>gs-segment</artifactId>
-				<version>${gazetteer.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 </project>

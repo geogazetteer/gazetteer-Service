@@ -38,6 +38,7 @@ public class EnterpriseDatabaseProcessor {
 			mapper.dropTable(sql_tablename);
 			mapper.createAddressTable(sql_tablename);
 		}
+		sql_tablename = "其他街道";
 		map.put("sql_tablename", sql_tablename);
 		mapper.dropTable(sql_tablename);
 		mapper.createAddressTable(sql_tablename);
@@ -84,7 +85,7 @@ public class EnterpriseDatabaseProcessor {
 					mapper.insertAddress(valueMap);
 				}
 				// 找到街道
-				String street = WordSegmenter.getStreet(row.getStreet());
+				String street = WordSegmenter.getStreet(row.getAddress());
 				if (null != street && !street.isEmpty()) {
 					valueMap.put("sql_tablename", street);
 					mapper.insertAddress(valueMap);
