@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<!-- 项目顶级POM -->
 	<groupId>top.geomatics.gazetteer</groupId>
 	<artifactId>gs-gazetteer</artifactId>
@@ -22,11 +24,12 @@
 		<module>segment</module>
 		<module>web</module>
 		<module>service</module>
- 		<module>lucene</module>
+		<module>lucene</module>
 	</modules>
 	<!-- 依赖第三方库的版本 -->
 	<properties>
 		<java.version>11</java.version>
+		<gazetteer.version>0.0.2-SNAPSHOT</gazetteer.version>
 	</properties>
 	<!-- 软件仓库位置 -->
 	<repositories>
@@ -72,7 +75,20 @@
 
 	<!-- 项目依赖 -->
 	<dependencies>
+		<dependency>
+			<groupId>top.geomatics.gazetteer.segment</groupId>
+			<artifactId>gs-segment</artifactId>
+		</dependency>
 
 	</dependencies>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>top.geomatics.gazetteer.segment</groupId>
+				<artifactId>gs-segment</artifactId>
+				<version>${gazetteer.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

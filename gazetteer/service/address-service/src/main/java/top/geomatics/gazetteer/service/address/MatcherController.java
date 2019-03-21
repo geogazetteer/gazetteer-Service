@@ -34,7 +34,7 @@ public class MatcherController {
 	/**
 	 * 
 	 * examples:
-	 * http://localhost:8080/matcher/address?keywords=%25深圳市龙华区龙华街道东环一路天汇大厦B座906室%25&min_sim=0.1&pagesize=10
+	 * http://localhost:8080/matcher/address?keywords=%25东环一路天汇大厦%25&min_sim=0.1&pagesize=10
 	 * 
 	 * @return
 	 */

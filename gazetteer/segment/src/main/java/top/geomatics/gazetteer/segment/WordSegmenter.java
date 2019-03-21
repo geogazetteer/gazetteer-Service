@@ -10,6 +10,8 @@ import org.ansj.domain.Result;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.DicAnalysis;
 
+import top.geomatics.gazetteer.model.IGazetteerConstant;
+
 /**
  * <!--提供分词功能-->
  * 
@@ -17,6 +19,32 @@ import org.ansj.splitWord.analysis.DicAnalysis;
  *
  */
 public class WordSegmenter {
+	/**
+	 * 判断地址中包含街道信息，并返回
+	 * @param address
+	 * @return
+	 */
+	public static final String getStreet(String address) {
+		for (String street:IGazetteerConstant.STREET_LIST) {
+			if (address.contains(street)) {
+				return street;
+			}
+		}
+		return null;
+	}
+	/**
+	 * 判断地址中包含社区信息，并返回
+	 * @param address
+	 * @return
+	 */
+	public static final String getCommunity(String address) {
+		for (String community:IGazetteerConstant.COMMUNITY_LIST) {
+			if (address.contains(community)) {
+				return community;
+			}
+		}
+		return null;
+	}
 	/**
 	 * @param word
 	 * @return
