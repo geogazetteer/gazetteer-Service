@@ -20,7 +20,7 @@ public class WordSegmenter {
 	 * @param word
 	 * @return
 	 */
-	public List<WordEntry> segment(String word){
+	public static List<WordEntry> segment(String word){
 		List<WordEntry> wordResults = new ArrayList<WordEntry>();
 		// 分词结果的一个封装，主要是一个List<Term>的terms
 		Result result = DicAnalysis.parse(word); 
