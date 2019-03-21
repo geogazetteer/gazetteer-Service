@@ -15,7 +15,7 @@
 	<packaging>jar</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gs_database.version>0.0.2-SNAPSHOT</gs_database.version>
+		<gazetteer.version>0.0.2-SNAPSHOT</gazetteer.version>
 		<opencsv_version>4.5</opencsv_version>
 		<poi_version>4.0.1</poi_version>
 		<easyexcel.version>1.1.1</easyexcel.version>
@@ -67,6 +67,10 @@
 		<dependency>
 			<groupId>top.geomatics.gazetteer.database</groupId>
 			<artifactId>gs-database</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>top.geomatics.gazetteer.segment</groupId>
+			<artifactId>gs-segment</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.opencsv</groupId>
@@ -171,8 +175,9 @@
 			<dependency>
 				<groupId>top.geomatics.gazetteer.database</groupId>
 				<artifactId>gs-database</artifactId>
-				<version>${gs_database.version}</version>
+				<version>${gazetteer.version}</version>
 			</dependency>
+
 			<dependency>
 				<groupId>com.alibaba</groupId>
 				<artifactId>easyexcel</artifactId>
@@ -192,6 +197,11 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-compress</artifactId>
 				<version>1.18</version>
+			</dependency>
+			<dependency>
+				<groupId>top.geomatics.gazetteer.segment</groupId>
+				<artifactId>gs-segment</artifactId>
+				<version>${gazetteer.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

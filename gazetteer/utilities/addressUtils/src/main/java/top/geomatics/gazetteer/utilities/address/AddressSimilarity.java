@@ -19,14 +19,14 @@ public class AddressSimilarity {
 	/**
 	 * 计算jaccard相似系数
 	 */
-	public double jaccard(String address1, String address2) {
+	public static double jaccard(String address1, String address2) {
 		return jaccardSimilarity.apply(address1, address2);
 	}
 
 	/**
 	 * 计算模糊匹配分数
 	 */
-	public Integer fuzzy(String address1, String address2) {
+	public static Integer fuzzy(String address1, String address2) {
 		return fuzzyScore.fuzzyScore(address1, address2);
 	}
 
