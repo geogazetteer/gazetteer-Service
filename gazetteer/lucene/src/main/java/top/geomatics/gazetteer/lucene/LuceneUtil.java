@@ -35,26 +35,16 @@ public class LuceneUtil {
 	public static String INDEX_PATH;
 	private Directory dir;
 
-	/**
-	 * ��ȡIndexWriterʵ��
-	 *
-	 * @return
-	 * @throws Exception
-	 */
+	
 	private IndexWriter getWriter() throws Exception {
-		Analyzer analyzer = new IKAnalyzer(true); // �������ִ��� �����ʳ����л���
+		Analyzer analyzer = new IKAnalyzer(true); 
 		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_47, analyzer);
 		iwc.setRAMBufferSizeMB(16);
 		IndexWriter writer = new IndexWriter(dir, iwc);
 		return writer;
 	}
 
-	/**
-	 * ��ʱ����������ÿ��1��8�����һ��������
-	 *
-	 * @throws Exception
-	 */
-
+	
 	@Scheduled(cron = "0 0 8 1 * ? ")
 	public void updateIndex() throws Exception {
 		dir = FSDirectory.open(new File("D:\\lucene_index"));
@@ -66,7 +56,7 @@ public class LuceneUtil {
 			Document doc = new Document();
 			doc.add(new StringField("code", resultSet.getString("CODE"), Field.Store.YES));
 			doc.add(new TextField("address", resultSet.getString("ADDRESS"), Field.Store.YES));
-			writer.addDocument(doc); // ����ĵ�
+			writer.addDocument(doc); 
 		}
 		writer.close();
 	}
@@ -74,11 +64,8 @@ public class LuceneUtil {
 	private IndexSearcher init() throws IOException {
 		IndexSearcher indexSearcher = null;
 		if (indexSearcher == null) {
-			// 1������Directory
-			Directory directory = FSDirectory.open(new File("E:\\lucene_index"));
-			// 2������IndexReader
+			Directory directory = FSDirectory.open(new File("D:\\lucene_index"));
 			DirectoryReader directoryReader = DirectoryReader.open(directory);
-			// 3������IndexReader����IndexSearch
 			indexSearcher = new IndexSearcher(directoryReader);
 		}
 		return indexSearcher;
@@ -95,7 +82,7 @@ public class LuceneUtil {
 			Long start = System.currentTimeMillis();
 			TopDocs topDocs = indexSearcher.search(query, 10);
 			Long end = System.currentTimeMillis();
-			System.out.println("lucene��ʱ" + (end - start));
+			System.out.println("lucene执行耗时" + (end - start));
 			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 				Document doc = indexSearcher.doc(scoreDoc.doc);
 				list.add(doc.get("address"));
