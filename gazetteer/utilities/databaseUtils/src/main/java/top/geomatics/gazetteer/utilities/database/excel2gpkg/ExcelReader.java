@@ -28,10 +28,12 @@ import top.geomatics.gazetteer.utilities.database.csv2sqlite.AddressRecord;
 import top.geomatics.gazetteer.utilities.database.csv2sqlite.AddressSchema;
 
 /**
+ * <em>用于读取excel表格数据</em>
+ * 
  * @author whudyj
  */
 public class ExcelReader implements Runnable {
-	private String csvFName;// CSV文件名
+	private String csvFName;// excel文件名
 	private BlockingQueue<AddressRecord> blockingQueue;
 	private OPCPackage xlsxPackage = null;
 	private AddressSchema schema = null;
@@ -42,10 +44,17 @@ public class ExcelReader implements Runnable {
 	private XSSFReader.SheetIterator iter = null;
 	private int count = 0;
 
+	/**
+	 * @return AddressSchema <b>返回excel第一个sheet的表头</b><br>
+	 */
 	public AddressSchema getSchema() {
 		return schema;
 	}
 
+	/**
+	 * @param csvFName      excel文件名
+	 * @param blockingQueue 读数据线程队列，AddressRecord表示excel中的一行
+	 */
 	public ExcelReader(String csvFName, BlockingQueue<AddressRecord> blockingQueue) {
 		super();
 		this.csvFName = csvFName;
@@ -53,9 +62,8 @@ public class ExcelReader implements Runnable {
 	}
 
 	/**
-	 * 打开excel文件
 	 * 
-	 * @return
+	 * @throws Exception 异常
 	 */
 	public void openFile() throws Exception {
 		File xlsxFile = new File(csvFName);
@@ -71,7 +79,12 @@ public class ExcelReader implements Runnable {
 		iter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
 	}
 
-	public void process() throws IOException, OpenXML4JException, SAXException {
+	/**
+	 * @throws IOException        异常
+	 * @throws OpenXML4JException 异常
+	 * @throws SAXException       异常
+	 */
+	private void process() throws IOException, OpenXML4JException, SAXException {
 
 		int index = 0;// 只考虑一个sheet的情况
 		while (iter.hasNext()) {
@@ -88,7 +101,15 @@ public class ExcelReader implements Runnable {
 		}
 	}
 
-	public void processSheet(Styles styles, SharedStrings strings, SheetContentsHandler sheetHandler,
+	/**
+	 * @param styles           样式
+	 * @param strings          SharedStrings
+	 * @param sheetHandler     SheetContentsHandler
+	 * @param sheetInputStream InputStream
+	 * @throws IOException  异常
+	 * @throws SAXException 异常
+	 */
+	private void processSheet(Styles styles, SharedStrings strings, SheetContentsHandler sheetHandler,
 			InputStream sheetInputStream) throws IOException, SAXException {
 		DataFormatter formatter = new DataFormatter();
 		InputSource sheetSource = new InputSource(sheetInputStream);
@@ -104,9 +125,10 @@ public class ExcelReader implements Runnable {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run() {
 		System.out.println("开始读取数据，请耐心等待......");
 		long startTime = System.currentTimeMillis(); // 获取开始时间

@@ -3,11 +3,18 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<!-- 使用spring boot 超级POM -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.3.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
 
-	<!-- 项目顶级POM -->
+	<!-- 本项目顶级POM -->
 	<groupId>top.geomatics.gazetteer</groupId>
 	<artifactId>gs-gazetteer</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>gazetteer</name>
 	<description>gazetteer service for smart Longhhua</description>
@@ -20,16 +27,17 @@
 	<modules>
 		<module>model</module>
 		<module>database</module>
-		<module>utilities</module>
 		<module>segment</module>
-		<module>web</module>
-		<module>service</module>
 		<module>lucene</module>
+		<module>utilities</module>
+		<module>service</module>
+		<module>web</module>
+
 	</modules>
+
 	<!-- 依赖第三方库的版本 -->
 	<properties>
 		<java.version>11</java.version>
-		<gazetteer.version>0.0.2-SNAPSHOT</gazetteer.version>
 	</properties>
 	<!-- 软件仓库位置 -->
 	<repositories>

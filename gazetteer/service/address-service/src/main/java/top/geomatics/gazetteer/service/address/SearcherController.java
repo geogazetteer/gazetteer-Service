@@ -1,40 +1,23 @@
 package top.geomatics.gazetteer.service.address;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.websocket.server.PathParam;
-
-import org.apache.ibatis.javassist.expr.NewArray;
 import org.apache.ibatis.session.SqlSession;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.util.Version;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import com.alibaba.fastjson.JSON;
 
 import io.swagger.annotations.ApiOperation;
 import top.geomatics.gazetteer.database.AddressMapper;
 import top.geomatics.gazetteer.database.DatabaseHelper;
-
+import top.geomatics.gazetteer.lucene.LuceneUtil;
 import top.geomatics.gazetteer.model.AddressRow;
-import top.geomatics.gazetteer.service.utils.IndexUtil;
-import top.geomatics.gazetteer.service.utils.LuceneUtil;
-import top.geomatics.gazetteer.service.utils.SqlliteUtil;
 
 /**
  * SearcherController
@@ -412,8 +395,7 @@ public class SearcherController {
 	@ApiOperation(value = "根据lucene索引查询", notes = "根据lucene索引查询")
 	@GetMapping("/selectAddressBylucene")
 	public String selectAddressBylucene(@RequestParam(value = "keyWord") String keyWord) {
-		LuceneUtil luceneUtil=new LuceneUtil();
-		return luceneUtil.selectAddressBylucene(keyWord);
+		return JSON.toJSONString(LuceneUtil.search(keyWord));
 	}
 
 }

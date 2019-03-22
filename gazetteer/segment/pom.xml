@@ -4,27 +4,31 @@
 	xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
-	<!-- <parent> <groupId>top.geomatics.gazetteer</groupId> <artifactId>gazetteer</artifactId> 
-		<version>0.0.2-SNAPSHOT</version> </parent> -->
+	<parent>
+		<groupId>top.geomatics.gazetteer</groupId>
+		<artifactId>gs-gazetteer</artifactId>
+		<version>0.0.3-SNAPSHOT</version>
+	</parent>
+
 	<groupId>top.geomatics.gazetteer.segment</groupId>
 	<artifactId>gs-segment</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>gazetteer word segment</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gazetteer.version>0.0.2-SNAPSHOT</gazetteer.version>
+		<gazetteer.version>0.0.3-SNAPSHOT</gazetteer.version>
 		<ansj_seg.version>5.1.5</ansj_seg.version>
 		<hanlp.version>portable-1.7.2</hanlp.version>
 		<opencsv_version>4.5</opencsv_version>
 	</properties>
 	<dependencies>
-		<!-- 增加对model模块的依赖 -->
+		<!-- 增加model模块依赖 -->
 		<dependency>
 			<groupId>top.geomatics.gazetteer.model</groupId>
 			<artifactId>gs-model</artifactId>
 		</dependency>
-		<!-- 增加对database模块的依赖 -->
+		<!-- 增加database模块依赖 -->
 		<dependency>
 			<groupId>top.geomatics.gazetteer.database</groupId>
 			<artifactId>gs-database</artifactId>
@@ -55,6 +59,11 @@
 			<dependency>
 				<groupId>top.geomatics.gazetteer.model</groupId>
 				<artifactId>gs-model</artifactId>
+				<version>${gazetteer.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>top.geomatics.gazetteer.database</groupId>
+				<artifactId>gs-database</artifactId>
 				<version>${gazetteer.version}</version>
 			</dependency>
 			<dependency>

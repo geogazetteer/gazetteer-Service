@@ -7,15 +7,16 @@
 	<parent>
 		<groupId>top.geomatics.gazetteer.utilities</groupId>
 		<artifactId>gs-utilities</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
+
 	<groupId>top.geomatics.gazetteer.utilities.address</groupId>
 	<artifactId>gs-addressUtils</artifactId>
-	<name>addressUtils</name>
+	<packaging>jar</packaging>
+	<name>gazetteer address utilities</name>
 	<description>gazetteer utilities for database</description>
 	<url>https://github.com/geogazetteer/gazetteer-Service</url>
-	<packaging>jar</packaging>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<commons_text.version>1.5</commons_text.version>

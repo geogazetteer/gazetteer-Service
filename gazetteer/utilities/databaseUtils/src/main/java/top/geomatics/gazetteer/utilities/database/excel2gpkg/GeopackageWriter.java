@@ -33,6 +33,8 @@ import org.opengis.referencing.operation.MathTransform;
 import top.geomatics.gazetteer.utilities.database.csv2sqlite.AddressRecord;
 
 /**
+ * <em>数据转换到GeoPackage，并将坐标（原CGCS2000经纬度：EPSG:4490）转换到深圳高斯坐标系：EPSG:4547</em>
+ * 
  * @author whudyj
  */
 public class GeopackageWriter implements Runnable {
@@ -56,6 +58,13 @@ public class GeopackageWriter implements Runnable {
 
 	private static final AtomicLong nextSerialNum = new AtomicLong();
 
+	/**
+	 * <em>构造函数</em>
+	 * 
+	 * @param gpkgFName     String gpkg文件路径名
+	 * @param tableName     String 表名
+	 * @param blockingQueue BlockingQueue 线程队列，AddressRecord表示一行
+	 */
 	public GeopackageWriter(String gpkgFName, String tableName, BlockingQueue<AddressRecord> blockingQueue) {
 		super();
 		this.gpkgFName = gpkgFName;
@@ -63,6 +72,10 @@ public class GeopackageWriter implements Runnable {
 		this.blockingQueue = blockingQueue;
 	}
 
+	/**
+	 * <em>初始化GeoPackage</em>
+	 * 
+	 */
 	private void initiateGpkg() {
 		try {
 			geopkg = new GeoPackage(new File(gpkgFName));
@@ -72,6 +85,10 @@ public class GeopackageWriter implements Runnable {
 		}
 	}
 
+	/**
+	 * <em>创建表，为写入数据准备</em>
+	 * 
+	 */
 	public void prepare() {
 		try {
 			crsSource = CRS.decode("EPSG:4490");
@@ -108,6 +125,9 @@ public class GeopackageWriter implements Runnable {
 
 	}
 
+	/**
+	 * @return SimpleFeatureType 返回创建的要素类型
+	 */
 	private SimpleFeatureType createFeatureType() {
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
 		builder.setName(tableName);
@@ -128,17 +148,14 @@ public class GeopackageWriter implements Runnable {
 		builder.add("update_address", String.class);
 		builder.add("update_address_id", String.class);
 
-		// build the type
-		final SimpleFeatureType LOCATION = builder.buildFeatureType();
-
-		return LOCATION;
+		return builder.buildFeatureType();
 	}
 
 	/**
-	 * 经纬度转换为高斯坐标
+	 * <em>经纬度转换为高斯坐标 </em>
 	 * 
-	 * @param geom
-	 * @return
+	 * @param geom Geometry 几何对象
+	 * @return Geometry坐标转换后的几何对象
 	 */
 	public Geometry lonlat2xy(Geometry geom) {
 		try {
@@ -152,6 +169,9 @@ public class GeopackageWriter implements Runnable {
 		}
 	}
 
+	/**
+	 * <em>关闭GeoPackage文件</em>
+	 */
 	public void close() {
 		geopkg.close();
 	}
