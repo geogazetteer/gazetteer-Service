@@ -1,18 +1,9 @@
 package top.geomatics.gazetteer.database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
-
-import com.alibaba.fastjson.JSON;
-
-import top.geomatics.gazetteer.model.AddressRow;
 
 public class Test {
 

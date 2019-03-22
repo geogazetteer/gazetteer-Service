@@ -7,13 +7,13 @@
 	<parent>
 		<groupId>top.geomatics.gazetteer</groupId>
 		<artifactId>gs-gazetteer</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
-	
+
 	<!-- 模型模块 -->
 	<groupId>top.geomatics.gazetteer.model</groupId>
 	<artifactId>gs-model</artifactId>
-	<name>gazetteer-model</name>
+	<name>gazetteer model</name>
 	<packaging>jar</packaging>
 
 	<properties>

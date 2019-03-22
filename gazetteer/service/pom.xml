@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<!-- 父POM -->
 	<parent>
 		<groupId>top.geomatics.gazetteer</groupId>
 		<artifactId>gs-gazetteer</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 
+	<!-- 本模块Maven坐标 -->
 	<groupId>top.geomatics.gazetteer.service</groupId>
 	<artifactId>gs-service</artifactId>
-	<name>gazetteer-service</name>
+	<name>gazetteer service</name>
 	<description>gazetteer restful service using spring boot</description>
 	<packaging>pom</packaging>
+	
+	<!-- 项目包含的模块 -->
 	<modules>
-	   <module>address-service</module>
-  </modules>
+		<module>address-service</module>
+	</modules>
 </project>
