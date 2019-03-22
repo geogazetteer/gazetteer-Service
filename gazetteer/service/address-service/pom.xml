@@ -14,7 +14,7 @@
 	<groupId>top.geomatics.gazetteer.service.address</groupId>
 	<artifactId>gs-address-service</artifactId>
 	<packaging>jar</packaging>
-	<name>address service</name>
+	<name>gazetteer address service</name>
 	<description>address service</description>
 
 	<properties>

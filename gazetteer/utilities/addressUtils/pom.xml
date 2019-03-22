@@ -13,7 +13,7 @@
 	<groupId>top.geomatics.gazetteer.utilities.address</groupId>
 	<artifactId>gs-addressUtils</artifactId>
 	<packaging>jar</packaging>
-	<name>address utilities</name>
+	<name>gazetteer address utilities</name>
 	<description>gazetteer utilities for database</description>
 	<url>https://github.com/geogazetteer/gazetteer-Service</url>
 

@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>top.geomatics.gazetteer.utilities.database</groupId>
 	<artifactId>gs-databaseUtils</artifactId>
-	<name>database utilities</name>
+	<name>gazetteer database utilities</name>
 	<packaging>jar</packaging>
 
 	<properties>

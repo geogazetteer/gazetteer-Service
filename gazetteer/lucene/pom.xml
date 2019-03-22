@@ -14,9 +14,26 @@
 	<name>gazetteer lucene</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<gazetteer.version>0.0.3-SNAPSHOT</gazetteer.version>
 		<lucene.version>4.7.2</lucene.version>
+		<spring.version>5.1.5.RELEASE</spring.version>
 	</properties>
 	<dependencies>
+		<!-- 增加model模块依赖 -->
+		<dependency>
+			<groupId>top.geomatics.gazetteer.model</groupId>
+			<artifactId>gs-model</artifactId>
+		</dependency>
+		<!-- 增加database模块依赖 -->
+		<dependency>
+			<groupId>top.geomatics.gazetteer.database</groupId>
+			<artifactId>gs-database</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
@@ -36,6 +53,21 @@
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>top.geomatics.gazetteer.model</groupId>
+				<artifactId>gs-model</artifactId>
+				<version>${gazetteer.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>top.geomatics.gazetteer.database</groupId>
+				<artifactId>gs-database</artifactId>
+				<version>${gazetteer.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-core</artifactId>
