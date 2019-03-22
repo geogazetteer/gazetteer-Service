@@ -16,17 +16,13 @@ import top.geomatics.gazetteer.utilities.database.csv2sqlite.AddressRecord;
 import top.geomatics.gazetteer.utilities.database.csv2sqlite.AddressSchema;
 
 /**
+ * <em>处理excel表中的一个sheet</em>
+ * 
  * @author whudyj
  *
  */
 public class ExcelSheetHandler implements SheetContentsHandler {
 	private BlockingQueue<AddressRecord> blockingQueue;
-
-	public ExcelSheetHandler(BlockingQueue<AddressRecord> blockingQueue) {
-		super();
-		this.blockingQueue = blockingQueue;
-	}
-
 	private boolean firstCellOfRow;
 	private int currentRow = -1;
 	private int currentCol = -1;
@@ -35,14 +31,37 @@ public class ExcelSheetHandler implements SheetContentsHandler {
 	private int length = 0;
 	private int count = 0;
 
+	/**
+	 * <b>构造函数</b>
+	 * 
+	 * @param blockingQueue 线程队列，AddressRecord为sheet中的一行
+	 */
+	public ExcelSheetHandler(BlockingQueue<AddressRecord> blockingQueue) {
+		super();
+		this.blockingQueue = blockingQueue;
+	}
+
+	/**
+	 * @return int 返回记录的个数
+	 */
 	public int getCount() {
 		return count;
 	}
 
+	/**
+	 * @return AddressSchema 返回sheet的表头数据
+	 */
 	public AddressSchema getSchema() {
 		return schema;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler#
+	 * startRow(int)
+	 */
 	@Override
 	public void startRow(int rowNum) {
 		// Prepare for this row
@@ -52,14 +71,21 @@ public class ExcelSheetHandler implements SheetContentsHandler {
 		rowList.clear();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler#
+	 * endRow(int)
+	 */
 	@Override
 	public void endRow(int rowNum) {
 		int len = rowList.size();
 		if (len < 1) {
 			return;
 		}
-		//补齐空列
-		for (int i = 0; i < length-len; i++) {
+		// 补齐空列
+		for (int i = 0; i < length - len; i++) {
 			rowList.add("");
 		}
 
@@ -86,9 +112,17 @@ public class ExcelSheetHandler implements SheetContentsHandler {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		count ++;
+		count++;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler#
+	 * cell(java.lang.String, java.lang.String,
+	 * org.apache.poi.xssf.usermodel.XSSFComment)
+	 */
 	@Override
 	public void cell(String cellReference, String formattedValue, XSSFComment comment) {
 		if (firstCellOfRow) {
