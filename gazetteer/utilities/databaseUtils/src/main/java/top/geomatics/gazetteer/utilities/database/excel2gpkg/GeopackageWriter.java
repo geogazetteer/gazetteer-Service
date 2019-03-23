@@ -45,16 +45,27 @@ public class GeopackageWriter implements Runnable {
 
 	private GeoPackage geopkg = null;
 	// 原CGCS2000经纬度：EPSG:4490
-	private CoordinateReferenceSystem crsSource = null;
+	private static CoordinateReferenceSystem crsSource = null;
 	// 深圳高斯坐标系：EPSG:4547
-	private CoordinateReferenceSystem crsTarget = null;
+	private static CoordinateReferenceSystem crsTarget = null;
+
+	{
+		try {
+			crsSource = CRS.decode("EPSG:4490");
+			crsTarget = CRS.decode("EPSG:4547");
+		} catch (NoSuchAuthorityCodeException e1) {
+			e1.printStackTrace();
+		} catch (FactoryException e1) {
+			e1.printStackTrace();
+		}
+	}
 
 	private int count = 0;
 	private SimpleFeatureBuilder featureBuilder = null;
 	private FeatureEntry entry = null;
 	private SimpleFeatureType sfType = null;
 	private List<SimpleFeature> features = null;
-	private GeometryFactory geometryFactory = null;
+	private static GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();;
 
 	private static final AtomicLong nextSerialNum = new AtomicLong();
 
@@ -90,14 +101,7 @@ public class GeopackageWriter implements Runnable {
 	 * 
 	 */
 	public void prepare() {
-		try {
-			crsSource = CRS.decode("EPSG:4490");
-			crsTarget = CRS.decode("EPSG:4547");
-		} catch (NoSuchAuthorityCodeException e1) {
-			e1.printStackTrace();
-		} catch (FactoryException e1) {
-			e1.printStackTrace();
-		}
+
 		// 准备Geopackage文件
 		initiateGpkg();
 
@@ -119,8 +123,6 @@ public class GeopackageWriter implements Runnable {
 		// 属性结构
 		sfType = createFeatureType();
 		features = new ArrayList<SimpleFeature>();
-		geometryFactory = JTSFactoryFinder.getGeometryFactory();
-
 		featureBuilder = new SimpleFeatureBuilder(sfType);
 
 	}
@@ -140,6 +142,8 @@ public class GeopackageWriter implements Runnable {
 		builder.add("street", String.class); // 所在街道
 		builder.add("owner", String.class); // 法定代表人
 		builder.add("address", String.class); // JYCS
+		builder.add("x", Double.class); // x坐标
+		builder.add("y", Double.class); // y坐标
 		builder.add("geometry", Point.class);// 坐标，x,y
 		// 增加的字段
 		builder.add("status", Integer.class);
@@ -157,7 +161,7 @@ public class GeopackageWriter implements Runnable {
 	 * @param geom Geometry 几何对象
 	 * @return Geometry坐标转换后的几何对象
 	 */
-	public Geometry lonlat2xy(Geometry geom) {
+	public static Geometry lonlat2xy(Geometry geom) {
 		try {
 
 			// 投影转换
@@ -167,6 +171,27 @@ public class GeopackageWriter implements Runnable {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	/**
+	 * <em>经纬度转换为高斯坐标 </em>
+	 * 
+	 * @param longlat double [] 经度 纬度 坐标
+	 * @return double [] x y坐标
+	 */
+	public static double[] lonlat2xy(double[] longlat) {
+		double[] result = null;
+		if (null == longlat || 2 > longlat.length || 0 != longlat.length % 2) {
+			return result;
+		}
+		result = new double[longlat.length];
+		for (int i = 0; i < longlat.length / 2; i++) {
+			Point point = geometryFactory.createPoint(new Coordinate(longlat[2 * i], longlat[2 * i + 1]));
+			Point point2 = (Point) lonlat2xy(point);
+			result[2 * i] = point2.getY();
+			result[2 * i + 1] = point2.getX();
+		}
+		return result;
 	}
 
 	/**
@@ -219,6 +244,8 @@ public class GeopackageWriter implements Runnable {
 					Point point3 = geometryFactory
 							.createPoint(new Coordinate(point2.getCoordinate().y, point2.getCoordinate().x));
 
+					featureBuilder.add(point3.getCoordinate().x);
+					featureBuilder.add(point3.getCoordinate().y);
 					featureBuilder.add(point3);
 				}
 
