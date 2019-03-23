@@ -65,7 +65,7 @@ public class GeopackageWriter implements Runnable {
 	private FeatureEntry entry = null;
 	private SimpleFeatureType sfType = null;
 	private List<SimpleFeature> features = null;
-	private static GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();;
+	private static GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
 
 	private static final AtomicLong nextSerialNum = new AtomicLong();
 
@@ -142,6 +142,8 @@ public class GeopackageWriter implements Runnable {
 		builder.add("street", String.class); // 所在街道
 		builder.add("owner", String.class); // 法定代表人
 		builder.add("address", String.class); // JYCS
+		builder.add("longitude", Double.class); // 经度
+		builder.add("latitude", Double.class); // 纬度
 		builder.add("x", Double.class); // x坐标
 		builder.add("y", Double.class); // y坐标
 		builder.add("geometry", Point.class);// 坐标，x,y
@@ -236,10 +238,12 @@ public class GeopackageWriter implements Runnable {
 				featureBuilder.add(str4.trim());
 				featureBuilder.add(str5.trim());
 				if (!str6.trim().isEmpty() && !str7.trim().isEmpty()) {
-					double latitude = Double.parseDouble(str6);
-					double longitude = Double.parseDouble(str7);
+					double longitude = Double.parseDouble(str6);
+					double latitude = Double.parseDouble(str7);
+					featureBuilder.add(longitude);
+					featureBuilder.add(latitude);
 
-					Point point = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+					Point point = geometryFactory.createPoint(new Coordinate(latitude,longitude));
 					Point point2 = (Point) lonlat2xy(point);
 					Point point3 = geometryFactory
 							.createPoint(new Coordinate(point2.getCoordinate().y, point2.getCoordinate().x));

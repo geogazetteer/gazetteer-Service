@@ -66,7 +66,7 @@ public class EnterpriseDatabaseProcessor {
 		// 按查询所有记录
 		String sql_tablename = "";
 		map.clear();
-		map.put("sql_fields", "code,name,street,owner,address");
+		map.put("sql_fields", "*");
 		Map<String, Object> valueMap = new HashMap<String, Object>();
 		for (int i = 0; i < 4; i++) {
 			sql_tablename = "enterprise" + (i + 1);
@@ -78,6 +78,10 @@ public class EnterpriseDatabaseProcessor {
 				valueMap.put("street", row.getStreet());
 				valueMap.put("owner", row.getOwner());
 				valueMap.put("address", row.getAddress());
+				valueMap.put("longitude", row.getLongitude());
+				valueMap.put("latitude", row.getLatitude());
+				valueMap.put("x", row.getX());
+				valueMap.put("y", row.getY());
 				// 先找到社区
 				String community = WordSegmenter.getCommunity(row.getAddress());
 				if (null != community && !community.isEmpty()) {

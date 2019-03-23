@@ -9,7 +9,7 @@
     <!--create table-->
     <update id="createAddressTable" parameterType="String">  
         CREATE TABLE ${_parameter} (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          fid INTEGER PRIMARY KEY AUTOINCREMENT,
           code TEXT,
           name TEXT,
           street TEXT,
@@ -17,6 +17,8 @@
           address TEXT,
           longitude double,
           latitude double,
+          x double,
+          y double,
           status int,
           modifier TEXT,
           update_date Date,
@@ -36,6 +38,8 @@
           address ,
           longitude ,
           latitude ,
+          x,
+          y,
           status ,
           modifier ,
           update_date ,
@@ -51,6 +55,8 @@
             #{address} ,
             #{longitude} ,
             #{latitude} ,
+            #{x},
+            #{y},
             #{status} ,
             #{modifier} ,
             #{update_date} ,
