@@ -50,6 +50,10 @@
 			<groupId>top.geomatics.gazetteer.utilities.address</groupId>
 			<artifactId>gs-addressUtils</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>top.geomatics.gazetteer.utilities.database</groupId>
+			<artifactId>gs-databaseUtils</artifactId>
+		</dependency>
 		<!-- 增加spring-boot-starter-web依赖 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -106,6 +110,13 @@
 					top.geomatics.gazetteer.utilities.address
 				</groupId>
 				<artifactId>gs-addressUtils</artifactId>
+				<version>${gazetteer.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>
+					top.geomatics.gazetteer.utilities.database
+				</groupId>
+				<artifactId>gs-databaseUtils</artifactId>
 				<version>${gazetteer.version}</version>
 			</dependency>
 			<dependency>

@@ -2,7 +2,6 @@ package top.geomatics.gazetteer.lucene;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
