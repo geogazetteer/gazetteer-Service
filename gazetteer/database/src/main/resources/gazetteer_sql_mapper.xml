@@ -2,6 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="top.geomatics.gazetteer.database.AddressMapper">
     <!--added by dyj 20190316-->
+    
+     <!--通过id查询所有字段-->
+    <select id="selectById" parameterType="String" resultType="AddressRow">
+        SELECT * FROM dmdz where id = #{id}
+    </select>
+    
     <!--选择所有字段-->
     <select id="selectAll" parameterType="String" resultType="AddressRow">
         SELECT T.*

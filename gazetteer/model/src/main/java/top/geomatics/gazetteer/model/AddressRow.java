@@ -1,6 +1,8 @@
 package top.geomatics.gazetteer.model;
 
 public class AddressRow {
+	private String id;
+	
 	private String address_id; // 地址标识，数据库自动生成，示例：63EEDE6BA4206A3AE0538CC0C0C07BB0
 	private String code; // 地址编码，唯一，由权威机构确定，示例：44030600960102T0117 000000 共25位
 	private String building_id; // 建筑标识，唯一，由权威机构确定，示例：44030600960102T0117 共19位
@@ -19,6 +21,13 @@ public class AddressRow {
 	private String update_address_date; // 地址更新日期
 	private String publish; // 地址是否已发布
 	private String create_address_date; // 地址创建日期
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
 	
 	public String getAddress_id() {
 		return address_id;
