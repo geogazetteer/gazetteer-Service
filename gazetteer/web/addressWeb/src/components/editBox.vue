@@ -10,7 +10,7 @@
         <div class="block flex_row">
           <!--选择街道-->
           <span class="label">街道：</span>
-          <select v-model="curStreet" class="select">
+          <select v-model="curStreet" class="select" @change="onSelStreet">
             <option v-for="s in allStreets">
               {{s}}
             </option>
@@ -20,9 +20,9 @@
         <div class="block flex_row">
           <span class="label">社区：</span>
           <!--选择社区-->
-          <select v-model="curCommunity" class="select">
+          <select v-model="curCommunity" class="select" @change="onSelCommunity">
             <option v-for="c in allCommunity">
-              {{c}}
+              {{c.community}}
             </option>
           </select>
         </div>
@@ -35,7 +35,7 @@
 
       <!--列表-->
      <ul v-if="showList" class="siteList">
-       <li class="site flex_row" @click="toggleEditModal" v-for="(l,index) in listArr.slice(10*(page-1),10*page)">
+       <li class="site flex_row" @click="toggleEditModal(l.address)" v-for="(l,index) in listArr.slice(10*(page-1),10*page)">
          <span>{{l.address}}</span>
          <img src="../../static/images/map/edit.png" class="imgItem">
        </li>
@@ -48,8 +48,7 @@
     <Modal
       v-model="showEditModal"
       title="地址编辑"
-      ok-text="保存"
-      cancel-text="取消"
+
       @on-ok="submitEdit"
       :mask="false"
       :styles="{
@@ -58,26 +57,47 @@
           top: '75px',
           right: '20px',
           maxHeight:'80%'}"
-      loading scrollable :visible="editVisible"
+       scrollable :visible="editVisible"
     >
 
-      <div v-for="(e,index) in editObj" class="editLine flex_row">
+      <div v-for="(val,index) in editObj" class="editLine flex_row">
         <div class="label flex_row">
-          <span style="color:red;vertical-align: middle;padding-right: 4px;" v-if="e.necessary">*</span>
-          <span>{{e.label}}：</span>
+          <span v-html="val.label"></span>
         </div>
 
 
-        <input type="text" v-model="e.value" v-if="e.type=='text'" :class="e.disabled?'text':'text canEdit'"
-               :disabled="e.disabled"/>
-        <select v-if="e.type=='select'" v-model="e.value" class="select" @change="onEditSelect(e.label,e.value)">
-          <option v-for="s in e.selectors">
-            {{s}}
-          </option>
-        </select>
+        <input type="text" v-model="editValue[val.val]"  :class="val.disabled?'text':'text canEdit'"
+               :disabled="val.disabled" />
 
-            <textarea v-if="e.type=='textarea'" class="textarea"
-                      v-model="e.value" :placeholder="e.placeholder"></textarea>
+      </div>
+
+
+      <div  class="editLine flex_row selectContainer">
+        <div class="label flex_row">
+          <span>相似标准地址</span>
+        </div>
+
+
+        <div  class="selectWrapper">
+          <select  v-model="curSelAddress" class="select" @change="onEditSelect" size="5">
+            <option v-for="s in matchResult">
+              {{s.address}}
+            </option>
+          </select>
+        </div>
+
+      </div>
+
+      <!--按钮-->
+      <div slot="footer" class="">
+        <Button size="small">
+          <Icon type="ios-arrow-back"></Icon>
+        </Button>
+        <Button>取消</Button>
+        <Button type="primary"  @click="submitEdit">保存</Button>
+        <Button  size="small">
+          <Icon type="ios-arrow-forward"></Icon>
+        </Button>
       </div>
 
     </Modal>
@@ -88,6 +108,7 @@
 
 
 <script>
+  import {EDITSELECTORCFG,URLCFG} from '../js/config.js'
   export default{
     name: 'editBox',
     data() {
@@ -95,55 +116,34 @@
         needUser:false,
 
         page:1,//当前页
-        curStreet:'龙华街道',//当前选择的街道
-        allStreets:['龙华街道','街道2','街道3','街道4'],
-        curCommunity:'社区1',//当前选择的社区
-        allCommunity:['社区1','社区2','社区3','社区4'],
+        curStreet:'',//当前选择的街道
+        allStreets:EDITSELECTORCFG['street'],
+        curCommunity:'',//当前选择的社区
+        allCommunity:[],
         showList:false,//打开非标准地址列表
         //非标准地址列表
-        listArr:[
-          {id: 0, address: '非标准地址武汉市洪山区广八路'},
-          {id: 1, address: '非标准地址武汉市洪山区广埠屯路'},
-          {id: 2, address: '非标准地址武汉市洪山区八一路路'},
-          {id: 3, address: '非标准地址武汉市洪山区广八路'},
-          {id: 0, address: '非标准地址武汉市洪山区广八路'},
-          {id: 1, address: '非标准地址武汉市洪山区广埠屯路'},
-          {id: 2, address: '非标准地址武汉市洪山区八一路路'},
-          {id: 3, address: '非标准地址武汉市洪山区广八路'},
-          {id: 0, address: '非标准地址武汉市洪山区广八路'},
-          {id: 1, address: '非标准地址武汉市洪山区广埠屯路'},
-          {id: 2, address: '非标准地址武汉市洪山区八一路路'},
-          {id: 3, address: '非标准地址武汉市洪山区广八路'}, {id: 0, address: '非标准地址武汉市洪山区广八路'},
-          {id: 1, address: '非标准地址武汉市洪山区广埠屯路'},
-          {id: 2, address: '非标准地址武汉市洪山区八一路路'},
-          {id: 3, address: '非标准地址武汉市洪山区广八路'}
-          , {id: 0, address: '非标准地址武汉市洪山区广八路'},
-          {id: 1, address: '非标准地址武汉市洪山区广埠屯路'},
-          {id: 2, address: '非标准地址武汉市洪山区八一路路'},
-          {id: 3, address: '非标准地址武汉市洪山区广八路'},
-          {id: 2, address: '非标准地址武汉市洪山区八一路路'},
-          {id: 3, address: '非标准地址武汉市洪山区广八路'}
-        ],
+        listArr:[],
 
         showEditModal:false,//是否打开编辑浮云
         //编辑对象
         editVisible:false,
         editObj:[
-          {'label':'省份','disabled':true,value:'广东省','necessary':false,type:'text'},
-          {'label':'城市','disabled':true,value:'深圳市','necessary':false,type:'text'},
-          {'label':'区县','disabled':true,value:'宝安区','necessary':false,type:'text'},
-          {'label':'街道','disabled':true,value:'xxx街道','necessary':false,type:'text'},
-          {'label':'社区',value:'A社区','disabled':true,'necessary':false,type:'text'},
-//          {'label':'姓名',value:'','necessary':true,type:'text'},
-//          {'label':'手机',value:'','necessary':true,type:'text'},
-          {'label':'原始地址',value:'观澜街道A1栋3307','disabled':true,'necessary':false,type:'text'},//JYCS字段
-          {'label':'相似标准地址','value':'匹配结果1','selectors':['匹配结果1','匹配结果2','匹配结果3','匹配结果4'],type:'select',},//列出相似的标准地址,可选择
-          {'label':'校正标准地址',value:'','disabled':true,'necessary':true,type:'text'},//选择确认的标准地址
-
-          {'label':'特殊说明',value:'','necessary':false,type:'textarea'},//选择确认的标准地址
+          {'label':'统一社会信用代码',val:'code','disabled':true,'necessary':false,type:'text'},
+          {'label':'企业名称',val:'name','disabled':true,'necessary':false,type:'text'},
+          {'label':'街道',val:'street','disabled':true,'necessary':false,type:'text'},
+          {'label':'社区',val:'community','disabled':true,'necessary':false,type:'text'},
+          {'label':'原地址',val:'originAddress','disabled':true,'necessary':false,type:'text'},//JYCS字段
 
         ],
-
+        editValue:{
+          code:'00xx',
+          name:'xxx',
+          street:'xx街道',
+          community:'xx社区',
+          originAddress:'原地址'
+        },
+        curSelAddress:'匹配结果1',//当前选择的匹配结果
+        matchResult:[]
 
       }
     },
@@ -167,15 +167,97 @@
         this.page = page
       },
 
+      //选择街道时
+      onSelStreet(){
+        var curStreet = this.curStreet;
+        var $this = this;
+        if(curStreet){
+          //调用接口获取当前街道含有的所有社区
+          var url = URLCFG['getCommunityByStreet'];
+          $this.$api.getMsg(url,{tablename:curStreet}).then(function (res) {
+            $this.allCommunity = res;
+            $this.curCommunity = res[0]['community'];
 
+             //调用接口获取当前街道，社区下的所有非标准地址
+           var url = URLCFG['getAddressByCommunity'];
+           $this.$api.getMsg(url, {fields:'address',tablename: $this.curCommunity}).then(function (res) {
+            $this.listArr=res;
+            $this.showList = true;
+           });
+          })
+
+
+
+         //测试数据
+          /*var res = [{"community":"龙塘社区"},{"community":"新牛社区"},{"community":"白石龙社区"},{"community":"民乐社区"},{"community":"樟坑社区"},{"community":"民治社区"},{"community":"民新社区"},{"community":"上芬社区"},{"community":"民强社区"},{"community":"大岭社区"},{"community":"北站社区"},{"community":"民泰社区"}];
+          $this.allCommunity = res;
+          $this.curCommunity = res[0]['community'];
+          $this.showList = true;
+          var res = [{"address":"深圳市龙华区民治街道民治社区民治大道398号汇宝江大厦B503"},{"address":"深圳市龙华区民治街道民治社区潜龙＊鑫茂花园A区3栋2单元16D"},{"address":"深圳市龙华区民治街道民治社区沙吓新二村8栋902号"},{"address":"深圳市龙华区民治街道民治社区沙元埔大厦380栋1408"},{"address":"深圳市龙华区民治街道民治社区梅花山庄欣梅园C33栋整套"},];
+          $this.listArr = res;
+          $this.showList = true;*/
+        }
+
+      },
+      //当选择社区时
+      onSelCommunity(){
+        var curCommunity  = this.curCommunity;
+        var $this = this;
+        if(curCommunity){
+          //调用接口获取当前街道，社区下的所有非标准地址
+          var url = URLCFG['getAddressByCommunity'];
+          $this.$api.getMsg(url, {fields:'address',tablename: curCommunity}).then(function (res) {
+           $this.listArr=res;
+           $this.showList = true;
+          });
+
+        /* //测试数据
+          var res = [{"address":"深圳市龙华区民治街道民治社区民治大道398号汇宝江大厦B503"},{"address":"深圳市龙华区民治街道民治社区潜龙＊鑫茂花园A区3栋2单元16D"},{"address":"深圳市龙华区民治街道民治社区沙吓新二村8栋902号"},{"address":"深圳市龙华区民治街道民治社区沙元埔大厦380栋1408"},{"address":"深圳市龙华区民治街道民治社区梅花山庄欣梅园C33栋整套"},];
+          $this.listArr = res;
+          $this.showList = true;*/
+        }
+
+      },
       //编辑开关
-      toggleEditModal(){
-        this.showEditModal = true;
+      toggleEditModal(address){
+        var $this = this;
+        //调用接口查询编辑信息
+         var url = URLCFG['getEditInfo'];
+         $this.$api.getEditMsg(url,address,$this.curStreet).then(function (res) {
+           $this.editValue = {
+             code:res[0]['code'],
+               name:res[0]['name'],
+               street:res[0]['street'],
+               community:res[0]['community'],
+               originAddress:res[0]['address']
+           };
+           $this.showEditModal = true;
 
-        //默认选择第一个相似标准地址
-        var editObj = this.$data.editObj;
-        editObj[editObj.length-2]['value'] = '匹配结果1';//将所选择的相似标准地址写入校正……
-        this.$set(editObj,editObj)
+           //调用接口获取匹配地址
+           var keyword = res[0]['name'];
+           var match_url = URLCFG['getMatchList'];
+           $this.$api.getEditMsg(match_url,$this.curCommunity,keyword).then(function (res) {
+             $this.matchResult =res;
+             $this.curSelAddress=res[0]['address'];//默认选择第一个
+
+           });
+
+         });
+
+
+         //测试数据
+        /* var res = [{"address":"深圳市龙华区龙华办事处和平路28号福轩大厦第九层908号","code":"9144030007177920XH","name":"深圳福吉田科技有限公司","owner":"陈佳杰","street":"龙华"}]
+        $this.editValue = {
+          code:res[0]['code'],
+          name:res[0]['name'],
+          street:res[0]['street'],
+          community:res[0]['community'],
+          originAddress:res[0]['address']
+        };
+        $this.showEditModal = true;
+        var res=[{"address":"广东省深圳市龙华区龙华街道油松社区东环二路万亨达大厦","similarity":0.22},{"address":"广东省深圳市龙华区龙华街道油松社区东环二路水斗新围万亨达大厦104","similarity":0.17},{"address":"广东省深圳市龙华区龙华街道油松社区东环二路水斗新围万亨达大厦B808","similarity":0.17},{"address":"广东省深圳市龙华区龙华街道油松社区东环二路水斗新围万亨达大厦A1001","similarity":0.17},{"address":"广东省深圳市龙华区龙华街道油松社区东环二路水斗新围万亨达大厦A2002","similarity":0.17},{"address":"广东省深圳市龙华区龙华街道油松社区东环二路水斗新围万亨达大厦102","similarity":0.17},{"address":"广东省深圳市龙华区龙华街道油松社区东环二路水斗新围万亨达大厦201","similarity":0.17},{"address":"广东省深圳市龙华区龙华街道油松社区东环二路水斗新围万亨达大厦A1101","similarity":0.17},{"address":"广东省深圳市龙华区龙华街道油松社区东环二路水斗新围万亨达大厦301","similarity":0.17}]
+        $this.matchResult =res;
+        $this.curSelAddress=res[0]['address'];//默认选择第一个*/
       },
 
       //编辑框中select控件改变时
@@ -217,7 +299,7 @@
 
 <style scoped>
 .listView{
-  width: 360px;
+  width: 380px;
 }
 .listView .selector{
   margin-top: 20px;
@@ -299,7 +381,7 @@
     background: #3385ff;
     color: #fff;
     height: 100%;
-    width: 95px;
+    width: 100px;
     justify-content: center;
     flex-shrink: 0;
   }
@@ -309,7 +391,7 @@
   .editLine .text{
     background: none;
   }
-  .editLine .text,.editLine .select,.editLine .textarea{
+  .editLine .text,.editLine .textarea,.editLine .selectWrapper{
     margin-left: 10px;
     height: 80%;
     width: 100%;
@@ -317,7 +399,20 @@
   .editLine .textarea{
     padding: 2px;
   }
-  .editLine:last-child{
-    height: 100px;
+.selectContainer{
+  height: 120px;
+  border: none;
+}
+  .editLine .selectWrapper{
+    position: relative;
+    max-height: 120px;
   }
+  .editLine .select{
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+.editLine .select option{
+height: 20px;
+}
 </style>

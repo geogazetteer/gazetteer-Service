@@ -1,0 +1,13 @@
+一、编辑模块
+1.接口http://localhost:8080/editor/all?：
+参数：page:当前页码，limit:每页显示数目，默认为10，fields=address&tablename=民治社区
+返回
+count:当前社区数据总数（用于分页）,
+data:[
+{uid:用于获取记录},address:'地址']
+
+2.接口http://localhost:8080/editor/address/深圳市龙华区龙华办事处和平路28号福轩大厦第九层908号?tablename=其他街道，
+应该使用uid进行查找
+返回结果中缺少“社区字段”
+3.http://localhost:8080/matcher/address?tablename=油松社区&keywords=%25万亨达大厦%25&min_sim=0.1&pagesize=10
+keyword前端难以自行确定

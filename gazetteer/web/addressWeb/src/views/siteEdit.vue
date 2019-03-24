@@ -11,10 +11,6 @@
     <!--个人中心-->
     <right-view   class="rightView"></right-view>
 
-    <!--返回搜索按钮-->
-    <div class="toSearch" @click="toSearch">
-      <img src="../../static/images/search_1.png">
-    </div>
   </div>
 </template>
 
@@ -38,10 +34,6 @@ export default {
     onGetMarkCoord(coordArr){
       this.markerCoord = coordArr
     },
-    //跳转到编辑页
-    toSearch(){
-      this.$router.push("/siteSearch");//跳转地名搜索
-    }
   }
 }
 </script>
@@ -65,20 +57,5 @@ export default {
   top: 20px;
   right: 20px;
 }
-  .toSearch{
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    z-index: 100;
-    cursor: pointer;
-    background: #fff;
-    border-radius: 50%;
-    border:3px solid #d8d8d8;
-  }
-  .toSearch img{
-    width: 100%;
-    border-radius: 50%;
-  }
+
 </style>

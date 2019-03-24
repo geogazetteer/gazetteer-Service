@@ -35,8 +35,25 @@ export function fetch(method, url, params) {
 }
 
 export default {
-    //demo
-    getSearchList(url,params) {
+    getMsg(url,params) {
         return fetch('get', url,params)
-    }
+    },
+
+  //获取编辑信息
+  getEditMsg(url,address,tablename) {
+    return fetch('get', url+'/'+address,{
+      tablename:tablename
+    })
+  },
+  //获取匹配标准地址
+  //获取编辑信息
+  getMatchAddress(url,tablename,keywords) {
+      //http://localhost:8080/matcher/address?tablename=油松社区&keywords=%25万亨达大厦%25&min_sim=0.1&pagesize=10
+    return fetch('get', url,{
+      tablename:tablename,
+      keywords:'%25'+keywords+'%25',
+      min_sim:0.1,
+      pagesize:10
+    })
+  }
 };

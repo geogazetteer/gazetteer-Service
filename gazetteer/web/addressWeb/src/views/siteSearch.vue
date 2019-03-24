@@ -11,10 +11,6 @@
     <!--右侧工具栏-->
     <right-view   class="rightView"></right-view>
 
-    <!--编辑跳转按钮-->
-    <div class="toEdit" @click="toEdit">
-      <img src="../../static/images/edit_1.png">
-    </div>
   </div>
 </template>
 
@@ -37,10 +33,6 @@ export default {
   methods:{
     onGetMarkCoord(coordArr){
       this.markerCoord = coordArr
-    },
-    //跳转到编辑页
-    toEdit(){
-      this.$router.push("/siteEdit");
     }
   }
 }
@@ -66,20 +58,5 @@ export default {
   top: 20px;
   right: 20px;
 }
-  .toEdit{
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    z-index: 100;
-    background: #fff;
-    border-radius: 50%;
-    border:3px solid #d8d8d8;
-  }
-  .toEdit img{
-    width: 100%;
-    border-radius: 50%;
-  }
+
 </style>

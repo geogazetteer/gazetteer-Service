@@ -241,7 +241,7 @@
           $this.needSpin = true;//显示spin
 
           var url = URLCFG['searchAddressUrl'];
-          $this.$api.getSearchList(url,{keyWord:curStr}).then(function (res) {
+          $this.$api.getMsg(url,{keyWord:curStr}).then(function (res) {
            $this.resultList = res;
            $this.showResult = true;//显示搜索结果
            $this.needSpin = false;//隐藏spin

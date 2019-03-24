@@ -8,18 +8,20 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: resolve => require(['@/views/home'], resolve)
+      component: resolve => require(['@/views/home'], resolve),
+      children:[
+        {
+          path: 'siteSearch/',
+          name: 'siteSearch',
+          component: resolve => require(['@/views/siteSearch'], resolve)
+        },
+        {
+          path: 'siteEdit/',
+          name: 'siteEdit',
+          component: resolve => require(['@/views/siteEdit'], resolve)
+        },
+      ]
     },
-    {
-      path: '/siteSearch',
-      name: 'siteSearch',
-      component: resolve => require(['@/views/siteSearch'], resolve)
-    },
-    {
-      path: '/siteEdit',
-      name: 'siteEdit',
-      component: resolve => require(['@/views/siteEdit'], resolve)
-},
     {
       path: '/AddressWebService',
       name: 'webService',
