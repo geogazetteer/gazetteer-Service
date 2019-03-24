@@ -49,5 +49,10 @@ public interface AddressMapper {
 	
 	public void createStreetTable(String tableName);
 	public void insertStreet(Map<String, Object> map);
+	
+	
+	//通过id查询所有
+	public List<AddressRow> selectById(String id);
+
 		
 }

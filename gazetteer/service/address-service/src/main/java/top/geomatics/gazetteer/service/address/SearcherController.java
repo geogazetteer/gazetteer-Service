@@ -397,5 +397,16 @@ public class SearcherController {
 	public String selectAddressBylucene(@RequestParam(value = "keyWord") String keyWord) {
 		return JSON.toJSONString(LuceneUtil.search(keyWord));
 	}
+	
+	@ApiOperation(value = "根据id查询详细信息", notes = "根据id查询详细信息")
+	@GetMapping("/selectById")
+	public String selectById(@RequestParam(value = "id") String id) {
+		Long start = System.currentTimeMillis();	
+		List<AddressRow> row = mapper.selectById(id);
+		Long end = System.currentTimeMillis();
+		System.out.println("selectById wasted time: " + (end - start));
+		// 使用阿里巴巴的fastjson
+		return JSON.toJSONString(row);
+}
 
 }

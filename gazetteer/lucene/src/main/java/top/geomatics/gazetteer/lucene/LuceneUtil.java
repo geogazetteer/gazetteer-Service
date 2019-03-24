@@ -70,14 +70,14 @@ public class LuceneUtil {
 		IndexWriter writer = getWriter();
 		writer.deleteAll();
 
-		map.put("sql_fields", "code,address");
+		map.put("sql_fields", "id,address");
 		map.put("sql_tablename", "dmdz");
 
 		List<AddressRow> rows = mapper.findEquals(map);
 
 		for (AddressRow row : rows) {
 			Document doc = new Document();
-			doc.add(new StringField("code", row.getCode(), Field.Store.YES));
+			doc.add(new StringField("id", row.getId(), Field.Store.YES));
 			doc.add(new TextField("address", row.getAddress(), Field.Store.YES));
 			writer.addDocument(doc);
 		}
@@ -87,7 +87,7 @@ public class LuceneUtil {
 	private static IndexSearcher init() throws IOException {
 		IndexSearcher indexSearcher = null;
 		if (indexSearcher == null) {
-			Directory directory = FSDirectory.open(new File("E:\\lucene_index"));
+			Directory directory = FSDirectory.open(new File("D:\\lucene_index"));
 			DirectoryReader directoryReader = DirectoryReader.open(directory);
 			indexSearcher = new IndexSearcher(directoryReader);
 		}
@@ -104,9 +104,10 @@ public class LuceneUtil {
 			Long start = System.currentTimeMillis();
 			TopDocs topDocs = indexSearcher.search(query, 10);
 			Long end = System.currentTimeMillis();
-			System.out.println("wasted time: " + (end - start));
+			System.out.println("lucene wasted time: " + (end - start));
 			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 				Document doc = indexSearcher.doc(scoreDoc.doc);
+				list.add(doc.get("id"));
 				list.add(doc.get("address"));
 			}
 		} catch (Exception e) {
