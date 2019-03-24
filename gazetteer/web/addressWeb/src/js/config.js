@@ -2,7 +2,10 @@
  * Created by lixiaochao on 2019/3/21.
  */
 const URLCFG={
+  searchCtx:'http://localhost:8080/address/building',//搜索联想
   searchAddressUrl:'http://localhost:8080/address/selectAddressBylucene',//搜索
+  //根据id获取详情
+  getDetailBySearchId:'http://localhost:8080/address/selectById',//param：id=1942646
 
   //查询当前街道包含的所有社区
   getCommunityByStreet:'http://localhost:8080/address/all',//(param:tablename=民治街道）

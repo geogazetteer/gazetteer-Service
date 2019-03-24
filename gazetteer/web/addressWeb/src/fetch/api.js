@@ -39,6 +39,12 @@ export default {
         return fetch('get', url,params)
     },
 
+  //搜索联想 http://localhost:8080/address/building/12号?limit=5
+  getSearchCtx(url,keyword){
+      return fetch('get',url+'/'+keyword,{
+        limit:5
+      })
+  },
   //获取编辑信息
   getEditMsg(url,address,tablename) {
     return fetch('get', url+'/'+address,{
@@ -46,7 +52,6 @@ export default {
     })
   },
   //获取匹配标准地址
-  //获取编辑信息
   getMatchAddress(url,tablename,keywords) {
       //http://localhost:8080/matcher/address?tablename=油松社区&keywords=%25万亨达大厦%25&min_sim=0.1&pagesize=10
     return fetch('get', url,{

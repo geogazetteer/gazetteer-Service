@@ -38,7 +38,7 @@
 
     <!--搜索结果-->
     <ul class="cardlist resultList" v-if="showResult">
-      <li v-for="(ca,index) in resultList" @click="showDetailList(index)" class="flex_row">
+      <li v-for="(ca,index) in resultList" @click="showDetailList(ca.id)" class="flex_row">
         <div class="imgItem" :style="{backgroundPosition:(-21*index)+'px 0'}"></div>
         <div class="right flex_col">
           <div class="address" v-html="ca.village"></div>
@@ -137,25 +137,10 @@
         needSpin: false,//显示spin
         showResult:false,//显示搜索结果
         resultList:[
-          {
+          /*{
             "address": "广东省深圳市龙华区观湖街道观城社区横坑河东村329号",
-            "building": "329号",
-            "building_id": "4403060100035000115",
-            "city": "深圳市",
-            "code": "4403060100035000115",
-            "community": "观城社区",
-            "create_address_date": "2018/7/3 20:30:11",
-            "district": "龙华区",
-            "floor": "",
-            "house_id": "",
-            "province": "广东省",
-            "publish": "1",
-            "road": "",
-            "road_num": "",
-            "street": "观湖街道",
-            "update_address_date": "2017/2/9 17:38:24",
-            "village": "横坑河东村"
-          }
+            "id":0001
+          }*/
         ],
 
         //历史记录
@@ -218,11 +203,16 @@
         this.showResult = false;//隐藏搜索结果
         this.showDetail=false;//隐藏详细信息
         var str = RegularStr(this.searchContent);//输入的搜索内容(去除空格)
+        var $this = this;
         if(str){
           //调用接口获取搜索联想
-          //this.cardList = res;//将接口获取的值传递到vue实例的data中
-          this.showCard = true;//显示搜索联想
-          this.showHis = false;//隐藏历史记录
+          var url = URLCFG['searchCtx'];
+          $this.$api.getSearchCtx(url,str).then(function (res) {
+            debugger
+            this.cardList = res;//将接口获取的值传递到vue实例的data中
+            this.showCard = true;//显示搜索联想
+            this.showHis = false;//隐藏历史记录
+          });
         }else{
           //当输入为空时，显示历史记录
           this.showCard = false;//隐藏搜索联想
@@ -252,37 +242,44 @@
       },
 
       //显示搜索详情
-      showDetailList(index){
-        this.showResult = false;//隐藏搜索结果
+      showDetailList(id){
+        if(id){
+          this.showResult = false;//隐藏搜索结果
 
-        var listData = this.resultList[index];
-        var detail = {
-          standard: [
-            {label: '省', value: listData['province']},
-            {label: '市', value: listData['city']},
-            {label: '区', value: listData['district']},
-            {label: '街道', value: listData['street']},
-            {label: '社区', value: listData['community']},
-            {label: '基础网格', value: ''},
-            {label: '路', value: listData['road']},
-            {label: '路号', value: listData['road_num']},
-            {label: '小区', value: listData['village']},
-            {label: '楼栋', value: listData['building']},
-          ],
-          detailList: [
-            {label: '楼栋编码', value: listData['building_id']},
-            {label: '详细地址', value: listData['address']},
-            {label: '门楼号地址', value: ''},
-            {label: '小学学区', value: ''},
-            {label: '初级中学学区', value: ''},
-            {label: '社区网格员ID', value: ''},
-          ]
-        };
-        this.detail = detail;
+          var url = URLCFG['searchAddressUrl'];
+          $this.$api.getMsg(url,{id:id}).then(function (res) {
+            var listData = res;
+            var detail = {
+              standard: [
+                {label: '省', value: listData['province']},
+                {label: '市', value: listData['city']},
+                {label: '区', value: listData['district']},
+                {label: '街道', value: listData['street']},
+                {label: '社区', value: listData['community']},
+                {label: '基础网格', value: ''},
+                {label: '路', value: listData['road']},
+                {label: '路号', value: listData['road_num']},
+                {label: '小区', value: listData['village']},
+                {label: '楼栋', value: listData['building']},
+              ],
+              detailList: [
+                {label: '楼栋编码', value: listData['building_id']},
+                {label: '详细地址', value: listData['address']},
+                {label: '门楼号地址', value: ''},
+                {label: '小学学区', value: ''},
+                {label: '初级中学学区', value: ''},
+                {label: '社区网格员ID', value: ''},
+              ]
+            };
+            this.detail = detail;
 
-        this.showDetail = true;//显示详情
-        this.hideDetail  = false;
-        //this.$emit('setMarkCoord', [114.30,30.52]);//地图定位
+            this.showDetail = true;//显示详情
+            this.hideDetail  = false;
+            //this.$emit('setMarkCoord', [114.30,30.52]);//地图定位
+          })
+
+        }
+
       },
       //返回搜索结果
       backResult(){

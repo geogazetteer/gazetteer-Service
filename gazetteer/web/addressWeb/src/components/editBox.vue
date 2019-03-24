@@ -236,7 +236,7 @@
            //调用接口获取匹配地址
            var keyword = res[0]['name'];
            var match_url = URLCFG['getMatchList'];
-           $this.$api.getEditMsg(match_url,$this.curCommunity,keyword).then(function (res) {
+           $this.$api.getMatchAddress(match_url,$this.curCommunity,keyword).then(function (res) {
              $this.matchResult =res;
              $this.curSelAddress=res[0]['address'];//默认选择第一个
 
