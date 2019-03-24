@@ -87,11 +87,8 @@ public class LuceneUtil {
 	private static IndexSearcher init() throws IOException {
 		IndexSearcher indexSearcher = null;
 		if (indexSearcher == null) {
-<<<<<<< HEAD
+
 			Directory directory = FSDirectory.open(new File("D:\\data\\lucene_index"));
-=======
-			Directory directory = FSDirectory.open(new File("D:\\lucene_index"));
->>>>>>> 0964b85037f46fc591731ed9493f856831cfd1df
 			DirectoryReader directoryReader = DirectoryReader.open(directory);
 			indexSearcher = new IndexSearcher(directoryReader);
 		}

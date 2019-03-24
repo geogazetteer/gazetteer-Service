@@ -14,7 +14,6 @@ import org.springframework.web.servlet.config.annotation.ContentNegotiationConfi
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
-<<<<<<< HEAD
 /**
  * @author whudyj
  *
@@ -47,20 +46,3 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 	}
 
 }
-=======
-///**
-// * @author whudyj
-// *
-// */
-//@Configuration
-//public class WebMvcConfig extends WebMvcConfigurationSupport {
-//
-//	@Override
-//	protected void addCorsMappings(CorsRegistry registry) {
-//		super.addCorsMappings(registry);
-//		registry.addMapping("/**").allowedOrigins("*").allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
-//				.maxAge(3600).allowCredentials(true);
-//	}
-//
-//}
->>>>>>> 0964b85037f46fc591731ed9493f856831cfd1df
