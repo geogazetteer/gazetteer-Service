@@ -2,12 +2,11 @@ package top.geomatics.gazetteer.lucene;
 
 public class Test {
 	public static void main(String[] args) {
-	/*	try {
-			new LuceneUtil().updateIndex();
+		try {
+			LuceneUtil.updateIndex();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
-		System.out.println("���");
+		}
+		System.out.println("执行成功，索引文件在D:\\lucene_index");
 	}
 }

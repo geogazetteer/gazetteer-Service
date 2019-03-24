@@ -66,7 +66,7 @@ public class LuceneUtil {
 	 */
 	@Scheduled(cron = "0 0 8 1 * ? ")
 	public static void updateIndex() throws Exception {
-		dir = FSDirectory.open(new File("D:\\lucene_index"));
+		dir = FSDirectory.open(new File("D:\\data\\lucene_index"));
 		IndexWriter writer = getWriter();
 		writer.deleteAll();
 
@@ -87,7 +87,7 @@ public class LuceneUtil {
 	private static IndexSearcher init() throws IOException {
 		IndexSearcher indexSearcher = null;
 		if (indexSearcher == null) {
-			Directory directory = FSDirectory.open(new File("E:\\lucene_index"));
+			Directory directory = FSDirectory.open(new File("D:\\data\\lucene_index"));
 			DirectoryReader directoryReader = DirectoryReader.open(directory);
 			indexSearcher = new IndexSearcher(directoryReader);
 		}
