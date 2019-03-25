@@ -33,6 +33,10 @@ public interface EnterpriseAddressMapper {
 	public Integer updateAll(Map<String, Object> map);
 
 	// 查询数据库表
+	public List<EnterpriseRow> selectByFid(Map<String, Object> map);
+
+	public List<EnterpriseRow> selectByFids(Map<String, Object> map);
+
 	public List<EnterpriseRow> findEquals(Map<String, Object> map);
 
 	public List<EnterpriseRow> findLike(Map<String, Object> map);

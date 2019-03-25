@@ -1,5 +1,6 @@
 package top.geomatics.gazetteer.service.address;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
 import top.geomatics.gazetteer.database.EnterpriseAddressMapper;
 import top.geomatics.gazetteer.database.EnterpriseDatabaseHelper;
+import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.EnterpriseRow;
 
 //编辑服务
@@ -100,7 +102,50 @@ public class EditorController {
 		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
 		List<EnterpriseRow> rows = mapper.findEquals(map);
 		// 使用阿里巴巴的fastjson
+		return "[{\"count\"" + ":" + "\"" + rows.size() + "\"}," + JSON.toJSONString(rows) + "]";
+	}
+
+	/**
+	 * http://localhost:8080/editor/fid/1?fields=*&tablename=民治街道
+	 * 
+	 * @param fid
+	 * @param fields
+	 * @param tablename
+	 * @return
+	 */
+	@ApiOperation(value = "根据fid查询详细信息", notes = "根据fid查询详细信息")
+	@GetMapping("/fid/{fid}")
+	public String selectByFid(@PathVariable(value = "fid", required = true) Integer fid,
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename) {
+		Map<String, Object> map = getRequestMap(fields, tablename, null, null, 0);
+		map.put("fid", fid);
+		List<EnterpriseRow> rows = mapper.selectByFid(map);
 		return JSON.toJSONString(rows);
+	}
+
+	/**
+	 * http://localhost:8080/editor/fids?in=1,2,3&field=*&tablename=民治街道
+	 * 
+	 * @param fields
+	 * @param tablename
+	 * @param fids
+	 * @return
+	 */
+	@ApiOperation(value = "根据一组fid查询详细信息", notes = "根据一组fid查询详细信息")
+	@GetMapping("/fids")
+	public String selectByFids(@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
+			@RequestParam(value = "in", required = true) String fids) {
+		List<Integer> idList = new ArrayList<Integer>();
+		String listString[] = fids.split(",");
+		for (String str : listString) {
+			idList.add(Integer.parseInt(str));
+		}
+		Map<String, Object> map = getRequestMap(fields, tablename, null, null, 0);
+		map.put("fids", idList);
+		List<EnterpriseRow> row = mapper.selectByFids(map);
+		return JSON.toJSONString(row);
 	}
 
 	/**

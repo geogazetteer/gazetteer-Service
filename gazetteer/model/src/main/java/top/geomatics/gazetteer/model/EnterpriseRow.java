@@ -8,6 +8,8 @@ package top.geomatics.gazetteer.model;
  *
  */
 public class EnterpriseRow extends AddressModifier {
+	private Integer fid;// 数据库fid
+
 	private String code;// 统一社会信用代码
 	private String name;// 企业名称
 	private String street;// 所在街道
@@ -17,6 +19,14 @@ public class EnterpriseRow extends AddressModifier {
 	private Double latitude;// 经度
 	private Double x;
 	private Double y;
+
+	public Integer getFid() {
+		return fid;
+	}
+
+	public void setFid(Integer fid) {
+		this.fid = fid;
+	}
 
 	public Double getX() {
 		return x;

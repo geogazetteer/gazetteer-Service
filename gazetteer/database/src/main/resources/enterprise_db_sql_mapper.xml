@@ -1,310 +1,342 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="top.geomatics.gazetteer.database.EnterpriseAddressMapper">
-    <!--drop table-->
-    <update id="dropTable" parameterType="String">  
-        DROP TABLE IF EXISTS ${_parameter} 
-    </update>  
-    
-    <!--create table-->
-    <update id="createAddressTable" parameterType="String">  
-        CREATE TABLE ${_parameter} (
-          fid INTEGER PRIMARY KEY AUTOINCREMENT,
-          code TEXT,
-          name TEXT,
-          street TEXT,
-          owner TEXT,
-          address TEXT,
-          longitude double,
-          latitude double,
-          x double,
-          y double,
-          status int,
-          modifier TEXT,
-          update_date Date,
-          update_address TEXT,
-          update_address_id TEXT
-          ) 
-    </update> 
-    
-    <!--insert into table-->
-    <insert id="insertAddress" parameterType="map">
-        insert into ${sql_tablename}
-        (
-          code ,
-          name ,
-          street ,
-          owner ,
-          address ,
-          longitude ,
-          latitude ,
-          x,
-          y,
-          status ,
-          modifier ,
-          update_date ,
-          update_address ,
-          update_address_id
-        )
-        values
-        (
-            #{code} ,
-            #{name} ,
-            #{street} ,
-            #{owner} ,
-            #{address} ,
-            #{longitude} ,
-            #{latitude} ,
-            #{x},
-            #{y},
-            #{status} ,
-            #{modifier} ,
-            #{update_date} ,
-            #{update_address} ,
-            #{update_address_id} 
-         )
-    </insert>
+<mapper
+	namespace="top.geomatics.gazetteer.database.EnterpriseAddressMapper">
+	<!--drop table -->
+	<update id="dropTable" parameterType="String">
+		DROP TABLE IF EXISTS
+		${_parameter}
+	</update>
 
-    <update  id="updateStatus"  parameterType="map" >
-         update ${sql_tablename} set
-            status = #{status}
-         <where> 
-            <if test="code != null">
-                code = #{code}
-            </if>
-            <if test="name != null">
-                AND name = #{name}
-            </if> 
-            <if test="street != null">
-                AND street = #{street}
-            </if> 
-            <if test="owner != null">
-                AND owner = #{owner}
-            </if> 
-            <if test="address != null">
-                AND address = #{address}
-            </if> 
-            <if test="modifier != null">
-                AND modifier = #{modifier}
-            </if>
-            <if test="update_date != null">
-                AND update_date = #{update_date}
-            </if>
-        </where>
-    </update>
+	<!--create table -->
+	<update id="createAddressTable" parameterType="String">
+		CREATE TABLE
+		${_parameter} (
+		fid INTEGER PRIMARY KEY AUTOINCREMENT,
+		code TEXT,
+		name
+		TEXT,
+		street TEXT,
+		owner TEXT,
+		address TEXT,
+		longitude double,
+		latitude
+		double,
+		x double,
+		y double,
+		status int,
+		modifier TEXT,
+		update_date Date,
+		update_address TEXT,
+		update_address_id TEXT
+		)
+	</update>
 
-    <update  id="updateModifier"  parameterType="map" >
-         update ${sql_tablename} set
-            modifier = #{modifier}
-       <where> 
-            <if test="code != null">
-                code = #{code}
-            </if>
-            <if test="name != null">
-                AND name = #{name}
-            </if> 
-            <if test="street != null">
-                AND street = #{street}
-            </if> 
-            <if test="owner != null">
-                AND owner = #{owner}
-            </if> 
-            <if test="address != null">
-                AND address = #{address}
-            </if> 
-            <if test="status != null">
-                AND status = #{status}
-            </if>
-             <if test="update_date != null">
-                AND update_date = #{update_date}
-            </if>
-        </where>
-    </update>
-    <update  id="updateDate"  parameterType="map" >
-         update ${sql_tablename} set
-            update_date = #{update_date}
-        <where> 
-            <if test="code != null">
-                code = #{code}
-            </if>
-            <if test="name != null">
-                AND name = #{name}
-            </if> 
-            <if test="street != null">
-                AND street = #{street}
-            </if> 
-            <if test="owner != null">
-                AND owner = #{owner}
-            </if> 
-            <if test="address != null">
-                AND address = #{address}
-            </if> 
-            <if test="status != null">
-                AND status = #{status}
-            </if>
-            <if test="modifier != null">
-                AND modifier = #{modifier}
-            </if>
-        </where>
-    </update>
-    <update  id="updateAddress"  parameterType="map" >
-         update ${sql_tablename} set
-            update_address = #{update_address}
-         <where> 
-            <if test="code != null">
-                code = #{code}
-            </if>
-            <if test="name != null">
-                AND name = #{name}
-            </if> 
-            <if test="street != null">
-                AND street = #{street}
-            </if> 
-            <if test="owner != null">
-                AND owner = #{owner}
-            </if> 
-            <if test="status != null">
-                AND status = #{status}
-            </if>
-            <if test="modifier != null">
-                AND modifier = #{modifier}
-            </if>
-            <if test="update_date != null">
-                AND update_date = #{update_date}
-            </if>
-        </where>
-    </update>
-    <update  id="updateAddressId"  parameterType="map" >
-         update ${sql_tablename} set
-            update_address_id = #{update_address_id}
-         <where> 
-            <if test="code != null">
-                code = #{code}
-            </if>
-            <if test="name != null">
-                AND name = #{name}
-            </if> 
-            <if test="street != null">
-                AND street = #{street}
-            </if> 
-            <if test="owner != null">
-                AND owner = #{owner}
-            </if> 
-            <if test="address != null">
-                AND address = #{address}
-            </if> 
-            <if test="status != null">
-                AND status = #{status}
-            </if>
-            <if test="modifier != null">
-                AND modifier = #{modifier}
-            </if>
-            <if test="update_date != null">
-                AND update_date = #{update_date}
-            </if>
-        </where>
-    </update>
-    <update  id="updateAll"  parameterType="map" >
-         update ${sql_tablename} set
-            status = #{status},
-            modifier = #{modifier},
-            update_date = #{update_date},
-            update_address = #{update_address},
-            update_address_id = #{update_address_id}
-         <where> 
-            <if test="code != null">
-                code = #{code}
-            </if>
-            <if test="name != null">
-                AND name = #{name}
-            </if> 
-            <if test="street != null">
-                AND street = #{street}
-            </if> 
-            <if test="owner != null">
-                AND owner = #{owner}
-            </if> 
-            <if test="address != null">
-                AND address = #{address}
-            </if> 
-      </where>
-    </update>
-    
-    <!--动态SQL-->
-    <select id="findEquals" resultType="EnterpriseRow">
-        SELECT ${sql_fields}
-        FROM ${sql_tablename}  
-        <where> 
-            <if test="code != null">
-                code = #{code}
-            </if>
-            <if test="name != null">
-                AND name = #{name}
-            </if> 
-            <if test="street != null">
-                AND street = #{street}
-            </if> 
-            <if test="owner != null">
-                AND owner = #{owner}
-            </if> 
-            <if test="address != null">
-                AND address = #{address}
-            </if> 
-            <if test="status != null">
-                AND status = #{status}
-            </if>
-            <if test="modifier != null">
-                AND modifier = #{modifier}
-            </if>
-            <if test="update_date != null">
-                AND update_date = #{update_date}
-            </if>
-        </where>
-        <if test="sql_orderBy != null">
-                ORDER BY  ${sql_orderBy}
-        </if>
-        <if test="sql_limit != null">
-                LIMIT  #{sql_limit}
-        </if>
-    </select>
-    <select id="findLike" resultType="EnterpriseRow">
-        SELECT ${sql_fields}
-        FROM ${sql_tablename} 
-        <where> 
-            <if test="code != null">
-                code LIKE #{code}
-            </if>
-            <if test="name != null">
-                AND name LIKE #{name}
-            </if> 
-            <if test="street != null">
-                AND street LIKE #{street}
-            </if> 
-            <if test="owner != null">
-                AND owner LIKE #{owner}
-            </if> 
-            <if test="address != null">
-                AND address LIKE #{address}
-            </if>
-            <if test="status != null">
-                AND status LIKE #{status}
-            </if>
-            <if test="modifier != null">
-                AND modifier LIKE #{modifier}
-            </if>
-            <if test="update_address != null">
-                AND update_address LIKE #{update_address}
-            </if>
-            <if test="update_address_id != null">
-                AND update_address_id LIKE #{update_address_id}
-            </if>     
-        </where>
-        <if test="sql_orderBy != null">
-                ORDER BY  ${sql_orderBy}
-        </if>
-        <if test="sql_limit != null">
-                LIMIT  #{sql_limit}
-        </if>
-    </select>
- 
+	<!--insert into table -->
+	<insert id="insertAddress" parameterType="map">
+		insert into
+		${sql_tablename}
+		(
+		code ,
+		name ,
+		street ,
+		owner ,
+		address ,
+		longitude ,
+		latitude ,
+		x,
+		y,
+		status ,
+		modifier ,
+		update_date ,
+		update_address ,
+		update_address_id
+		)
+		values
+		(
+		#{code} ,
+		#{name} ,
+		#{street} ,
+		#{owner} ,
+		#{address} ,
+		#{longitude} ,
+		#{latitude} ,
+		#{x},
+		#{y},
+		#{status} ,
+		#{modifier} ,
+		#{update_date} ,
+		#{update_address} ,
+		#{update_address_id}
+		)
+	</insert>
+
+	<update id="updateStatus" parameterType="map">
+		update ${sql_tablename} set
+		status = #{status}
+		<where>
+			<if test="code != null">
+				code = #{code}
+			</if>
+			<if test="name != null">
+				AND name = #{name}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="owner != null">
+				AND owner = #{owner}
+			</if>
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+			<if test="modifier != null">
+				AND modifier = #{modifier}
+			</if>
+			<if test="update_date != null">
+				AND update_date = #{update_date}
+			</if>
+		</where>
+	</update>
+
+	<update id="updateModifier" parameterType="map">
+		update ${sql_tablename} set
+		modifier = #{modifier}
+		<where>
+			<if test="code != null">
+				code = #{code}
+			</if>
+			<if test="name != null">
+				AND name = #{name}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="owner != null">
+				AND owner = #{owner}
+			</if>
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+			<if test="status != null">
+				AND status = #{status}
+			</if>
+			<if test="update_date != null">
+				AND update_date = #{update_date}
+			</if>
+		</where>
+	</update>
+	<update id="updateDate" parameterType="map">
+		update ${sql_tablename} set
+		update_date = #{update_date}
+		<where>
+			<if test="code != null">
+				code = #{code}
+			</if>
+			<if test="name != null">
+				AND name = #{name}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="owner != null">
+				AND owner = #{owner}
+			</if>
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+			<if test="status != null">
+				AND status = #{status}
+			</if>
+			<if test="modifier != null">
+				AND modifier = #{modifier}
+			</if>
+		</where>
+	</update>
+	<update id="updateAddress" parameterType="map">
+		update ${sql_tablename} set
+		update_address = #{update_address}
+		<where>
+			<if test="code != null">
+				code = #{code}
+			</if>
+			<if test="name != null">
+				AND name = #{name}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="owner != null">
+				AND owner = #{owner}
+			</if>
+			<if test="status != null">
+				AND status = #{status}
+			</if>
+			<if test="modifier != null">
+				AND modifier = #{modifier}
+			</if>
+			<if test="update_date != null">
+				AND update_date = #{update_date}
+			</if>
+		</where>
+	</update>
+	<update id="updateAddressId" parameterType="map">
+		update ${sql_tablename} set
+		update_address_id = #{update_address_id}
+		<where>
+			<if test="code != null">
+				code = #{code}
+			</if>
+			<if test="name != null">
+				AND name = #{name}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="owner != null">
+				AND owner = #{owner}
+			</if>
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+			<if test="status != null">
+				AND status = #{status}
+			</if>
+			<if test="modifier != null">
+				AND modifier = #{modifier}
+			</if>
+			<if test="update_date != null">
+				AND update_date = #{update_date}
+			</if>
+		</where>
+	</update>
+	<update id="updateAll" parameterType="map">
+		update ${sql_tablename} set
+		status = #{status},
+		modifier = #{modifier},
+		update_date = #{update_date},
+		update_address = #{update_address},
+		update_address_id = #{update_address_id}
+		<where>
+			<if test="code != null">
+				code = #{code}
+			</if>
+			<if test="name != null">
+				AND name = #{name}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="owner != null">
+				AND owner = #{owner}
+			</if>
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+		</where>
+	</update>
+
+	<!--通过fid查询字段 -->
+	<select id="selectByFid" resultType="EnterpriseRow">
+		SELECT ${sql_fields}
+		FROM
+		${sql_tablename}
+		where fid =#{fid}
+	</select>
+
+	<!--通过fids查询字段 -->
+	<select id="selectByFids" resultType="EnterpriseRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="fids != null">
+				fid in
+				<foreach collection="fids" index="index" item="fid" open="("
+					separator="," close=")">
+					#{fid}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+	<!--动态SQL -->
+	<select id="findEquals" resultType="EnterpriseRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="fid != null">
+				fid = #{fid}
+			</if>
+			<if test="code != null">
+				code = #{code}
+			</if>
+			<if test="name != null">
+				AND name = #{name}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="owner != null">
+				AND owner = #{owner}
+			</if>
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+			<if test="status != null">
+				AND status = #{status}
+			</if>
+			<if test="modifier != null">
+				AND modifier = #{modifier}
+			</if>
+			<if test="update_date != null">
+				AND update_date = #{update_date}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<if test="sql_limit != null">
+			LIMIT #{sql_limit}
+		</if>
+	</select>
+	<select id="findLike" resultType="EnterpriseRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="code != null">
+				code LIKE #{code}
+			</if>
+			<if test="name != null">
+				AND name LIKE #{name}
+			</if>
+			<if test="street != null">
+				AND street LIKE #{street}
+			</if>
+			<if test="owner != null">
+				AND owner LIKE #{owner}
+			</if>
+			<if test="address != null">
+				AND address LIKE #{address}
+			</if>
+			<if test="status != null">
+				AND status LIKE #{status}
+			</if>
+			<if test="modifier != null">
+				AND modifier LIKE #{modifier}
+			</if>
+			<if test="update_address != null">
+				AND update_address LIKE #{update_address}
+			</if>
+			<if test="update_address_id != null">
+				AND update_address_id LIKE #{update_address_id}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<if test="sql_limit != null">
+			LIMIT #{sql_limit}
+		</if>
+	</select>
+
 </mapper>
