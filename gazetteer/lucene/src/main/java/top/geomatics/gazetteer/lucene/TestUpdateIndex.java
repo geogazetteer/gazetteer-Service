@@ -1,12 +1,13 @@
 package top.geomatics.gazetteer.lucene;
 
-public class Test {
+public class TestUpdateIndex {
 	public static void main(String[] args) {
+		System.out.println("开始更新索引......");
 		try {
 			LuceneUtil.updateIndex();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("执行成功，索引文件在D:\\lucene_index");
+		System.out.println("更新索引结束！");
 	}
 }

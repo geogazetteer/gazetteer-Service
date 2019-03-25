@@ -3,13 +3,14 @@
 <configuration>
     <!-- 引入外部配置文件 -->
     <properties resource="sqlite.properties"></properties>
-    <!--
+ 
     <settings>
        <setting name="logImpl" value="STDOUT_LOGGING" /> 
     </settings>
-    -->
+  
     <typeAliases>
         <typeAlias type="top.geomatics.gazetteer.model.AddressRow" alias="AddressRow"/>
+        <typeAlias type="top.geomatics.gazetteer.model.SimpleAddressRow" alias="SimpleAddressRow"/>
     </typeAliases>
     <environments default="development">
         <environment id="development">

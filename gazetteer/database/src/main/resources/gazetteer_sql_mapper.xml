@@ -4,7 +4,7 @@
     <!--added by dyj 20190316-->
     
      <!--通过id查询所有字段-->
-    <select id="selectById" parameterType="String" resultType="AddressRow">
+    <select id="selectById" parameterType="int" resultType="AddressRow">
         SELECT * FROM dmdz where id = #{id}
     </select>
     
@@ -113,7 +113,65 @@
     <select id="findEquals" resultType="AddressRow">
         SELECT ${sql_fields}
         FROM ${sql_tablename}  
-        <where> 
+        <where>
+            <if test="id != null">
+                id = #{id}
+            </if> 
+            <if test="province != null">
+                province = #{province}
+            </if>
+            <if test="city != null">
+                AND city = #{city}
+            </if> 
+            <if test="district != null">
+                AND district = #{district}
+            </if> 
+            <if test="street != null">
+                AND street = #{street}
+            </if> 
+            <if test="community != null">
+                AND community = #{community}
+            </if> 
+            <if test="address != null">
+                AND address = #{address}
+            </if>
+            <if test="address_id != null">
+                AND address_id = #{address_id}
+            </if>
+            <if test="building != null">
+                AND building = #{building}
+            </if>
+            <if test="building_id != null">
+                AND building_id = #{building_id}
+            </if>
+            <if test="code != null">
+                AND code = #{code}
+            </if>     
+            <if test="road != null">
+                AND road = #{road}
+            </if> 
+            <if test="road_num != null">
+                AND road_num = #{road_num}
+            </if>
+            <if test="village != null">
+                AND village = #{village}
+            </if>  
+        </where>
+        <if test="sql_orderBy != null">
+                ORDER BY  ${sql_orderBy}
+        </if>
+        <if test="sql_limit != null">
+                LIMIT  #{sql_limit}
+        </if>
+    </select>
+    <!--动态SQL，返回简单地址-->
+    <select id="findSimpleEquals" resultType="SimpleAddressRow">
+        SELECT ${sql_fields}
+        FROM ${sql_tablename}  
+        <where>
+            <if test="id != null">
+                id = #{id}
+            </if> 
             <if test="province != null">
                 province = #{province}
             </if>

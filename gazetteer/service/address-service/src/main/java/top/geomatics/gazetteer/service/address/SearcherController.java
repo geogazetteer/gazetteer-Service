@@ -392,21 +392,25 @@ public class SearcherController {
 		return selectAll(fields, tablename, orderby, limit, aRow);
 	}
 
-	@ApiOperation(value = "根据lucene索引查询", notes = "根据lucene索引查询")
-	@GetMapping("/selectAddressBylucene")
-	public String selectAddressBylucene(@RequestParam(value = "keyWord") String keyWord) {
-		return JSON.toJSONString(LuceneUtil.search(keyWord));
+	/**
+	 * @param keyWords String 查询关键词，多个关键词以空格分隔
+	 * @return String 返回查询的地址，包含地址id信息
+	 */
+	@ApiOperation(value = "根据关键词进行模糊查询", notes = "根据关键词进行模糊查询")
+	@GetMapping("/hint")
+	public String selectAddressByKeywords(@RequestParam(value = "keywords") String keywords) {
+		return JSON.toJSONString(LuceneUtil.search(keywords,10));
 	}
-	
+
 	@ApiOperation(value = "根据id查询详细信息", notes = "根据id查询详细信息")
-	@GetMapping("/selectById")
-	public String selectById(@RequestParam(value = "id") String id) {
-		Long start = System.currentTimeMillis();	
+	@GetMapping("/id/{id}")
+	public String selectById(@PathVariable(value = "id", required = true) Integer id) {
+		Long start = System.currentTimeMillis();
 		List<AddressRow> row = mapper.selectById(id);
 		Long end = System.currentTimeMillis();
 		System.out.println("selectById wasted time: " + (end - start));
 		// 使用阿里巴巴的fastjson
 		return JSON.toJSONString(row);
-}
+	}
 
 }

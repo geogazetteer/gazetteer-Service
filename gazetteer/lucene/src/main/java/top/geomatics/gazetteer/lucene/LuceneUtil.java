@@ -16,8 +16,11 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.PhraseQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
@@ -30,6 +33,7 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 import top.geomatics.gazetteer.database.AddressMapper;
 import top.geomatics.gazetteer.database.DatabaseHelper;
 import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.model.SimpleAddressRow;
 
 /**
  * <em>lucene工具类</em>
@@ -39,8 +43,23 @@ import top.geomatics.gazetteer.model.AddressRow;
  */
 public class LuceneUtil {
 	@Value("${index.path}")
-	public static String INDEX_PATH;
+	public static String INDEX_PATH = "D:\\data\\lucene_index";
 	private static Directory dir;
+	private static IndexSearcher indexSearcher;
+	private static final String ADDRESS_ID = "id";
+	private static final String ADDRESS = "address";
+	private static final String SELECT_FIELDS = "id,address";
+	private static final String TABLE_NAME = "dmdz";
+
+	static
+	{
+		try {
+			indexSearcher = init();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	private static QueryParser queryParser = new QueryParser(Version.LUCENE_47, ADDRESS, new IKAnalyzer(true));
 
 	private static DatabaseHelper helper = new DatabaseHelper();
 	private static SqlSession session = helper.getSession();
@@ -66,19 +85,19 @@ public class LuceneUtil {
 	 */
 	@Scheduled(cron = "0 0 8 1 * ? ")
 	public static void updateIndex() throws Exception {
-		dir = FSDirectory.open(new File("D:\\data\\lucene_index"));
+		dir = FSDirectory.open(new File(INDEX_PATH));
 		IndexWriter writer = getWriter();
 		writer.deleteAll();
 
-		map.put("sql_fields", "id,address");
-		map.put("sql_tablename", "dmdz");
+		map.put("sql_fields", SELECT_FIELDS);
+		map.put("sql_tablename", TABLE_NAME);
 
-		List<AddressRow> rows = mapper.findEquals(map);
+		List<SimpleAddressRow> rows = mapper.findSimpleEquals(map);
 
-		for (AddressRow row : rows) {
+		for (SimpleAddressRow row : rows) {
 			Document doc = new Document();
-			doc.add(new StringField("id", row.getId(), Field.Store.YES));
-			doc.add(new TextField("address", row.getAddress(), Field.Store.YES));
+			doc.add(new StringField(ADDRESS_ID, row.getId().toString(), Field.Store.YES));
+			doc.add(new TextField(ADDRESS, row.getAddress(), Field.Store.YES));
 			writer.addDocument(doc);
 		}
 		writer.close();
@@ -88,29 +107,44 @@ public class LuceneUtil {
 		IndexSearcher indexSearcher = null;
 		if (indexSearcher == null) {
 
-			Directory directory = FSDirectory.open(new File("D:\\data\\lucene_index"));
+			Directory directory = FSDirectory.open(new File(INDEX_PATH));
 			DirectoryReader directoryReader = DirectoryReader.open(directory);
 			indexSearcher = new IndexSearcher(directoryReader);
 		}
 		return indexSearcher;
 	}
 
-	public static List<String> search(String keyWord) {
-		List<String> list = new ArrayList<String>();
+	/**
+	 * <em> 根据关键词进行搜索，支持多个关键词模糊搜索</em>
+	 * 
+	 * @param keywords String 搜索关键词，多个关键词以空格分隔
+	 * @param maxHits  int 搜索词的最大个数
+	 * @return List 返回一个简单地址数组
+	 */
+	public static List<SimpleAddressRow> search(String keywords, int maxHits) {
+		List<SimpleAddressRow> list = new ArrayList<SimpleAddressRow>();
 		try {
-			IndexSearcher indexSearcher = init();
-			QueryParser queryParser = new QueryParser(Version.LUCENE_47, "address", new IKAnalyzer(true));
-//        String q="select ADDRESS from dmdz where ADDRESS like '%"+keyWord+"%' limit 0,10";
-			org.apache.lucene.search.Query query = queryParser.parse(keyWord);
+//			String words[] = keywords.split(" ");
+//			String queryString = "";
+//			for (int i = 0; i < words.length; i++) {
+//				queryString += words[i];
+//				if (i < words.length - 1) {
+//					queryString += "~ OR ";// 多个关键词模糊查询
+//				}
+//			}
+			Query query = queryParser.parse(keywords);
 			Long start = System.currentTimeMillis();
-			TopDocs topDocs = indexSearcher.search(query, 10);
-			Long end = System.currentTimeMillis();
-			System.out.println("lucene wasted time: " + (end - start));
+			TopDocs topDocs = indexSearcher.search(query, maxHits);
+
 			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 				Document doc = indexSearcher.doc(scoreDoc.doc);
-				list.add(doc.get("id"));
-				list.add(doc.get("address"));
+				SimpleAddressRow row = new SimpleAddressRow();
+				row.setId(Integer.parseInt(doc.get(ADDRESS_ID)));
+				row.setAddress(doc.get(ADDRESS));
+				list.add(row);
 			}
+			Long end = System.currentTimeMillis();
+			System.out.println("lucene wasted time: " + (end - start) + "ms");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
