@@ -255,7 +255,7 @@ public class SearcherController {
 	 * @return
 	 */
 	@ApiOperation(value = "根据地址ID查询", notes = "获取对应地址的信息")
-	@GetMapping("/id/{address_id}")
+	@GetMapping("/address_id/{address_id}")
 	public String selectByAddressId(@PathVariable(value = "address_id", required = true) String address_id,
 			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
 			@RequestParam(value = "tablename", required = false, defaultValue = "dmdz") String tablename,
@@ -398,8 +398,9 @@ public class SearcherController {
 	 */
 	@ApiOperation(value = "根据关键词进行模糊查询", notes = "根据关键词进行模糊查询")
 	@GetMapping("/hint")
-	public String selectAddressByKeywords(@RequestParam(value = "keywords") String keywords) {
-		return JSON.toJSONString(LuceneUtil.search(keywords,10));
+	public String selectAddressByKeywords(@RequestParam(value = "keywords") String keywords,
+			@RequestParam(value = "maxHits") Integer maxHits) {
+		return JSON.toJSONString(LuceneUtil.search(keywords,maxHits));
 	}
 
 	@ApiOperation(value = "根据id查询详细信息", notes = "根据id查询详细信息")

@@ -39,10 +39,11 @@ export default {
         return fetch('get', url,params)
     },
 
-  //搜索联想 http://localhost:8080/address/building/12号?limit=5
+  //搜索联想 http://localhost:8080/address/hint?keywords=上塘农贸建材市场 库坑凹背村&maxHits=1000
   getSearchCtx(url,keyword){
-      return fetch('get',url+'/'+keyword,{
-        limit:5
+      return fetch('get',url,{
+          'keywords':keyword,
+            maxHits:1000
       })
   },
   //获取编辑信息
