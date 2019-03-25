@@ -7,21 +7,16 @@
    <base-map :markerCoord="markerCoord"></base-map>
     <!--搜索框-->
     <search-box @setMarkCoord="onGetMarkCoord"  class="leftView"></search-box>
-
-    <!--右侧工具栏-->
-    <right-view   class="rightView"></right-view>
-
   </div>
 </template>
 
 <script>
   import baseMap from '../components/baseMap.vue'
   import searchBox from '../components/searchBox.vue'
-  import rightView from '../components/userCenter.vue'
 export default {
   name: 'home',
   components: {
-    baseMap,searchBox,rightView
+    baseMap,searchBox
   },
   created(){
   },
@@ -51,12 +46,6 @@ export default {
   top: 0;
   z-index: 100;
   height: 100%;
-}
-.rightView {
-  z-index: 100;
-  position: absolute;
-  top: 20px;
-  right: 20px;
 }
 
 </style>

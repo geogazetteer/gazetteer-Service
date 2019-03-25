@@ -6,15 +6,19 @@
   <div class="wrapper">
     <router-view></router-view>
     <toggle class="toggle"></toggle>
+    <!--个人中心-->
+    <user-center class="rightView"></user-center>
   </div>
 </template>
 
 <script>
-import toggle from '../components/toggleBox'
+import toggle from '../components/toggleBox';
+import userCenter from '../components/userCenter'
+
 export default {
   name: 'home',
   components: {
-    toggle
+    toggle,userCenter
   },
   created(){
     this.$router.push("siteSearch");//跳转地名搜索
@@ -42,5 +46,10 @@ export default {
     z-index: 100;
     cursor: pointer;
   }
-
+  .rightView {
+    z-index: 100;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
 </style>

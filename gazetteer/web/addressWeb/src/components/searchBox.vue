@@ -19,12 +19,12 @@
 
 
     <!--搜索联想-->
-    <ul class="cardlist" v-if="showCard">
-      <li v-for="(ca,index) in cardList" @click="searchItems(ca.address)" class="flex_row">
-        <span class="imgItem"></span>
-        <span>{{ca.address}}</span>
-      </li>
-    </ul>
+    <!--<ul class="cardlist" v-if="showCard">
+    <li v-for="(ca,index) in cardList" @click="searchItems(ca.address)" class="flex_row">
+      <span class="imgItem"></span>
+      <span>{{ca.address}}</span>
+    </li>
+    </ul>-->
 
     <!--loading spin-->
     <div v-if="needSpin" class="spin-icon-load">
@@ -200,7 +200,7 @@
       },
       //获取搜索联想
       getCardList(){
-        this.showResult = false;//隐藏搜索结果
+        /*this.showResult = false;//隐藏搜索结果
         this.showDetail=false;//隐藏详细信息
         var str = RegularStr(this.searchContent);//输入的搜索内容(去除空格)
         var $this = this;
@@ -217,7 +217,7 @@
           //当输入为空时，显示历史记录
           this.showCard = false;//隐藏搜索联想
           this.showHis = true;//显示历史记录
-        }
+        }*/
       },
      //获取搜索结果
       searchItems(curStr){
