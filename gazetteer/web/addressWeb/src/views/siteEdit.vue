@@ -8,20 +8,16 @@
     <!--编辑框-->
     <edit-box @setMarkCoord="onGetMarkCoord"  class="leftView"></edit-box>
 
-    <!--个人中心-->
-    <right-view   class="rightView"></right-view>
-
   </div>
 </template>
 
 <script>
   import baseMap from '../components/baseMap.vue'
   import editBox from '../components/editBox.vue'
-  import rightView from '../components/userCenter.vue'
 export default {
   name: 'home',
   components: {
-    baseMap,editBox,rightView
+    baseMap,editBox
   },
   created(){
   },
@@ -51,11 +47,6 @@ export default {
   z-index: 100;
   height: 100%;
 }
-.rightView {
-  z-index: 100;
-  position: absolute;
-  top: 20px;
-  right: 20px;
-}
+
 
 </style>
