@@ -2,10 +2,10 @@
  * Created by lixiaochao on 2019/3/21.
  */
 const URLCFG={
-  searchCtx:'http://localhost:8080/address/hint',//搜索联想
-  searchAddressUrl:'http://localhost:8080/address/selectAddressBylucene',//搜索
+  searchCtx:'http://localhost:8080/address/hint',//搜索联想，param:keywords=上塘农贸建材市场 库坑凹背村&maxHits=1000
+  searchAddressUrl:'http://localhost:8080/address/hint',//搜索，param:keywords=上塘农贸建材市场 库坑凹背村&maxHits=1000
   //根据id获取详情
-  getDetailBySearchId:'http://localhost:8080/address/selectById',//param：id=1942646
+  getDetailBySearchId:'http://localhost:8080/address/id/',// + 794848
 
   //查询当前街道包含的所有社区
   getCommunityByStreet:'http://localhost:8080/address/all',//(param:tablename=民治街道）

@@ -67,6 +67,7 @@ public interface AddressMapper {
 
 	// 通过id查询所有
 	public List<AddressRow> selectById(Integer id);
+	public List<AddressRow> selectByIds(List<Integer> ids);
 
 	public List<SimpleAddressRow> findSimpleEquals(Map<String, Object> map);
 

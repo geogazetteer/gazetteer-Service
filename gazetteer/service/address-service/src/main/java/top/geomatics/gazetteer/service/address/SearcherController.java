@@ -1,5 +1,6 @@
 package top.geomatics.gazetteer.service.address;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -400,7 +401,7 @@ public class SearcherController {
 	@GetMapping("/hint")
 	public String selectAddressByKeywords(@RequestParam(value = "keywords") String keywords,
 			@RequestParam(value = "maxHits") Integer maxHits) {
-		return JSON.toJSONString(LuceneUtil.search(keywords,maxHits));
+		return JSON.toJSONString(LuceneUtil.search(keywords, maxHits));
 	}
 
 	@ApiOperation(value = "根据id查询详细信息", notes = "根据id查询详细信息")
@@ -411,6 +412,18 @@ public class SearcherController {
 		Long end = System.currentTimeMillis();
 		System.out.println("selectById wasted time: " + (end - start));
 		// 使用阿里巴巴的fastjson
+		return JSON.toJSONString(row);
+	}
+
+	@ApiOperation(value = "根据一组id查询详细信息", notes = "根据一组id查询详细信息")
+	@GetMapping("/ids")
+	public String selectByIds(@RequestParam(value = "in", required = true) String ids) {
+		List<Integer> idList = new ArrayList<Integer>();
+		String listString[] = ids.split(",");
+		for(String str:listString) {
+			idList.add(Integer.parseInt(str));
+		}
+		List<AddressRow> row = mapper.selectByIds(idList);
 		return JSON.toJSONString(row);
 	}
 
