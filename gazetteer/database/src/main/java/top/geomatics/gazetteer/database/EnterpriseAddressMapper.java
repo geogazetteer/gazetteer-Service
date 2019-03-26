@@ -40,5 +40,7 @@ public interface EnterpriseAddressMapper {
 	public List<EnterpriseRow> findEquals(Map<String, Object> map);
 
 	public List<EnterpriseRow> findLike(Map<String, Object> map);
+	
+	public List<EnterpriseRow> findPageEquals(Map<String, Object> map);
 
 }

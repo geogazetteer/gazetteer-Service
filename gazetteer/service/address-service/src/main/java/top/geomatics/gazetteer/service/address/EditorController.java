@@ -18,7 +18,6 @@ import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
 import top.geomatics.gazetteer.database.EnterpriseAddressMapper;
 import top.geomatics.gazetteer.database.EnterpriseDatabaseHelper;
-import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.EnterpriseRow;
 
 //编辑服务
@@ -87,6 +86,23 @@ public class EditorController {
 	}
 
 	/**
+	 * @param rows
+	 * @return
+	 */
+	private static String getResponseBody(List<EnterpriseRow> rows) {
+		/*
+		 * { "total": 3, "rows": [ { "id": 0, "name": "Item 0", "price": "$0" }, { "id":
+		 * 1, "name": "Item 1", "price": "$1" } ] }
+		 */
+		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
+		// 使用阿里巴巴的fastjson
+		responseString += JSON.toJSONString(rows);
+		responseString += "}";
+		return responseString;
+
+	}
+
+	/**
 	 * 
 	 * examples:
 	 * http://localhost:8080/editor/all?fields=code,name,address&tablename=enterprise1&limit=10
@@ -101,8 +117,28 @@ public class EditorController {
 			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit, EnterpriseRow row) {
 		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
 		List<EnterpriseRow> rows = mapper.findEquals(map);
-		// 使用阿里巴巴的fastjson
-		return "[{\"count\"" + ":" + "\"" + rows.size() + "\"}," + JSON.toJSONString(rows) + "]";
+		return getResponseBody(rows);
+	}
+
+	/**
+	 * 
+	 * examples:
+	 * http://localhost:8080/editor/page/1?fields=code,name,address&tablename=enterprise1&limit=10
+	 * 
+	 * @return
+	 */
+	@ApiOperation(value = "列出所有需要编辑的地址", notes = "列出所有需要编辑的地址")
+	@GetMapping("/page/{index}")
+	public String editPage(@PathVariable(value = "index", required = true) Integer index,
+			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
+			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
+			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
+			@RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit, EnterpriseRow row) {
+		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
+		Integer page_start = (index - 1) * limit;
+		map.put("page_start", page_start);
+		List<EnterpriseRow> rows = mapper.findPageEquals(map);
+		return getResponseBody(rows);
 	}
 
 	/**
@@ -121,7 +157,7 @@ public class EditorController {
 		Map<String, Object> map = getRequestMap(fields, tablename, null, null, 0);
 		map.put("fid", fid);
 		List<EnterpriseRow> rows = mapper.selectByFid(map);
-		return JSON.toJSONString(rows);
+		return getResponseBody(rows);
 	}
 
 	/**
@@ -145,7 +181,7 @@ public class EditorController {
 		Map<String, Object> map = getRequestMap(fields, tablename, null, null, 0);
 		map.put("fids", idList);
 		List<EnterpriseRow> row = mapper.selectByFids(map);
-		return JSON.toJSONString(row);
+		return getResponseBody(row);
 	}
 
 	/**
@@ -184,7 +220,7 @@ public class EditorController {
 
 		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
 		List<EnterpriseRow> rows = mapper.findEquals(map);
-		return JSON.toJSONString(rows);
+		return getResponseBody(rows);
 	}
 
 	/**
@@ -223,7 +259,7 @@ public class EditorController {
 
 		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
 		List<EnterpriseRow> rows = mapper.findLike(map);
-		return JSON.toJSONString(rows);
+		return getResponseBody(rows);
 	}
 
 	/**
