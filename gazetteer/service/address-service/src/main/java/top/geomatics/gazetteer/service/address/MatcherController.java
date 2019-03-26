@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 
 import io.swagger.annotations.ApiOperation;
-import top.geomatics.gazetteer.database.DatabaseHelper;
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.ComparableAddress;
 import top.geomatics.gazetteer.model.IGazetteerConstant;
@@ -28,8 +27,6 @@ import top.geomatics.gazetteer.utilities.address.AddressSimilarity;
 @RestController
 @RequestMapping("/matcher")
 public class MatcherController {
-	private static final String ADDRESS_FIELD = "address";
-	private static final String TABLE_NAME = "dmdz";
 
 	/**
 	 * 
@@ -67,14 +64,15 @@ public class MatcherController {
 			}
 		}
 		if (true == tablename.isEmpty()) {
-			tablename = TABLE_NAME;
+			tablename = IControllerConstant.TABLE_NAME;
 		}
 		row.setAddress("%" + shortKeywords + "%");
 		// </分词>
 
 		// <查询>
-		Map<String, Object> map = DatabaseHelper.getRequestMap(ADDRESS_FIELD, tablename, row, null, 0);
-		List<AddressRow> rows = AddressServiceApplication.mapper.findLike(map);
+		Map<String, Object> map = ControllerUtils.getRequestMap(IControllerConstant.ADDRESS_FIELD, tablename, row, null,
+				0);
+		List<AddressRow> rows = ControllerUtils.mapper.findLike(map);
 		// </查询>
 		// <相似性计算，并排序>
 		List<ComparableAddress> sortAddresses = new ArrayList<ComparableAddress>();

@@ -2,105 +2,22 @@ package top.geomatics.gazetteer.service.address;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.session.SqlSession;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
-
 import io.swagger.annotations.ApiOperation;
-import top.geomatics.gazetteer.database.EnterpriseAddressMapper;
-import top.geomatics.gazetteer.database.EnterpriseDatabaseHelper;
 import top.geomatics.gazetteer.model.EnterpriseRow;
 
 //编辑服务
 @RestController
 @RequestMapping("/editor")
 public class EditorController {
-	private static EnterpriseDatabaseHelper helper = new EnterpriseDatabaseHelper();
-	private static SqlSession session = helper.getSession();
-	private static EnterpriseAddressMapper mapper = session.getMapper(EnterpriseAddressMapper.class);
-
-	private static Map<String, Object> getRequestMap(String fields, String tablename, EnterpriseRow row, String orderby,
-			int limit) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("sql_fields", fields);
-		map.put("sql_tablename", tablename);
-		if (null != row) {
-			// 11个字段
-			String code = row.getCode();
-			String name = row.getName();
-			String street = row.getStreet();
-			String owner = row.getOwner();
-			String address = row.getAddress();
-			// geometry字段;
-			Integer iStatus = row.getStatus();
-			String modifier = row.getModifier();
-			Date date = row.getUpdate_date();
-			String update_address = row.getUpdate_address();
-			String update_address_id = row.getUpdate_address_id();
-
-			if (code != null && !code.isEmpty())
-				map.put("code", code);
-			if (name != null && !name.isEmpty())
-				map.put("name", name);
-			if (street != null && !street.isEmpty())
-				map.put("street", street);
-			if (owner != null && !owner.isEmpty())
-				map.put("owner", owner);
-			if (address != null && !address.isEmpty())
-				map.put("address", address);
-
-			if (iStatus != null) {
-				String status = iStatus.toString();
-				if (!status.isEmpty()) {
-					map.put("status", status);
-				}
-			}
-			if (modifier != null && !modifier.isEmpty())
-				map.put("modifier", modifier);
-			if (date != null) {
-				String update_date = date.toString();
-				if (!update_date.isEmpty()) {
-					map.put("update_date", update_date);
-				}
-			}
-			if (update_address != null && !update_address.isEmpty())
-				map.put("update_address", update_address);
-			if (update_address_id != null && !update_address_id.isEmpty())
-				map.put("update_address_id", update_address_id);
-		}
-
-		if (orderby != null && !orderby.isEmpty())
-			map.put("sql_orderBy", orderby);
-		if (limit > 0)
-			map.put("sql_limit", limit);
-		return map;
-	}
-
-	/**
-	 * @param rows
-	 * @return
-	 */
-	private static String getResponseBody(List<EnterpriseRow> rows) {
-		/*
-		 * { "total": 3, "rows": [ { "id": 0, "name": "Item 0", "price": "$0" }, { "id":
-		 * 1, "name": "Item 1", "price": "$1" } ] }
-		 */
-		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		// 使用阿里巴巴的fastjson
-		responseString += JSON.toJSONString(rows);
-		responseString += "}";
-		return responseString;
-
-	}
 
 	/**
 	 * 
@@ -115,9 +32,9 @@ public class EditorController {
 			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
 			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
 			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit, EnterpriseRow row) {
-		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
-		List<EnterpriseRow> rows = mapper.findEquals(map);
-		return getResponseBody(rows);
+		Map<String, Object> map = ControllerUtils.getRequestMap2(fields, tablename, row, orderby, limit);
+		List<EnterpriseRow> rows = ControllerUtils.mapper2.findEquals(map);
+		return ControllerUtils.getResponseBody2(rows);
 	}
 
 	/**
@@ -134,11 +51,11 @@ public class EditorController {
 			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename,
 			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
 			@RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit, EnterpriseRow row) {
-		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
+		Map<String, Object> map = ControllerUtils.getRequestMap2(fields, tablename, row, orderby, limit);
 		Integer page_start = (index - 1) * limit;
 		map.put("page_start", page_start);
-		List<EnterpriseRow> rows = mapper.findPageEquals(map);
-		return getResponseBody(rows);
+		List<EnterpriseRow> rows = ControllerUtils.mapper2.findPageEquals(map);
+		return ControllerUtils.getResponseBody2(rows);
 	}
 
 	/**
@@ -154,10 +71,10 @@ public class EditorController {
 	public String selectByFid(@PathVariable(value = "fid", required = true) Integer fid,
 			@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
 			@RequestParam(value = "tablename", required = false, defaultValue = "enterprise1") String tablename) {
-		Map<String, Object> map = getRequestMap(fields, tablename, null, null, 0);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put("fid", fid);
-		List<EnterpriseRow> rows = mapper.selectByFid(map);
-		return getResponseBody(rows);
+		List<EnterpriseRow> rows = ControllerUtils.mapper2.selectByFid(map);
+		return ControllerUtils.getResponseBody2(rows);
 	}
 
 	/**
@@ -178,10 +95,10 @@ public class EditorController {
 		for (String str : listString) {
 			idList.add(Integer.parseInt(str));
 		}
-		Map<String, Object> map = getRequestMap(fields, tablename, null, null, 0);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put("fids", idList);
-		List<EnterpriseRow> row = mapper.selectByFids(map);
-		return getResponseBody(row);
+		List<EnterpriseRow> row = ControllerUtils.mapper2.selectByFids(map);
+		return ControllerUtils.getResponseBody2(row);
 	}
 
 	/**
@@ -218,9 +135,9 @@ public class EditorController {
 		}
 		row.setModifier(modifier);
 
-		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
-		List<EnterpriseRow> rows = mapper.findEquals(map);
-		return getResponseBody(rows);
+		Map<String, Object> map = ControllerUtils.getRequestMap2(fields, tablename, row, orderby, limit);
+		List<EnterpriseRow> rows = ControllerUtils.mapper2.findEquals(map);
+		return ControllerUtils.getResponseBody2(rows);
 	}
 
 	/**
@@ -257,9 +174,9 @@ public class EditorController {
 		}
 		row.setModifier(modifier);
 
-		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
-		List<EnterpriseRow> rows = mapper.findLike(map);
-		return getResponseBody(rows);
+		Map<String, Object> map = ControllerUtils.getRequestMap2(fields, tablename, row, orderby, limit);
+		List<EnterpriseRow> rows = ControllerUtils.mapper2.findLike(map);
+		return ControllerUtils.getResponseBody2(rows);
 	}
 
 	/**
@@ -415,9 +332,9 @@ public class EditorController {
 
 		row.setModifier(modifier);
 
-		Map<String, Object> map = getRequestMap(null, tablename, row, null, 0);
-		Integer updatedRows = mapper.updateStatus(map);
-		session.commit(true);
+		Map<String, Object> map = ControllerUtils.getRequestMap2(null, tablename, row, null, 0);
+		Integer updatedRows = ControllerUtils.mapper2.updateStatus(map);
+		ControllerUtils.session2.commit(true);
 		return "Ok,updated rows:" + updatedRows;
 	}
 
@@ -447,9 +364,9 @@ public class EditorController {
 		row.setAddress(address);
 		row.setStatus(status);
 
-		Map<String, Object> map = getRequestMap(null, tablename, row, null, 0);
-		Integer updatedRows = mapper.updateModifier(map);
-		session.commit(true);
+		Map<String, Object> map = ControllerUtils.getRequestMap2(null, tablename, row, null, 0);
+		Integer updatedRows = ControllerUtils.mapper2.updateModifier(map);
+		ControllerUtils.session2.commit(true);
 		return "Ok,updated rows:" + updatedRows;
 	}
 
@@ -480,9 +397,9 @@ public class EditorController {
 		row.setStatus(status);
 		row.setModifier(modifier);
 
-		Map<String, Object> map = getRequestMap(null, tablename, row, null, 0);
-		Integer updatedRows = mapper.updateDate(map);
-		session.commit(true);
+		Map<String, Object> map = ControllerUtils.getRequestMap2(null, tablename, row, null, 0);
+		Integer updatedRows = ControllerUtils.mapper2.updateDate(map);
+		ControllerUtils.session2.commit(true);
 		return "Ok,updated rows:" + updatedRows;
 	}
 
@@ -513,9 +430,9 @@ public class EditorController {
 		row.setStatus(status);
 		row.setModifier(modifier);
 
-		Map<String, Object> map = getRequestMap(null, tablename, row, null, 0);
-		Integer updatedRows = mapper.updateAddress(map);
-		session.commit(true);
+		Map<String, Object> map = ControllerUtils.getRequestMap2(null, tablename, row, null, 0);
+		Integer updatedRows = ControllerUtils.mapper2.updateAddress(map);
+		ControllerUtils.session2.commit(true);
 		return "Ok,updated rows:" + updatedRows;
 	}
 
@@ -546,9 +463,9 @@ public class EditorController {
 		row.setStatus(status);
 		row.setModifier(modifier);
 
-		Map<String, Object> map = getRequestMap(null, tablename, row, null, 0);
-		Integer updatedRows = mapper.updateAddress(map);
-		session.commit(true);
+		Map<String, Object> map = ControllerUtils.getRequestMap2(null, tablename, row, null, 0);
+		Integer updatedRows = ControllerUtils.mapper2.updateAddress(map);
+		ControllerUtils.session2.commit(true);
 		return "Ok,updated rows:" + updatedRows;
 	}
 

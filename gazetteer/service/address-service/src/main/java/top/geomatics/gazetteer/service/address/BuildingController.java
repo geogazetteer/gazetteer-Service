@@ -24,9 +24,9 @@ import top.geomatics.gazetteer.utilities.database.excel2gpkg.GeopackageReader;
 public class BuildingController {
 	String addressFileName = "D:\\data\\LH_gazetteer.gpkg";
 	GeopackageReader reader2 = new GeopackageReader(addressFileName);
-	
-	//reader2.close();
-	
+
+	// reader2.close();
+
 	/**
 	 * example: http://localhost:8080/building/query?x=503361.375&y=2506786.75
 	 * 
@@ -36,8 +36,7 @@ public class BuildingController {
 	 * @return
 	 */
 	@GetMapping("/query")
-	public String query(
-			@RequestParam(value = "tablename", required = false, defaultValue = "龙华区楼栋") String tablename,
+	public String query(@RequestParam(value = "tablename", required = false, defaultValue = "龙华区楼栋") String tablename,
 			@RequestParam(value = "x", required = true) Double x,
 			@RequestParam(value = "y", required = true) Double y) {
 		reader2.preQuery("龙华区楼栋");

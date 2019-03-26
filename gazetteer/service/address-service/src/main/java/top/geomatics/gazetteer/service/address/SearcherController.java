@@ -1,11 +1,9 @@
 package top.geomatics.gazetteer.service.address;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.session.SqlSession;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 
 import io.swagger.annotations.ApiOperation;
-import top.geomatics.gazetteer.database.AddressMapper;
-import top.geomatics.gazetteer.database.DatabaseHelper;
 import top.geomatics.gazetteer.lucene.LuceneUtil;
 import top.geomatics.gazetteer.model.AddressRow;
 
@@ -29,66 +25,6 @@ import top.geomatics.gazetteer.model.AddressRow;
 @RequestMapping("/address")
 public class SearcherController {
 
-	private static DatabaseHelper helper = new DatabaseHelper();
-	private static SqlSession session = helper.getSession();
-	private static AddressMapper mapper = session.getMapper(AddressMapper.class);
-
-	private static Map<String, Object> getRequestMap(String fields, String tablename, AddressRow row, String orderby,
-			int limit) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("sql_fields", fields);
-		map.put("sql_tablename", tablename);
-		if (null != row) {
-			// 13个字段
-			String province = row.getProvince();
-			String city = row.getCity();
-			String district = row.getDistrict();
-			String street = row.getStreet();
-			String community = row.getCommunity();
-			String address = row.getAddress();
-			String address_id = row.getAddress_id();
-			String building = row.getBuilding();
-			String building_id = row.getBuilding_id();
-			String code = row.getCode();
-			String road = row.getRoad();
-			String road_num = row.getRoad_num();
-			String village = row.getVillage();
-
-			if (province != null && !province.isEmpty())
-				map.put("province", province);
-			if (city != null && !city.isEmpty())
-				map.put("city", city);
-			if (district != null && !district.isEmpty())
-				map.put("district", district);
-			if (street != null && !street.isEmpty())
-				map.put("street", street);
-			if (community != null && !community.isEmpty())
-				map.put("community", community);
-			if (address != null && !address.isEmpty())
-				map.put("address", address);
-			if (address_id != null && !address_id.isEmpty())
-				map.put("address_id", address_id);
-			if (building != null && !building.isEmpty())
-				map.put("building", building);
-			if (building_id != null && !building_id.isEmpty())
-				map.put("building_id", building_id);
-			if (code != null && !code.isEmpty())
-				map.put("code", code);
-			if (road != null && !road.isEmpty())
-				map.put("road", road);
-			if (road_num != null && !road_num.isEmpty())
-				map.put("road_num", road_num);
-			if (village != null && !village.isEmpty())
-				map.put("village", village);
-		}
-
-		if (orderby != null && !orderby.isEmpty())
-			map.put("sql_orderBy", orderby);
-		if (limit > 0)
-			map.put("sql_limit", limit);
-		return map;
-	}
-
 	/**
 	 * url:/all?fields={field}&tablename={tablename}&orderby={orderby}&limit={limit}
 	 * examples: /all/?fields=id,address&tablename=民治社区
@@ -100,8 +36,8 @@ public class SearcherController {
 			@RequestParam(value = "tablename", required = false, defaultValue = "dmdz") String tablename,
 			@RequestParam(value = "orderby", required = false, defaultValue = "") String orderby,
 			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit, AddressRow row) {
-		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
-		List<AddressRow> rows = mapper.findEquals(map);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
+		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		// 使用阿里巴巴的fastjson
 		return JSON.toJSONString(rows);
 	}
@@ -123,8 +59,8 @@ public class SearcherController {
 			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
 		// Map<String, Object> map = getRequestMap(fields, tablename, null, orderby,
 		// limit);
-		Map<String, Object> map = getRequestMap(fields, path_street, null, orderby, limit);
-		List<AddressRow> rows = mapper.findEquals(map);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_street, null, orderby, limit);
+		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		// 使用阿里巴巴的fastjson
 		return JSON.toJSONString(rows);
 	}
@@ -146,8 +82,8 @@ public class SearcherController {
 			@RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
 		// Map<String, Object> map = getRequestMap(fields, tablename, null, orderby,
 		// limit);
-		Map<String, Object> map = getRequestMap(fields, path_community, null, orderby, limit);
-		List<AddressRow> rows = mapper.findEquals(map);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_community, null, orderby, limit);
+		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		// 使用阿里巴巴的fastjson
 		return JSON.toJSONString(rows);
 	}
@@ -193,8 +129,8 @@ public class SearcherController {
 		row.setRoad(road);
 		row.setRoad_num(road_num);
 		row.setVillage(village);
-		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
-		List<AddressRow> rows = mapper.findEquals(map);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
+		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		return JSON.toJSONString(rows);
 	}
 
@@ -240,8 +176,8 @@ public class SearcherController {
 		row.setRoad(road);
 		row.setRoad_num(road_num);
 		row.setVillage(village);
-		Map<String, Object> map = getRequestMap(fields, tablename, row, orderby, limit);
-		List<AddressRow> rows = mapper.findLike(map);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
+		List<AddressRow> rows = ControllerUtils.mapper.findLike(map);
 		// 计算相似性
 		if (0 != simtype && similarity > 0.0) {
 
@@ -408,7 +344,7 @@ public class SearcherController {
 	@GetMapping("/id/{id}")
 	public String selectById(@PathVariable(value = "id", required = true) Integer id) {
 		Long start = System.currentTimeMillis();
-		List<AddressRow> row = mapper.selectById(id);
+		List<AddressRow> row = ControllerUtils.mapper.selectById(id);
 		Long end = System.currentTimeMillis();
 		System.out.println("selectById wasted time: " + (end - start));
 		// 使用阿里巴巴的fastjson
@@ -420,10 +356,10 @@ public class SearcherController {
 	public String selectByIds(@RequestParam(value = "in", required = true) String ids) {
 		List<Integer> idList = new ArrayList<Integer>();
 		String listString[] = ids.split(",");
-		for(String str:listString) {
+		for (String str : listString) {
 			idList.add(Integer.parseInt(str));
 		}
-		List<AddressRow> row = mapper.selectByIds(idList);
+		List<AddressRow> row = ControllerUtils.mapper.selectByIds(idList);
 		return JSON.toJSONString(row);
 	}
 
