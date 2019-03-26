@@ -19,15 +19,14 @@ import top.geomatics.gazetteer.model.AddressRow;
  * 
  * @author whudyj
  */
+
 @RestController
 @RequestMapping("/address")
 public class SearcherController {
 
 	/**
 	 * url:/all?fields={field}&tablename={tablename}&orderby={orderby}&limit={limit}
-	 * examples: /all/?fields=id,address&tablename=民治社区
-	 * 
-	 * @return
+	 * examples: http://localhost:8083/address/all?fields=id,address&tablename=民治社区
 	 */
 	@GetMapping("/all")
 	public String selectAll(@RequestParam(value = "fields", required = false, defaultValue = "*") String fields,
@@ -42,9 +41,7 @@ public class SearcherController {
 
 	/**
 	 * url:/{district}/{street}?fields={field}&orderby={orderby}&limit={limit}
-	 * examples: http://localhost:8080/address/龙华区/民治街道?limit=5
-	 * 
-	 * @return
+	 * examples: http://localhost:8083/address/龙华区/民治街道?limit=5
 	 */
 	@GetMapping("/{district}/{street}")
 	public String selectByStreetNode(@PathVariable(value = "district", required = false) String path_district,
@@ -65,9 +62,7 @@ public class SearcherController {
 
 	/**
 	 * url:/{district}/{street}/{community}?fields={field}&orderby={orderby}&limit={limit}
-	 * examples: http://localhost:8080/address/龙华区/民治街道/民治社区?limit=5
-	 * 
-	 * @return
+	 * examples: http://localhost:8083/address/龙华区/民治街道/民治社区?limit=5
 	 */
 	@GetMapping("/{district}/{street}/{community}")
 	public String selectByCommunityNode(@PathVariable(value = "district", required = false) String path_district,
@@ -87,12 +82,8 @@ public class SearcherController {
 	}
 
 	/**
-	 * url:/searcher?fields={field}&tablename={tablename} \
-	 * &address={address}&code={code}... \ &orderby={orderby}&limit={limit}
-	 * examples:
-	 * /searcher/?fields=id,address&tablename=民治社区&address=广东省深圳市龙华区民治街道民治社区沙吓村六巷7栋
-	 * 
-	 * @return
+	 * url:/searcher?fields={field}&tablename={tablename}&address={address}
+	 * examples:http://localhost:8083/address/searcher/?fields=id,address&tablename=民治社区&address=广东省深圳市龙华区民治街道民治社区沙吓村六巷7栋
 	 */
 	@GetMapping("/searcher")
 	public String selectWithConditions(
@@ -133,11 +124,9 @@ public class SearcherController {
 	}
 
 	/**
-	 * url:/searcher?fields={field}&tablename={tablename} \
+	 * url:/fuzzysearcher?fields={field}&tablename={tablename} \
 	 * &address={address}&code={code}... \ &orderby={orderby}&limit={limit}
-	 * examples: /searcher/?fields=id,address&tablename=民治社区&address=%沙吓村六巷7栋%
-	 * 
-	 * @return
+	 * examples: http://localhost:8083/address/fuzzysearcher/?fields=id,address&tablename=民治社区&address=%沙吓村六巷7栋%
 	 */
 	@GetMapping("/fuzzysearcher")
 	public String fuzzySelectWithConditions(
@@ -184,10 +173,8 @@ public class SearcherController {
 	}
 
 	/**
-	 * examples:
-	 * 
-	 * @param address
-	 * @return
+	 * url:/address_id/{address_id}
+	 * examples:http://localhost:8083/address/address_id/63EEDE6B9E9D6A3AE0538CC0C0C07BB0
 	 */
 	@ApiOperation(value = "根据地址ID查询", notes = "获取对应地址的信息")
 	@GetMapping("/address_id/{address_id}")
@@ -203,10 +190,8 @@ public class SearcherController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/address/code/44030600960102T0117?limit=5
-	 * 
-	 * @param code
-	 * @return
+	 * url:/code/{code}
+	 * examples:http://localhost:8083/address/code/44030600960102T0117?limit=5
 	 */
 	@ApiOperation(value = "根据地址编码查询", notes = "获取对应地址的信息")
 	@GetMapping("/code/{code}")
@@ -221,9 +206,8 @@ public class SearcherController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/address/street/民治街道?limit=5
-	 * 
-	 * @return
+	 * url:/street/{street}
+	 * examples:http://localhost:8083/address/street/民治街道?limit=5
 	 */
 	@ApiOperation(value = "根据街道名称查询", notes = "获取对应街道的所有地址信息")
 	@GetMapping("/street/{street}")
@@ -238,10 +222,8 @@ public class SearcherController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/address/community/龙塘社区?limit=5
-	 * 
-	 * @param community
-	 * @return
+	 * url:/community/{community}
+	 * examples:http://localhost:8083/address/community/龙塘社区?limit=5
 	 */
 	@ApiOperation(value = "根据社区名称查询", notes = "获取对应社区的所有地址信息")
 	@GetMapping("/community/{community}")
@@ -256,10 +238,8 @@ public class SearcherController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/address/buildingID/44030600960102T0117?limit=5
-	 * 
-	 * @param building_id
-	 * @return
+	 * url:/buildingID/{building_id}
+	 * examples:http://localhost:8083/address/buildingID/44030600960102T0117?limit=5
 	 */
 	@ApiOperation(value = "根据建筑物ID查询", notes = "获取对应建筑物的所有地址信息")
 	@GetMapping("/buildingID/{building_id}")
@@ -274,10 +254,8 @@ public class SearcherController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/address/building/L25号铁皮房?limit=5
-	 * 
-	 * @param building
-	 * @return
+	 * url:/building/{building}
+	 * examples:http://localhost:8083/address/building/L25号铁皮房?limit=5
 	 */
 	@ApiOperation(value = "根据建筑物名称查询", notes = "获取对应建筑物的所有地址信息")
 	@GetMapping("/building/{building}")
@@ -292,10 +270,8 @@ public class SearcherController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/address/village/上塘农贸建材市场?limit=5
-	 * 
-	 * @param village
-	 * @return
+	 * url:/village/{village}
+	 * examples:http://localhost:8083/address/village/上塘农贸建材市场?limit=5
 	 */
 	@ApiOperation(value = "根据村名称查询", notes = "获取对应村名的所有地址信息")
 	@GetMapping("/village/{village}")
@@ -310,10 +286,8 @@ public class SearcherController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/address/road/下围工业二路?limit=5
-	 * 
-	 * @param road
-	 * @return
+	 * url:/road/{road}
+	 * examples:http://localhost:8083/address/road/下围工业二路?limit=5
 	 */
 	@ApiOperation(value = "根据道路名称查询", notes = "获取对应道路的所有地址信息")
 	@GetMapping("/road/{road}")
@@ -328,6 +302,8 @@ public class SearcherController {
 	}
 
 	/**
+	 * url:/hint
+	 * examples:http://localhost:8083/address/hint?keywords=龙华&maxHits=1
 	 * @param keyWords String 查询关键词，多个关键词以空格分隔
 	 * @return String 返回查询的地址，包含地址id信息
 	 */
@@ -338,6 +314,11 @@ public class SearcherController {
 		return ControllerUtils.getResponseBody4(LuceneUtil.search(keywords, maxHits));
 	}
 
+	
+	/**
+	 * url:/id/{id}
+	 * examples:http://localhost:8083/address/id/1
+	 */
 	@ApiOperation(value = "根据id查询详细信息", notes = "根据id查询详细信息")
 	@GetMapping("/id/{id}")
 	public String selectById(@PathVariable(value = "id", required = true) Integer id) {
@@ -349,6 +330,10 @@ public class SearcherController {
 		return ControllerUtils.getResponseBody(row);
 	}
 
+	/**
+	 * url:
+	 * examples:
+	 */
 	@ApiOperation(value = "根据一组id查询详细信息", notes = "根据一组id查询详细信息")
 	@GetMapping("/ids")
 	public String selectByIds(@RequestParam(value = "in", required = true) String ids) {

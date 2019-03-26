@@ -20,20 +20,14 @@ import top.geomatics.gazetteer.utilities.address.AddressSimilarity;
 
 /**
  * 地址匹配服务
- * 
  * @author whudyj
- *
  */
 @RestController
 @RequestMapping("/matcher")
 public class MatcherController {
 
 	/**
-	 * 
-	 * examples:
-	 * http://localhost:8080/matcher/address?keywords=东环一路天汇大厦&min_sim=0.1&pagesize=10
-	 * 
-	 * @return
+	 * examples:http://localhost:8083/matcher/address?keywords=东环一路天汇大厦&min_sim=0.1&pagesize=10
 	 */
 	@ApiOperation(value = "地址匹配", notes = "地址匹配")
 	@GetMapping("/address")

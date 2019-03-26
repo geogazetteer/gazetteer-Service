@@ -21,7 +21,7 @@ public class SwaggerConfig {
 	@Bean
 	public Docket config() {
 		return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
-				.apis(RequestHandlerSelectors.basePackage("top.geomatics.controller")).build();
+				.apis(RequestHandlerSelectors.basePackage("top.geomatics.gazetteer.service.address")).build();
 	}
 
 	private ApiInfo apiInfo() {

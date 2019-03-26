@@ -20,11 +20,7 @@ import top.geomatics.gazetteer.model.EnterpriseRow;
 public class EditorController {
 
 	/**
-	 * 
-	 * examples:
-	 * http://localhost:8080/editor/all?fields=code,name,address&tablename=enterprise1&limit=10
-	 * 
-	 * @return
+	 * examples:http://localhost:8083/editor/all?fields=code,name,address&tablename=enterprise1&limit=10
 	 */
 	@ApiOperation(value = "列出所有需要编辑的地址", notes = "列出所有需要编辑的地址")
 	@GetMapping("/all")
@@ -38,11 +34,7 @@ public class EditorController {
 	}
 
 	/**
-	 * 
-	 * examples:
-	 * http://localhost:8080/editor/page/1?fields=code,name,address&tablename=enterprise1&limit=10
-	 * 
-	 * @return
+	 * examples:http://localhost:8083/editor/page/1?fields=code,name,address&tablename=enterprise1&limit=10
 	 */
 	@ApiOperation(value = "列出所有需要编辑的地址", notes = "列出所有需要编辑的地址")
 	@GetMapping("/page/{index}")
@@ -59,8 +51,7 @@ public class EditorController {
 	}
 
 	/**
-	 * http://localhost:8080/editor/fid/1?fields=*&tablename=民治街道
-	 * 
+	 * examples:http://localhost:8083/editor/fid/1?fields=*&tablename=民治街道
 	 * @param fid
 	 * @param fields
 	 * @param tablename
@@ -78,8 +69,7 @@ public class EditorController {
 	}
 
 	/**
-	 * http://localhost:8080/editor/fids?in=1,2,3&field=*&tablename=民治街道
-	 * 
+	 * examples:http://localhost:8083/editor/fids?in=1,2,3&field=*&tablename=民治街道
 	 * @param fields
 	 * @param tablename
 	 * @param fids
@@ -102,10 +92,7 @@ public class EditorController {
 	}
 
 	/**
-	 * 
-	 * examples:
-	 * http://localhost:8080/editor/query?fields=code,name,address&tablename=enterprise1&address=深圳市龙华区龙华街道东环一路天汇大厦B座906室
-	 * 
+	 * examples:http://localhost:8083/editor/query?fields=code,name,address&tablename=enterprise1&address=深圳市龙华区龙华街道东环一路天汇大厦B座906室
 	 * @return
 	 */
 	@ApiOperation(value = "根据条件查询", notes = "根据条件查询")
@@ -141,11 +128,7 @@ public class EditorController {
 	}
 
 	/**
-	 * 
-	 * examples:
-	 * http://localhost:8080/editor/fuzzyquery?fields=code,name&tablename=enterprise1&address=%25天汇大厦B座906室%25&limit=10
-	 * 
-	 * @return
+	 * examples:http://localhost:8083/editor/fuzzyquery?fields=code,name&tablename=enterprise1&address=%25天汇大厦B座906室%25&limit=10
 	 */
 	@ApiOperation(value = "根据条件模糊查询", notes = "根据条件模糊查询")
 	@GetMapping("/fuzzyquery")
@@ -180,8 +163,7 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/code/91440300MA5DK2PU7P
-	 * 
+	 * examples:http://localhost:8083/editor/code/91440300MA5DK2PU7P
 	 * @param code
 	 * @return
 	 */
@@ -198,8 +180,7 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/name/深圳市明慧汽配有限公司
-	 * 
+	 * examples:http://localhost:8083/editor/name/深圳市明慧汽配有限公司
 	 * @param name
 	 * @return
 	 */
@@ -216,8 +197,7 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/street/龙华?limit=10
-	 * 
+	 * examples:http://localhost:8083/editor/street/龙华?limit=10
 	 * @param street
 	 * @return
 	 */
@@ -234,8 +214,7 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/owner/方海英
-	 * 
+	 * examples:http://localhost:8083/editor/owner/方海英
 	 * @param owner
 	 * @return
 	 */
@@ -252,8 +231,7 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/address/深圳市龙华区龙华街道东环一路天汇大厦B座906室
-	 * 
+	 * examples:http://localhost:8083/editor/address/深圳市龙华区龙华街道东环一路天汇大厦B座906室
 	 * @param address
 	 * @return
 	 */
@@ -270,8 +248,7 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/status/0
-	 * 
+	 * examples:http://localhost:8083/editor/status/0
 	 * @param status
 	 * @return
 	 */
@@ -288,8 +265,7 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/modifier/Admin
-	 * 
+	 * examples:http://localhost:8083/editor/modifier/Admin
 	 * @param modifier
 	 * @return
 	 */
@@ -306,8 +282,7 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/update/status/0?code=91440300MA5DK2PU7P
-	 * 
+	 * examples:http://localhost:8083/editor/update/status/0?code=91440300MA5DK2PU7P
 	 * @param status
 	 * @return
 	 */
@@ -339,8 +314,7 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/update/modifier/Admin?code=91440300MA5DK2PU7P
-	 * 
+	 * examples:http://localhost:8083/editor/update/modifier/Admin?code=91440300MA5DK2PU7P
 	 * @param modifier
 	 * @return
 	 */
@@ -371,8 +345,7 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/update/status/0?code=91440300MA5DK2PU7P&
-	 * 
+	 * examples:http://localhost:8083/editor/update/status/0?code=91440300MA5DK2PU7P&
 	 * @param update_date
 	 * @return
 	 */
@@ -404,8 +377,7 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/update/status/0?code=91440300MA5DK2PU7P&
-	 * 
+	 * examples:http://localhost:8083/editor/update/status/0?code=91440300MA5DK2PU7P&
 	 * @param update_address
 	 * @return
 	 */
@@ -437,8 +409,7 @@ public class EditorController {
 	}
 
 	/**
-	 * examples:http://localhost:8080/editor/update/status/0?code=91440300MA5DK2PU7P&
-	 * 
+	 * examples:http://localhost:8083/editor/update/status/0?code=91440300MA5DK2PU7P&
 	 * @param update_address_id
 	 * @return
 	 */

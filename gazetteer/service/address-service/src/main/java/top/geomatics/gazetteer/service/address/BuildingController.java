@@ -17,19 +17,15 @@ import top.geomatics.gazetteer.utilities.database.excel2gpkg.GeopackageReader;
 
 /**
  * @author whudyj
- *
  */
 @RestController
 @RequestMapping("/building")
 public class BuildingController {
 	String addressFileName = "D:\\data\\LH_gazetteer.gpkg";
 	GeopackageReader reader2 = new GeopackageReader(addressFileName);
-
 	// reader2.close();
-
 	/**
-	 * example: http://localhost:8080/building/query?x=503361.375&y=2506786.75
-	 * 
+	 * example: http://localhost:8083/building/query?x=503361.375&y=2506786.75
 	 * @param tablename
 	 * @param x
 	 * @param y
