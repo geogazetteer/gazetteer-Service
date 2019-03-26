@@ -17,7 +17,9 @@ import top.geomatics.gazetteer.database.DatabaseHelper;
 import top.geomatics.gazetteer.database.EnterpriseAddressMapper;
 import top.geomatics.gazetteer.database.EnterpriseDatabaseHelper;
 import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.model.ComparableAddress;
 import top.geomatics.gazetteer.model.EnterpriseRow;
+import top.geomatics.gazetteer.model.SimpleAddressRow;
 
 /**
  * @author whudyj
@@ -184,6 +186,28 @@ public class ControllerUtils {
 	 * @return
 	 */
 	public static String getResponseBody2(List<EnterpriseRow> rows) {
+		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
+		responseString += JSON.toJSONString(rows);
+		responseString += "}";
+		return responseString;
+
+	}
+	/**
+	 * @param rows
+	 * @return
+	 */
+	public static String getResponseBody3(List<ComparableAddress> rows) {
+		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
+		responseString += JSON.toJSONString(rows);
+		responseString += "}";
+		return responseString;
+
+	}
+	/**
+	 * @param rows
+	 * @return
+	 */
+	public static String getResponseBody4(List<SimpleAddressRow> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
 		responseString += JSON.toJSONString(rows);
 		responseString += "}";

@@ -38,7 +38,7 @@ public class MatcherController {
 	@ApiOperation(value = "地址匹配", notes = "地址匹配")
 	@GetMapping("/address")
 	public String addressMatcher(
-			@RequestParam(value = "keywords", required = true, defaultValue = "龙华区") String keywords,
+			@RequestParam(value = "keywords", required = true, defaultValue = IGazetteerConstant.LH_DISTRICT) String keywords,
 			@RequestParam(value = "min_sim", required = false, defaultValue = "0.1") Double min_sim,
 			@RequestParam(value = "pagesize", required = false, defaultValue = "10") Integer pagesize) {
 		AddressRow row = new AddressRow();
@@ -64,14 +64,14 @@ public class MatcherController {
 			}
 		}
 		if (true == tablename.isEmpty()) {
-			tablename = IControllerConstant.TABLE_NAME;
+			tablename = IControllerConstant.ADDRESS_TABLE;
 		}
 		row.setAddress("%" + shortKeywords + "%");
 		// </分词>
 
 		// <查询>
-		Map<String, Object> map = ControllerUtils.getRequestMap(IControllerConstant.ADDRESS_FIELD, tablename, row, null,
-				0);
+		Map<String, Object> map = ControllerUtils.getRequestMap(IControllerConstant.ADDRESS_FIELDS2, tablename, row,
+				null, 0);
 		List<AddressRow> rows = ControllerUtils.mapper.findLike(map);
 		// </查询>
 		// <相似性计算，并排序>
@@ -85,7 +85,7 @@ public class MatcherController {
 		}
 		Collections.sort(sortAddresses);
 		// </相似性计算，并排序>
-		return JSON.toJSONString(sortAddresses);
+		return ControllerUtils.getResponseBody3(sortAddresses);
 	}
 
 }

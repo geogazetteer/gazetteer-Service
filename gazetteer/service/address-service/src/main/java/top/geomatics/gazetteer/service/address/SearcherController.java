@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
-
 import io.swagger.annotations.ApiOperation;
 import top.geomatics.gazetteer.lucene.LuceneUtil;
 import top.geomatics.gazetteer.model.AddressRow;
@@ -39,7 +37,7 @@ public class SearcherController {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		// 使用阿里巴巴的fastjson
-		return JSON.toJSONString(rows);
+		return ControllerUtils.getResponseBody(rows);
 	}
 
 	/**
@@ -62,7 +60,7 @@ public class SearcherController {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_street, null, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		// 使用阿里巴巴的fastjson
-		return JSON.toJSONString(rows);
+		return ControllerUtils.getResponseBody(rows);
 	}
 
 	/**
@@ -85,7 +83,7 @@ public class SearcherController {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_community, null, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		// 使用阿里巴巴的fastjson
-		return JSON.toJSONString(rows);
+		return ControllerUtils.getResponseBody(rows);
 	}
 
 	/**
@@ -131,7 +129,7 @@ public class SearcherController {
 		row.setVillage(village);
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
-		return JSON.toJSONString(rows);
+		return ControllerUtils.getResponseBody(rows);
 	}
 
 	/**
@@ -182,7 +180,7 @@ public class SearcherController {
 		if (0 != simtype && similarity > 0.0) {
 
 		}
-		return JSON.toJSONString(rows);
+		return ControllerUtils.getResponseBody(rows);
 	}
 
 	/**
@@ -337,7 +335,7 @@ public class SearcherController {
 	@GetMapping("/hint")
 	public String selectAddressByKeywords(@RequestParam(value = "keywords") String keywords,
 			@RequestParam(value = "maxHits") Integer maxHits) {
-		return JSON.toJSONString(LuceneUtil.search(keywords, maxHits));
+		return ControllerUtils.getResponseBody4(LuceneUtil.search(keywords, maxHits));
 	}
 
 	@ApiOperation(value = "根据id查询详细信息", notes = "根据id查询详细信息")
@@ -348,7 +346,7 @@ public class SearcherController {
 		Long end = System.currentTimeMillis();
 		System.out.println("selectById wasted time: " + (end - start));
 		// 使用阿里巴巴的fastjson
-		return JSON.toJSONString(row);
+		return ControllerUtils.getResponseBody(row);
 	}
 
 	@ApiOperation(value = "根据一组id查询详细信息", notes = "根据一组id查询详细信息")
@@ -360,7 +358,7 @@ public class SearcherController {
 			idList.add(Integer.parseInt(str));
 		}
 		List<AddressRow> row = ControllerUtils.mapper.selectByIds(idList);
-		return JSON.toJSONString(row);
+		return ControllerUtils.getResponseBody(row);
 	}
 
 }
