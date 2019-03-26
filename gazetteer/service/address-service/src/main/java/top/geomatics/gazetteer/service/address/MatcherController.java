@@ -16,8 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import top.geomatics.gazetteer.database.DatabaseHelper;
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.ComparableAddress;
-import top.geomatics.gazetteer.segment.WordEntry;
-import top.geomatics.gazetteer.segment.WordSegmenter;
+import top.geomatics.gazetteer.model.IGazetteerConstant;
 import top.geomatics.gazetteer.utilities.address.AddressSimilarity;
 
 /**
@@ -29,12 +28,13 @@ import top.geomatics.gazetteer.utilities.address.AddressSimilarity;
 @RestController
 @RequestMapping("/matcher")
 public class MatcherController {
-	private WordSegmenter seg = new WordSegmenter();
+	private static final String ADDRESS_FIELD = "address";
+	private static final String TABLE_NAME = "dmdz";
 
 	/**
 	 * 
 	 * examples:
-	 * http://localhost:8080/matcher/address?keywords=%25东环一路天汇大厦%25&min_sim=0.1&pagesize=10
+	 * http://localhost:8080/matcher/address?keywords=东环一路天汇大厦&min_sim=0.1&pagesize=10
 	 * 
 	 * @return
 	 */
@@ -45,26 +45,37 @@ public class MatcherController {
 			@RequestParam(value = "min_sim", required = false, defaultValue = "0.1") Double min_sim,
 			@RequestParam(value = "pagesize", required = false, defaultValue = "10") Integer pagesize) {
 		AddressRow row = new AddressRow();
-		String fields = "address";
-		String tablename = "dmdz";
-		row.setAddress(keywords);
+		String tablename = "";
+		String shortKeywords = keywords;
 		// <分词>
-
-		List<WordEntry> words = seg.segment(keywords);
-		for (WordEntry entry : words) {
-			if (0 == entry.getNature().compareToIgnoreCase("comm")) {// 按社区来查询，减少查询范围
-				tablename = entry.getName();
+		for (String str : IGazetteerConstant.COMMUNITY_LIST) {
+			if (keywords.contains(str)) {
+				tablename = str;
+				// 取社区后面的内容
+				shortKeywords = keywords.substring(keywords.indexOf(str) + str.length());
+				break;
 			}
 		}
+		if (true == tablename.isEmpty()) {
+			for (String str : IGazetteerConstant.STREET_LIST) {
+				if (keywords.contains(str)) {
+					tablename = str;
+					// 取街道后面的内容
+					shortKeywords = keywords.substring(keywords.indexOf(str) + str.length());
+					break;
+				}
+			}
+		}
+		if (true == tablename.isEmpty()) {
+			tablename = TABLE_NAME;
+		}
+		row.setAddress("%" + shortKeywords + "%");
 		// </分词>
 
 		// <查询>
-		Map<String, Object> map = DatabaseHelper.getRequestMap(fields, tablename, row, null, 0);
+		Map<String, Object> map = DatabaseHelper.getRequestMap(ADDRESS_FIELD, tablename, row, null, 0);
 		List<AddressRow> rows = AddressServiceApplication.mapper.findLike(map);
 		// </查询>
-		if (rows.size() <= pagesize) {
-			return JSON.toJSONString(rows);
-		}
 		// <相似性计算，并排序>
 		List<ComparableAddress> sortAddresses = new ArrayList<ComparableAddress>();
 		for (AddressRow arow : rows) {
