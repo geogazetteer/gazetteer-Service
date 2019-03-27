@@ -10,6 +10,7 @@ import org.ansj.domain.Result;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.DicAnalysis;
 
+
 import top.geomatics.gazetteer.model.IGazetteerConstant;
 
 /**
@@ -52,7 +53,12 @@ public class WordSegmenter {
 	public List<WordEntry> segment(String word) {
 		List<WordEntry> wordResults = new ArrayList<WordEntry>();
 		// 分词结果的一个封装，主要是一个List<Term>的terms
-		Result result = DicAnalysis.parse(word);
+
+		Result result = DicAnalysis.parse(word); 
+		// 对不标准地址进行分词
+		AddressRecognition re = new AddressRecognition();
+		re.recognition(result);
+
 
 		List<Term> terms = result.getTerms(); // 拿到terms
 		for (int i = 0; i < terms.size(); i++) {
