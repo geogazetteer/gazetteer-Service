@@ -71,10 +71,29 @@
 		)
 	</insert>
 
-	<update id="updateStatus" parameterType="map">
-		update ${sql_tablename} set
-		status = #{status}
+    <update id="updateAll" parameterType="map">
+		update ${sql_tablename} 
+        <set>
+            <if test="new_status!=null">
+                status = #{new_status},
+            </if>
+            <if test="new_modifier!=null">
+                modifier = #{new_modifier},
+            </if>
+            <if test="new_update_date!=null">
+                update_date = #{new_update_date},
+            </if>
+            <if test="new_update_address!=null">
+                update_address = #{new_update_address},
+            </if>
+            <if test="new_update_address_id!=null">
+                update_address_id = #{new_update_address_id},
+            </if>
+        </set>
 		<where>
+            <if test="fid != null">
+				fid = #{fid}
+			</if>
 			<if test="code != null">
 				code = #{code}
 			</if>
@@ -89,6 +108,43 @@
 			</if>
 			<if test="address != null">
 				AND address = #{address}
+			</if>
+            <if test="status != null">
+				AND status = #{status}
+			</if>
+			<if test="modifier != null">
+				AND modifier = #{modifier}
+			</if>
+			<if test="update_date != null">
+				AND update_date = #{update_date}
+			</if>
+		</where>
+	</update>
+
+	<update id="updateStatus" parameterType="map">
+		update ${sql_tablename} set
+		status = #{new_status}
+		<where>
+			<if test="fid != null">
+				fid = #{fid}
+			</if>
+			<if test="code != null">
+				code = #{code}
+			</if>
+			<if test="name != null">
+				AND name = #{name}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="owner != null">
+				AND owner = #{owner}
+			</if>
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+            <if test="status != null">
+				AND status = #{status}
 			</if>
 			<if test="modifier != null">
 				AND modifier = #{modifier}
@@ -101,8 +157,11 @@
 
 	<update id="updateModifier" parameterType="map">
 		update ${sql_tablename} set
-		modifier = #{modifier}
+		modifier = #{new_modifier}
 		<where>
+			<if test="fid != null">
+				fid = #{fid}
+			</if>
 			<if test="code != null">
 				code = #{code}
 			</if>
@@ -118,8 +177,11 @@
 			<if test="address != null">
 				AND address = #{address}
 			</if>
-			<if test="status != null">
+            <if test="status != null">
 				AND status = #{status}
+			</if>
+			<if test="modifier != null">
+				AND modifier = #{modifier}
 			</if>
 			<if test="update_date != null">
 				AND update_date = #{update_date}
@@ -128,8 +190,11 @@
 	</update>
 	<update id="updateDate" parameterType="map">
 		update ${sql_tablename} set
-		update_date = #{update_date}
+		update_date = #{new_update_date}
 		<where>
+			<if test="fid != null">
+				fid = #{fid}
+			</if>
 			<if test="code != null">
 				code = #{code}
 			</if>
@@ -145,18 +210,24 @@
 			<if test="address != null">
 				AND address = #{address}
 			</if>
-			<if test="status != null">
+            <if test="status != null">
 				AND status = #{status}
 			</if>
 			<if test="modifier != null">
 				AND modifier = #{modifier}
 			</if>
+			<if test="update_date != null">
+				AND update_date = #{update_date}
+			</if>
 		</where>
 	</update>
 	<update id="updateAddress" parameterType="map">
 		update ${sql_tablename} set
-		update_address = #{update_address}
+		update_address = #{new_update_address}
 		<where>
+			<if test="fid != null">
+				fid = #{fid}
+			</if>
 			<if test="code != null">
 				code = #{code}
 			</if>
@@ -169,7 +240,10 @@
 			<if test="owner != null">
 				AND owner = #{owner}
 			</if>
-			<if test="status != null">
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+            <if test="status != null">
 				AND status = #{status}
 			</if>
 			<if test="modifier != null">
@@ -182,8 +256,11 @@
 	</update>
 	<update id="updateAddressId" parameterType="map">
 		update ${sql_tablename} set
-		update_address_id = #{update_address_id}
+		update_address_id = #{new_update_address_id}
 		<where>
+			<if test="fid != null">
+				fid = #{fid}
+			</if>
 			<if test="code != null">
 				code = #{code}
 			</if>
@@ -199,7 +276,7 @@
 			<if test="address != null">
 				AND address = #{address}
 			</if>
-			<if test="status != null">
+            <if test="status != null">
 				AND status = #{status}
 			</if>
 			<if test="modifier != null">
@@ -210,32 +287,7 @@
 			</if>
 		</where>
 	</update>
-	<update id="updateAll" parameterType="map">
-		update ${sql_tablename} set
-		status = #{status},
-		modifier = #{modifier},
-		update_date = #{update_date},
-		update_address = #{update_address},
-		update_address_id = #{update_address_id}
-		<where>
-			<if test="code != null">
-				code = #{code}
-			</if>
-			<if test="name != null">
-				AND name = #{name}
-			</if>
-			<if test="street != null">
-				AND street = #{street}
-			</if>
-			<if test="owner != null">
-				AND owner = #{owner}
-			</if>
-			<if test="address != null">
-				AND address = #{address}
-			</if>
-		</where>
-	</update>
-
+	
 	<!--通过fid查询字段 -->
 	<select id="selectByFid" resultType="EnterpriseRow">
 		SELECT ${sql_fields}
