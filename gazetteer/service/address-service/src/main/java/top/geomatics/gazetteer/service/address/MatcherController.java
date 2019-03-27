@@ -19,7 +19,10 @@ import top.geomatics.gazetteer.model.IGazetteerConstant;
 import top.geomatics.gazetteer.utilities.address.AddressSimilarity;
 
 /**
- * 地址匹配服务
+ * <em>地址匹配服务</em><br>
+ * <i>说明</i><br>
+ * <i>目前地址匹配服务还不完善</i>
+ * 
  * @author whudyj
  */
 @RestController
@@ -27,14 +30,21 @@ import top.geomatics.gazetteer.utilities.address.AddressSimilarity;
 public class MatcherController {
 
 	/**
-	 * examples:http://localhost:8083/matcher/address?keywords=东环一路天汇大厦&min_sim=0.1&pagesize=10
+	 * <em>查询与指定关键词匹配的地址</em><br>
+	 * examples: <br>
+	 * <!--http://localhost:8083/matcher/address?keywords=东环一路天汇大厦&min_sim=0.1 -->
+	 * 
+	 * @param keywords String 请求参数，指定的关键词
+	 * @param min_sim  Double 请求参数，指定的最小相似度
+	 * @param limit    Integer 请求参数，指定返回记录个数
+	 * @return String 返回JSON格式的查询结果
 	 */
 	@ApiOperation(value = "地址匹配", notes = "地址匹配")
 	@GetMapping("/address")
 	public String addressMatcher(
-			@RequestParam(value = "keywords", required = true, defaultValue = IGazetteerConstant.LH_DISTRICT) String keywords,
-			@RequestParam(value = "min_sim", required = false, defaultValue = "0.1") Double min_sim,
-			@RequestParam(value = "pagesize", required = false, defaultValue = "10") Integer pagesize) {
+			@RequestParam(value = IControllerConstant.QUERY_KEYWORDS, required = true, defaultValue = IGazetteerConstant.LH_DISTRICT) String keywords,
+			@RequestParam(value = IControllerConstant.SIMILARITY_MIN, required = false, defaultValue = "0.1") Double min_sim,
+			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "10") Integer limit) {
 		AddressRow row = new AddressRow();
 		String tablename = "";
 		String shortKeywords = keywords;
