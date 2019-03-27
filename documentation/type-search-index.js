@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"EditorController","h":"","u":""},{"l":"IControllerConstant","h":"","u":""},{"l":"MatcherController","h":"","u":""},{"l":"SearcherController","h":"","u":""},{"l":"所有类","h":"","u":"allclasses-index.html"}]

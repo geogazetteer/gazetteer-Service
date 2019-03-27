@@ -214,5 +214,15 @@ public class ControllerUtils {
 		return responseString;
 
 	}
+	
+	/**
+	 * @param updateRows
+	 * @return
+	 */
+	public static String getUpdateResponseBody(Integer updateRows) {
+		//{"update": "ok","total": 10}
+		return "{\"update\": \"ok\",\"total\":" +  updateRows + "}";
+	}
+	
 
 }
