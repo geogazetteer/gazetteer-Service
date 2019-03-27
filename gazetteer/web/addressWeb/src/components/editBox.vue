@@ -175,13 +175,13 @@
           //调用接口获取当前街道含有的所有社区
           var url = URLCFG['getCommunityByStreet'];
           $this.$api.getMsg(url,{tablename:curStreet}).then(function (res) {
-            $this.allCommunity = res;
+            $this.allCommunity = res.rows;
             $this.curCommunity = res[0]['community'];
 
              //调用接口获取当前街道，社区下的所有非标准地址
            var url = URLCFG['getAddressByCommunity'];
            $this.$api.getMsg(url, {fields:'address',tablename: $this.curCommunity}).then(function (res) {
-            $this.listArr=res;
+            $this.listArr=res.rows;
             $this.showList = true;
            });
           })

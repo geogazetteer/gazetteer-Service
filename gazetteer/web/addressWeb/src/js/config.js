@@ -8,7 +8,7 @@ const URLCFG={
   getDetailBySearchId:'http://localhost:8080/address/id/',// + 794848
 
   //查询当前街道包含的所有社区
-  getCommunityByStreet:'http://localhost:8080/address/all',//(param:tablename=民治街道）
+  getCommunityByStreet:'http://localhost:8083/address/all',//(param:tablename=民治街道）
   //查询当前社区包含的地址
   getAddressByCommunity:'http://localhost:8080/editor/all',//(param:fields=address&tablename=民治社区)
   //查询当前地址包含的编辑信息
