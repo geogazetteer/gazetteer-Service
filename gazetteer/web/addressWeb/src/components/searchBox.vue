@@ -37,8 +37,8 @@
 
 
     <!--搜索结果-->
-    <ul class="cardlist resultList" v-if="showResult">
-      <li v-for="(ca,index) in resultList" @click="showDetailList(ca.id)" class="flex_row">
+    <ul class="cardlist resultList" v-show="showResult">
+      <li v-for="(ca,index) in resultList.slice(10*(resultPage-1),10*resultPage)" @click="showDetailList(ca.id)" class="flex_row">
         <div class="imgItem" :style="{backgroundPosition:(-21*index)+'px 0'}"></div>
         <div class="right flex_col">
           <div class="address" v-html="ca.village"></div>
@@ -54,6 +54,8 @@
         <!--</span>-->
         <span>--没有搜索结果--</span>
       </div>
+      <!--分页-->
+      <Page :total="resultCount" show-total size="small" class-name="pageClass" @on-change="pageChanged"/>
     </ul>
 
 
@@ -127,14 +129,12 @@
         //搜索联想
         showCard: false,//显示搜索联想
         cardList: [//搜索联想结果
-          {id: 0, address: '搜索联想武汉市洪山区广八路'},
-          {id: 1, address: '搜索联想武汉市洪山区广埠屯路'},
-          {id: 2, address: '搜索联想武汉市洪山区八一路路'},
-          {id: 3, address: '搜索联想武汉市洪山区广八路'}
         ],
 
         //搜索结果
         needSpin: false,//显示spin
+        resultPage:1,
+        resultCount:0,//总数
         showResult:false,//显示搜索结果
         resultList:[
           /*{
@@ -158,7 +158,7 @@
         hideDetail:false,
         detail:{
             standard:[
-              {label:'省',value:'广东省'},
+              /*{label:'省',value:'广东省'},
               {label:'市',value:'深圳市'},
               {label:'区',value:'南山区'},
               {label:'街道',value:'粤海街道'},
@@ -167,15 +167,15 @@
               {label:'路',value:'白石路'},
               {label:'路号',value:'3883号'},
               {label:'小区',value:'深圳大学南校区'},
-              {label:'楼栋',value:'深圳大学医学院'},
+              {label:'楼栋',value:'深圳大学医学院'},*/
             ],
           detailList: [
-            {label:'楼栋编码',value:'44030500700419000013'},
+           /* {label:'楼栋编码',value:'44030500700419000013'},
             {label:'详细地址',value:'广东省深圳市南山区粤海街道深大社区白石路3833号深圳大学南校区深圳大学医学院'},
             {label:'门楼号地址',value:'广东省深圳市南山区粤海街道深大社区白石路3833号深圳大学南校区深圳大学医学院'},
             {label:'小学学区',value:''},
             {label:'初级中学学区',value:''},
-            {label:'社区网格员ID',value:117847},
+            {label:'社区网格员ID',value:117847},*/
           ]
         }
       }
@@ -230,8 +230,9 @@
           $this.showCard = false;//隐藏联想
           $this.needSpin = true;//显示spin
 
-          var url = URLCFG['searchAddressUrl'];
-          $this.$api.getMsg(url,{keywords:curStr}).then(function (res) {
+          var url = URLCFG['searchCtxUrl'];
+          $this.$api.getSearchCtx(url,str).then(function (res) {
+           $this.resultCount = res.total;
            $this.resultList = res.rows;
            $this.showResult = true;//显示搜索结果
            $this.needSpin = false;//隐藏spin
@@ -240,15 +241,20 @@
 
         }
       },
-
+      //监听到页码变化
+      pageChanged(page){
+        this.resultPage = page
+      },
       //显示搜索详情
       showDetailList(id){
+        var $this = this;
         if(id){
           this.showResult = false;//隐藏搜索结果
 
-          var url = URLCFG['getDetailBySearchId'];
-          $this.$api.getMsg(url,{id:id}).then(function (res) {
-            var listData = res.rows;
+          //调用接口获取搜索详情
+          var url = URLCFG['getDetailBySearchIdUrl'];
+          $this.$api.getDetailBySearchId(url,id).then(function (res) {
+            var listData = res.rows[0];
             var detail = {
               standard: [
                 {label: '省', value: listData['province']},
@@ -271,10 +277,10 @@
                 {label: '社区网格员ID', value: ''},
               ]
             };
-            this.detail = detail;
+            $this.detail = detail;
 
-            this.showDetail = true;//显示详情
-            this.hideDetail  = false;
+            $this.showDetail = true;//显示详情
+            $this.hideDetail  = false;
             //this.$emit('setMarkCoord', [114.30,30.52]);//地图定位
           })
 
@@ -470,7 +476,11 @@
     text-align: left;
     line-height: 25px;
   }
-
+  /*分页*/
+  .pageClass{
+    padding: 5px 10px 0;
+    border-top: 1px solid #f2f2f2;
+  }
 
 
 

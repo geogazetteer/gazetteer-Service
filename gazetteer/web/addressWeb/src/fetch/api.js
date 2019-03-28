@@ -42,24 +42,38 @@ export default {
   //搜索联想 http://localhost:8083/address/hint?keywords=上塘农贸建材市场 库坑凹背村&limit=1000
   getSearchCtx(url,keyword){
       return fetch('get',url,{
-          keywords:keyword,
-            limit:1000
+        keywords:keyword,
+        limit:1000
       })
   },
+  //获取搜索详情
+  getDetailBySearchId(url,id) {
+    return fetch('get', url+'/'+id)
+  },
+
+
+  //获取当前社区所包含的所有非标准地址
+  getAddressByCommunity(url,page,tablename){
+    return fetch('get', url+'/'+page,{
+      fields:'fid,code,name,address',
+      tablename:tablename,
+      limit:10
+    })
+  },
   //获取编辑信息
-  getEditMsg(url,address,tablename) {
-    return fetch('get', url+'/'+address,{
+  getEditMsg(url,fid,tablename) {
+    return fetch('get', url+'/'+fid,{
       tablename:tablename
     })
   },
+
   //获取匹配标准地址
-  getMatchAddress(url,tablename,keywords) {
+  getMatchList(url,keywords) {
       //http://localhost:8083/matcher/address?tablename=油松社区&keywords=万亨达大厦&min_sim=0.1&pagesize=10
     return fetch('get', url,{
-      tablename:tablename,
       keywords:keywords,
       min_sim:0.1,
-      pagesize:10
+      limit:10
     })
   }
 };
