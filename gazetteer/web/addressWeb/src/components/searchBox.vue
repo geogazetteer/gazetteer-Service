@@ -209,7 +209,7 @@
           var url = URLCFG['searchCtx'];
           $this.$api.getSearchCtx(url,str).then(function (res) {
             debugger
-            this.cardList = res;//将接口获取的值传递到vue实例的data中
+            this.cardList = res.rows;//将接口获取的值传递到vue实例的data中
             this.showCard = true;//显示搜索联想
             this.showHis = false;//隐藏历史记录
           });
@@ -231,8 +231,8 @@
           $this.needSpin = true;//显示spin
 
           var url = URLCFG['searchAddressUrl'];
-          $this.$api.getMsg(url,{keyWord:curStr}).then(function (res) {
-           $this.resultList = res;
+          $this.$api.getMsg(url,{keywords:curStr}).then(function (res) {
+           $this.resultList = res.rows;
            $this.showResult = true;//显示搜索结果
            $this.needSpin = false;//隐藏spin
            })
@@ -246,9 +246,9 @@
         if(id){
           this.showResult = false;//隐藏搜索结果
 
-          var url = URLCFG['searchAddressUrl'];
+          var url = URLCFG['getDetailBySearchId'];
           $this.$api.getMsg(url,{id:id}).then(function (res) {
-            var listData = res;
+            var listData = res.rows;
             var detail = {
               standard: [
                 {label: '省', value: listData['province']},

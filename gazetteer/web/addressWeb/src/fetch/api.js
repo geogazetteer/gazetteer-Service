@@ -39,11 +39,11 @@ export default {
         return fetch('get', url,params)
     },
 
-  //搜索联想 http://localhost:8080/address/hint?keywords=上塘农贸建材市场 库坑凹背村&maxHits=1000
+  //搜索联想 http://localhost:8083/address/hint?keywords=上塘农贸建材市场 库坑凹背村&limit=1000
   getSearchCtx(url,keyword){
       return fetch('get',url,{
-          'keywords':keyword,
-            maxHits:1000
+          keywords:keyword,
+            limit:1000
       })
   },
   //获取编辑信息
@@ -54,10 +54,10 @@ export default {
   },
   //获取匹配标准地址
   getMatchAddress(url,tablename,keywords) {
-      //http://localhost:8080/matcher/address?tablename=油松社区&keywords=%25万亨达大厦%25&min_sim=0.1&pagesize=10
+      //http://localhost:8083/matcher/address?tablename=油松社区&keywords=万亨达大厦&min_sim=0.1&pagesize=10
     return fetch('get', url,{
       tablename:tablename,
-      keywords:'%25'+keywords+'%25',
+      keywords:keywords,
       min_sim:0.1,
       pagesize:10
     })

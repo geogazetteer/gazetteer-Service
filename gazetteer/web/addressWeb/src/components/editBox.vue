@@ -207,7 +207,7 @@
           //调用接口获取当前街道，社区下的所有非标准地址
           var url = URLCFG['getAddressByCommunity'];
           $this.$api.getMsg(url, {fields:'address',tablename: curCommunity}).then(function (res) {
-           $this.listArr=res;
+           $this.listArr=res.rows;
            $this.showList = true;
           });
 
@@ -225,11 +225,11 @@
          var url = URLCFG['getEditInfo'];
          $this.$api.getEditMsg(url,address,$this.curStreet).then(function (res) {
            $this.editValue = {
-             code:res[0]['code'],
-               name:res[0]['name'],
-               street:res[0]['street'],
-               community:res[0]['community'],
-               originAddress:res[0]['address']
+             code:res.rows[0]['code'],
+               name:res.rows[0]['name'],
+               street:res.rows[0]['street'],
+               community:res.rows[0]['community'],
+               originAddress:res.rows[0]['address']
            };
            $this.showEditModal = true;
 

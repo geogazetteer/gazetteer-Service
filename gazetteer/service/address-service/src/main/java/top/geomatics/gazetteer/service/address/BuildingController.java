@@ -32,7 +32,7 @@ public class BuildingController {
 	 * @param y
 	 * @return
 	 */
-	@ApiOperation(value = "根据坐标查询建筑物", notes = "根据坐标查询建筑物")
+	@ApiOperation(value = "根据坐标查询建筑物", notes = "根据坐标查询建筑物\r\n 示例：x=503361.375 y=2506786.75")
 	@GetMapping("/query")
 	public String query(@RequestParam(value = "tablename", required = false, defaultValue = "龙华区楼栋") String tablename,
 			@RequestParam(value = "x", required = true) Double x,

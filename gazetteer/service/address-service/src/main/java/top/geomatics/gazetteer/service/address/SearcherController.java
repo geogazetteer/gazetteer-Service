@@ -479,8 +479,9 @@ public class SearcherController {
 	 */
 	@ApiOperation(value = "根据关键词进行模糊查询", notes = "根据关键词进行模糊查询")
 	@GetMapping("/hint")
-	public String selectAddressByKeywords(@RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
-			@RequestParam(value = IControllerConstant.SQL_LIMIT) Integer limit) {
+	public String selectAddressByKeywords(
+			@RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
+			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "1000") Integer limit) {
 		return ControllerUtils.getResponseBody4(LuceneUtil.search(keywords, limit));
 	}
 
