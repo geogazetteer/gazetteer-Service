@@ -1,0 +1,10 @@
+1.根据id获取详情接口：http://localhost:8080/address/id/808817
+缺少key的中英文对照
+2.获取搜索列表接口：http://localhost:8080/address/hint?keywords=历史记录1&limit=1000
+只有address和id，是否需要显示【楼栋编号】？
+3.编辑-查询当前社区下的所有非标准地址分页接口：
+http://localhost:8083/editor/page/1?fields=fid,code,name,address&tablename=油松社区&limit=10
+返回的total应当为所有数据总数，而不是当前页的数量，事实上当前页的数量==limie 
+4.编辑-获取相似标准地址列表接口：
+http://localhost:8080/matcher/address?keywords=深圳市鸿利纸箱有限公司&min_sim=0.1&pagesize=10
+使用哪个字段充当keywords？
