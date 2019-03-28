@@ -20,10 +20,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gazetteer.version>0.0.3-SNAPSHOT</gazetteer.version>
-		<springfox.version>2.4.0</springfox.version>
+		<springfox.version>2.9.2</springfox.version>
 		<fastjson.version>1.2.47</fastjson.version>
-		<springfox-swagger2.version>2.4.0</springfox-swagger2.version>
-	    <springfox-swagger-ui.version>2.4.0</springfox-swagger-ui.version>
 	</properties>
 
 	<dependencies>
@@ -76,13 +74,11 @@
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
-			<version>2.4.0</version>
 		</dependency>
 		<!-- 增加swagger-ui依赖 -->
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
-			<version>2.4.0</version>
 		</dependency>
 
 	</dependencies>
