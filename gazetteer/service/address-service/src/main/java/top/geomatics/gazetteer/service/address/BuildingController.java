@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 
+import io.swagger.annotations.ApiOperation;
 import top.geomatics.gazetteer.model.BuildingRow;
 import top.geomatics.gazetteer.utilities.database.excel2gpkg.GeopackageReader;
 
@@ -31,6 +32,7 @@ public class BuildingController {
 	 * @param y
 	 * @return
 	 */
+	@ApiOperation(value = "根据坐标查询建筑物", notes = "根据坐标查询建筑物")
 	@GetMapping("/query")
 	public String query(@RequestParam(value = "tablename", required = false, defaultValue = "龙华区楼栋") String tablename,
 			@RequestParam(value = "x", required = true) Double x,

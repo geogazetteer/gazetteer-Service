@@ -38,6 +38,7 @@ public class SearcherController {
 	 * @param row       AddressRow 指定查询条件
 	 * @return String 返回JSON格式的查询结果
 	 */
+	@ApiOperation(value = "查询所有地址", notes = "查询所有地址")
 	@GetMapping("/all")
 	public String selectAll(
 			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
@@ -62,6 +63,7 @@ public class SearcherController {
 	 * @param limit         int 请求参数，限定查询的记录个数，如：limit=10
 	 * @return String 返回JSON格式的查询结果
 	 */
+	@ApiOperation(value = "查询一个街道的所有地址", notes = "查询一个街道的所有地址")
 	@GetMapping("/{district}/{street}")
 	public String selectByStreetNode(
 			@PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = false) String path_district,
@@ -87,6 +89,7 @@ public class SearcherController {
 	 * @param limit          int 请求参数，限定查询的记录个数，如：limit=10
 	 * @return String 返回JSON格式的查询结果
 	 */
+	@ApiOperation(value = "查询一个社区的所有地址", notes = "查询一个社区的所有地址")
 	@GetMapping("/{district}/{street}/{community}")
 	public String selectByCommunityNode(
 			@PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = false) String path_district,
@@ -127,6 +130,7 @@ public class SearcherController {
 	 * @param limit       int 请求参数，限定查询的记录个数，如：limit=10
 	 * @return String 返回JSON格式的查询结果
 	 */
+	@ApiOperation(value = "根据条件查询地址", notes = "根据条件查询地址")
 	@GetMapping("/searcher")
 	public String selectWithConditions(
 			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
@@ -208,6 +212,7 @@ public class SearcherController {
 	 * @param limit       int 请求参数，限定查询的记录个数，如：limit=10
 	 * @return String 返回JSON格式的查询结果
 	 */
+	@ApiOperation(value = "根据条件模糊查询地址", notes = "根据条件模糊查询地址")
 	@GetMapping("/fuzzysearcher")
 	public String fuzzySelectWithConditions(
 			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,

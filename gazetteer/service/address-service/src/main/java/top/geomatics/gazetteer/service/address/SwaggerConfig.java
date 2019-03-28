@@ -25,7 +25,7 @@ public class SwaggerConfig {
 	}
 
 	private ApiInfo apiInfo() {
-		return new ApiInfoBuilder().title("深圳市龙华区地名地址服务").termsOfServiceUrl("http://www.woshinibaba.cn/")
+		return new ApiInfoBuilder().title("深圳市龙华区地名地址服务").termsOfServiceUrl("http://localhost:8083")
 				.version("1.0.0").build();
 	}
 
