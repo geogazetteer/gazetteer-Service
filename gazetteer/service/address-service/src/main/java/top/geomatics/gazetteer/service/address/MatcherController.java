@@ -57,16 +57,16 @@ public class MatcherController {
 				break;
 			}
 		}
-		if (true == tablename.isEmpty()) {
-			for (String str : IGazetteerConstant.STREET_LIST) {
-				if (keywords.contains(str)) {
-					tablename = str;
-					// 取街道后面的内容
-					shortKeywords = keywords.substring(keywords.indexOf(str) + str.length());
-					break;
-				}
-			}
-		}
+//		if (true == tablename.isEmpty()) {
+//			for (String str : IGazetteerConstant.STREET_LIST) {
+//				if (keywords.contains(str)) {
+//					tablename = str;
+//					// 取街道后面的内容
+//					shortKeywords = keywords.substring(keywords.indexOf(str) + str.length());
+//					break;
+//				}
+//			}
+//		}
 		if (true == tablename.isEmpty()) {
 			tablename = IControllerConstant.ADDRESS_TABLE;
 		}
@@ -74,7 +74,7 @@ public class MatcherController {
 		// </分词>
 
 		// <查询>
-		Map<String, Object> map = ControllerUtils.getRequestMap(IControllerConstant.ADDRESS_FIELDS2, tablename, row,
+		Map<String, Object> map = ControllerUtils.getRequestMap(IControllerConstant.ADDRESS_FIELDS, tablename, row,
 				null, 0);
 		List<AddressRow> rows = ControllerUtils.mapper.findLike(map);
 		// </查询>

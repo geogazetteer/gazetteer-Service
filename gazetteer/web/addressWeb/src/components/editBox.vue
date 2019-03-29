@@ -212,7 +212,7 @@
         var $this = this;
         //调用接口查询编辑信息
         var url = URLCFG['getEditInfoUrl'];
-        $this.$api.getEditMsg(url, fid, $this.curStreet).then(function (res) {
+        $this.$api.getEditMsg(url, fid, $this.curCommunity).then(function (res) {
           $this.editValue = {
             code: res.rows[0]['code'],
             name: res.rows[0]['name'],
@@ -224,12 +224,12 @@
           $this.curEditIndex = index;//记录当前索引，方便下一条
 
           //调用接口获取匹配地址
-          // var keyword = res.rows[0]['name'];
-          var keyword = '龙华区';
+          var keyword = res.rows[0]['address'];
+          //var keyword = '龙华区';
           var match_url = URLCFG['getMatchListUrl'];
           $this.$api.getMatchList(match_url, keyword).then(function (res) {
-            $this.matchResult = res;
-            $this.curSelAddress = res[0]['address'];//默认选择第一个
+            $this.matchResult = res.rows;
+            $this.curSelAddress = res.rows[0]['address'];//默认选择第一个
 
           });
 

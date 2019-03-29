@@ -7,7 +7,9 @@ import iView from 'iview';
 import api from './fetch/api.js';
 import 'iview/dist/styles/iview.css';
 
+
 Vue.config.productionTip = false
+Vue.config.devtools = true
 Vue.use(iView);
 Vue.prototype.$api = api;
 /* eslint-disable no-new */
