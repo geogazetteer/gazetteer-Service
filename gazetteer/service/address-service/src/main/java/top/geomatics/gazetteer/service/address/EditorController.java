@@ -56,14 +56,14 @@ public class EditorController {
 	 * <!--http://localhost:8083/editor/count?tablename=油松社区-->
 	 * 
 	 * @param tablename String 请求参数，指定查询的数据库表，如：油松社区
-	 * @return Integer 返回记录总数
+	 * @return String 返回记录总数
 	 */
 	@ApiOperation(value = "返回记录总数", notes = "返回记录总数")
 	@GetMapping("/count")
-	public Integer getCount(
+	public String getCount(
 			@RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ENTERPRISE_TABLE_NAME) String tablename) {
 		Map<String, Object> map = ControllerUtils.getRequestMap2(null, tablename, null, null, 0);
-		return ControllerUtils.mapper2.getCount(map);
+		return "{ \"total\": "  + ControllerUtils.mapper2.getCount(map) + "}";
 	}
 
 	/**

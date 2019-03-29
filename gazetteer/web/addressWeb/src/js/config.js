@@ -14,6 +14,7 @@ const URLCFG={
   //查询当前街道包含的所有社区
   getCommunityByStreetUrl:serverUrl+'address/all',//(param:tablename=民治街道）
   //查询当前社区包含的地址
+  getCountByCommunityUrl:serverUrl+'editor/count',//(?tablename=tablename)
   getAddressByCommunityUrl:serverUrl+'editor/page',//(+pageNum?fields=fid,code,name,address&tablename=tablename&limit=10)
   //查询当前地址包含的编辑信息
   getEditInfoUrl:serverUrl+'editor/fid',
