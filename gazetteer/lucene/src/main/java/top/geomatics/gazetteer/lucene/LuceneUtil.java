@@ -16,10 +16,8 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
@@ -32,7 +30,6 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import top.geomatics.gazetteer.database.AddressMapper;
 import top.geomatics.gazetteer.database.DatabaseHelper;
-import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 
 /**
