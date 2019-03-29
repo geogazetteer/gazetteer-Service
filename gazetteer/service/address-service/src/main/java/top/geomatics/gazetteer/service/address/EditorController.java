@@ -51,6 +51,22 @@ public class EditorController {
 	}
 
 	/**
+	 * <em>返回记录总数</em><br>
+	 * examples:<br>
+	 * <!--http://localhost:8083/editor/count?tablename=油松社区-->
+	 * 
+	 * @param tablename String 请求参数，指定查询的数据库表，如：油松社区
+	 * @return Integer 返回记录总数
+	 */
+	@ApiOperation(value = "返回记录总数", notes = "返回记录总数")
+	@GetMapping("/count")
+	public Integer getCount(
+			@RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ENTERPRISE_TABLE_NAME) String tablename) {
+		Map<String, Object> map = ControllerUtils.getRequestMap2(null, tablename, null, null, 0);
+		return ControllerUtils.mapper2.getCount(map);
+	}
+
+	/**
 	 * <em>分页列出需要编辑的地址</em><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/editor/page/1?fields=fid,code,name,address&tablename=油松社区&limit=10-->

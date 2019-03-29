@@ -352,6 +352,11 @@
 		</if>
 	</select>
 
+    <select id="getCount" resultType="int">
+		SELECT count(*)
+		FROM ${sql_tablename}
+    </select>
+
     <select id="findPageEquals" resultType="EnterpriseRow">
 		SELECT ${sql_fields}
 		FROM ${sql_tablename}
