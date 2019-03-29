@@ -187,3 +187,14 @@ body {
   justify-content: center;
   align-items: center;
 }
+.editLine .select div{
+  height: auto !important;
+  width: 100% !important;
+}
+.editLine .select  span{
+  overflow: visible !important;
+  white-space: pre-wrap !important;
+  line-height: 1.5 !important;
+  height: auto !important;
+  min-height: 35px;
+}

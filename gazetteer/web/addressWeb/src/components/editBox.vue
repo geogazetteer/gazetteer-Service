@@ -32,14 +32,18 @@
         </div>
       </div>
 
+      <!--loading spin-->
+      <small-spin v-if="needSpin" msg="正在加载……"></small-spin>
 
       <!--列表-->
-      <ul v-if="showList" class="siteList">
-        <li class="site flex_row" @click="toggleEditModal(l.fid,index)" v-for="(l,index) in listArr">
+      <ul v-show="showList" class="siteList">
+        <li class="flex_row" @click="toggleEditModal(l.fid,index)" v-for="(l,index) in listArr"
+         :class="{sel:curEditIndex==index}"
+        >
           <span>{{l.address}}</span>
           <img src="../../static/images/map/edit.png" class="imgItem">
         </li>
-        <Page :total="listCount" show-total size="small" class-name="pageClass" @on-change="pageChanged"/>
+        <Page :current='page' :total="listCount" show-total size="small" class-name="pageClass" @on-change="pageChanged"/>
       </ul>
 
     </div>
@@ -48,8 +52,6 @@
     <Modal
       v-model="showEditModal"
       title="地址编辑"
-
-      @on-ok="submitEdit"
       :mask="false"
       :styles="{
           width: '320px',
@@ -60,7 +62,8 @@
       scrollable :visible="editVisible"
     >
 
-      <div v-for="(val,index) in editObj" class="editLine flex_row">
+      <div v-for="(val,index) in editObj" class="editLine flex_row"
+      :class="{autoHeightWrap:val.type=='textarea'}">
         <div class="label flex_row">
           <span v-html="val.label"></span>
         </div>
@@ -77,30 +80,44 @@
       </div>
 
 
-      <div class="editLine flex_row selectContainer">
+      <!--相似标准地址-->
+      <div class="editLine flex_row  autoHeightWrap">
         <div class="label flex_row">
           <span>相似标准地址</span>
         </div>
 
 
-        <div class="selectWrapper">
-          <select v-model="curSelAddress" class="select" @change="onEditSelect" size="5">
+        <div class="selectWrapper autoHeight">
+          <Select v-model="curSelAddress" class="select">
+            <Option v-for="s in matchResult" :value="s.address" >{{ s.address }}</Option>
+          </Select>
+          <!--<select v-model="curSelAddress" class="select"  size="1">
             <option v-for="s in matchResult">
               {{s.address}}
             </option>
-          </select>
+          </select>-->
+        </div>
+      </div>
+
+      <!--选择结果-->
+      <div class="editLine flex_row autoHeightWrap">
+        <div class="label flex_row">
+          <span>标准地址</span>
         </div>
 
+        <div class="autoHeight flex_row">
+          {{curSelAddress}}
+        </div>
       </div>
 
       <!--按钮-->
       <div slot="footer" class="">
-        <Button size="small" @click="backRecord">
+        <Button size="small" @click="backRecord" :class="{forbidden:page==1&&curEditIndex==0}">
           <Icon type="ios-arrow-back"></Icon>
         </Button>
         <Button>取消</Button>
         <Button type="primary" @click="submitEdit">保存</Button>
-        <Button size="small" @click="nextRecord">
+        <Button size="small" @click="nextRecord" :class="{forbidden:curEditIndex==listCount%10-1&&page==Math.ceil(listCount/10)}">
           <Icon type="ios-arrow-forward"></Icon>
         </Button>
       </div>
@@ -114,6 +131,7 @@
 
 <script>
   import {EDITSELECTORCFG, URLCFG} from '../js/config.js'
+  import SmallSpin from "./smallSpin";
 
   export default {
     name: 'editBox',
@@ -121,15 +139,20 @@
       return {
         needUser: false,
 
+        needSpin: false,//显示spin
         page: 1,//当前页
         curStreet: '',//当前选择的街道
         allStreets: EDITSELECTORCFG['street'],
         curCommunity: '',//当前选择的社区
         allCommunity: [],
+
+
         showList: false,//打开非标准地址列表
         //非标准地址列表
         listArr: [],
-        listCount: 0,//非标准地址数目，用于分页
+        listCount: 0,//非标准地址总数，用于分页
+        curEditIndex:-1,//当前选择结果索引
+
 
         showEditModal: false,//是否打开编辑浮云
         //编辑对象
@@ -143,18 +166,19 @@
 
         ],
         editValue: {
-          code: '00xx',
-          name: 'xxx',
-          street: 'xx街道',
-          community: 'xx社区',
-          originAddress: '原地址'
+          code: '',
+          name: '',//企业名称
+          street: '',//街道
+          community: '',//社区
+          originAddress: ''//原地址
         },
-        curSelAddress: '匹配结果1',//当前选择的匹配结果
-        matchResult: []
+
+        matchResult: [],//相似标准地址
+        curSelAddress: '',//当前选择的匹配结果
 
       }
     },
-    components: {},
+    components: {SmallSpin},
     computed: {},
     props: {},
     created() {
@@ -164,11 +188,12 @@
     },
     methods: {
       //监听到页码变化
-      pageChanged(page) {
+      pageChanged(page,option) {
+        option=option||{needSelFirst: true};
         var $this = this;
         $this.page = page;
-        //调用接口获取当前街道，社区下的所有非标准地址
-        $this.getAddressByCommunity()
+        //调用接口获取当前街道当前页，社区下的所有非标准地址
+        $this.getAddressByCommunity(false,option)
       },
 
       //选择街道时
@@ -198,18 +223,40 @@
 
       },
       //调用接口获取当前街道，社区下的所有非标准地址
-      getAddressByCommunity() {
+      getAddressByCommunity(needTotal,option) {
         var $this = this;
+        option=option||{};
+        $this.curEditIndex=-1;
+        $this.showList=false;
+        $this.needSpin = true;//显示正在加载
+
+        needTotal = needTotal == undefined ? true : needTotal;//翻页的时候可以不必查询总数
+        if (needTotal) {
+          //查询总数
+          var url = URLCFG['getCountByCommunityUrl'];
+          $this.$api.getMsg(url, {tablename: $this.curCommunity}).then(function (res) {
+            $this.listCount = res.total;//总数
+          });
+        }
+        //查询当前页列表
         var url = URLCFG['getAddressByCommunityUrl'];
         $this.$api.getAddressByCommunity(url, $this.page, $this.curCommunity).then(function (res) {
-          $this.listCount = res.total;
+          $this.needSpin = false;//显示正在加载
           $this.listArr = res.rows;
           $this.showList = true;
+          if(option.needSelFirst){
+            //需要默认选择第一项
+            $this.toggleEditModal(res.rows[0]['fid'],0)
+          }else if(option.needSelLast){
+            //需要默认选择最后一项
+            $this.toggleEditModal(res.rows[9]['fid'],9)
+          }
         });
       },
       //编辑开关
       toggleEditModal(fid,index) {
         var $this = this;
+        $this.curSelAddress='';
         //调用接口查询编辑信息
         var url = URLCFG['getEditInfoUrl'];
         $this.$api.getEditMsg(url, fid, $this.curCommunity).then(function (res) {
@@ -225,48 +272,55 @@
 
           //调用接口获取匹配地址
           var keyword = res.rows[0]['address'];
-          //var keyword = '龙华区';
           var match_url = URLCFG['getMatchListUrl'];
           $this.$api.getMatchList(match_url, keyword).then(function (res) {
-            $this.matchResult = res.rows;
-            $this.curSelAddress = res.rows[0]['address'];//默认选择第一个
-
+            if(res.rows&&res.rows.length>0){
+              $this.matchResult = res.rows;
+              $this.curSelAddress = res.rows[0]['address'];//默认选择第一个
+            }else{
+              //没有匹配结果
+              $this.matchResult=[];
+              $this.curSelAddress='没有匹配结果……'
+            }
           });
 
         });
 
       },
 
-      //编辑框中select控件改变时
-      onEditSelect(label, value) {
-        var editObj = this.$data.editObj;
-        editObj[editObj.length - 2]['value'] = value;//将所选择的相似标准地址写入校正……
-        this.$set(editObj, editObj)
-      },
-
       //上一条
-      backRecord(){
-        if(this.curEditIndex>0){
-          var index = this.curEditIndex-1;
+      backRecord() {
+        if (this.curEditIndex > 0) {
+          var index = this.curEditIndex - 1;
           var fid = this.listArr[index]['fid'];
           this.toggleEditModal(fid, index);
-          if(index==0){
-            //执行向前翻页
-            this.curEditIndex=9
-          }
-        }else{
+        } else if (this.page > 1) {
+          //执行向前翻页
+          this.pageChanged(this.page - 1, {needSelLast:true});
+          this.curEditIndex = 9
         }
       },
+      //下一条
       nextRecord(){
-        if(this.curEditIndex<this.listCount-1) {
+        var pageCount = Math.ceil(this.listCount/10);//总页数
+        if(this.page<pageCount){
+          //非最后一页
+          if(this.curEditIndex<9) {
+            var index = this.curEditIndex + 1;
+            var fid = this.listArr[index]['fid'];
+            this.toggleEditModal(fid, index);
+          }else{
+            //往后翻一页
+            this.pageChanged(this.page+1,{needSelFirst:true});
+            this.curEditIndex = 0
+          }
+        }else if(this.curEditIndex<this.listCount%10-1){
+          //非最后一条时可以点击下一条
           var index = this.curEditIndex + 1;
           var fid = this.listArr[index]['fid'];
           this.toggleEditModal(fid, index);
-          if (index == 9) {
-            //执行翻页
-            this.curEditIndex = 0
-          }
         }
+
       },
       //提交地址编辑
       submitEdit() {
@@ -336,24 +390,24 @@
     padding: 0 0 10px;
   }
 
-  .site {
+  .siteList li {
     height: 45px;
     justify-content: flex-start;
     cursor: pointer;
     padding: 0 10px;
   }
 
-  .site:hover {
+  .siteList .sel,.siteList li:hover {
     color: #fff;
     background: rgba(0, 0, 0, 0.2);
   }
 
-  .site span {
+  .siteList li span {
     width: 100%;
     padding: 2px 0;
   }
 
-  .site .imgItem {
+  .siteList li .imgItem {
     flex-shrink: 0;
     width: 20px;
     margin-left: 10px;
@@ -400,45 +454,44 @@
     white-space: nowrap;
   }
 
-  .editLine:nth-last-child(2).label {
+  .autoHeightWrap .label {
     /*height: auto;*/
     /*min-height: 35px;*/
   }
-  .editLine:nth-last-child(2){
+  .autoHeightWrap{
     height: auto;
     background:#3385ff ;
   }
   .editLine .autoHeight {
     height: auto;
+    min-height: 35px;
     padding-left: 10px;
     width: 100%;
     background: #fff;
-
+    justify-content: flex-start;
   }
 
-  .editLine .text, .editLine .textarea, .editLine .selectWrapper {
+  .editLine .text, .editLine .textarea{
     margin-left: 10px;
     height: 80%;
     width: 100%;
   }
 
   .selectContainer {
-    height: 120px;
-    border: none;
+    height: 45px;
   }
 
   .editLine .selectWrapper {
     position: relative;
-    max-height: 120px;
+    padding: 5px 0 10px 5px;
   }
-
   .editLine .select {
-    position: absolute;
-    top: 0;
     width: 100%;
+    height: auto;
   }
 
-  .editLine .select option {
-    height: 20px;
+  .forbidden{
+    cursor: not-allowed;
   }
+
 </style>

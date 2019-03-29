@@ -27,12 +27,7 @@
     </ul>-->
 
     <!--loading spin-->
-    <div v-if="needSpin" class="spin-icon-load">
-      <Spin fix>
-        <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-        <div>正在搜索…</div>
-      </Spin>
-    </div>
+    <small-spin v-if="needSpin" msg="正在搜索……"></small-spin>
 
 
 
@@ -121,6 +116,7 @@
 <script>
   import {RegularStr} from '../js/render.js'
   import {URLCFG} from '../js/config'
+  import smallSpin from "./smallSpin";
   export default{
     name: 'searchBox',
     data() {
@@ -180,7 +176,7 @@
         }
       }
     },
-    components: {},
+    components: {smallSpin},
     computed: {},
     props: {},
     created(){
@@ -376,13 +372,6 @@
   }
 
   /*搜索结果*/
-  .spin-icon-load {
-    background: #fff;
-    width: 377px;
-    position: relative;
-    height: 50px;
-    border-top: 1px solid #f2f2f2;
-  }
 
   .cardlist {
     border-top: 1px solid #f2f2f2;
