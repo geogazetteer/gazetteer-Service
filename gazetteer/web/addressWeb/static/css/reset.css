@@ -195,6 +195,15 @@ body {
   overflow: visible !important;
   white-space: pre-wrap !important;
   line-height: 1.5 !important;
+  padding: 7px 0;
   height: auto !important;
   min-height: 35px;
+  display: flex !important;
+  align-items: center;
+}
+.editLine .select .ivu-select-item{
+  height: auto;
+  width: 100%;
+  overflow-x: visible;
+  white-space: inherit;
 }

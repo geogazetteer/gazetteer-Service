@@ -94,16 +94,16 @@
 
 
     <!--历史记录-->
-    <ul class="cardlist hislist" v-if="showHis">
-      <li v-for="(ca,index) in hisList" @click="searchItems(ca.address)" class="flex_row">
+    <ul class="cardlist hislist" v-if="hisList.length>0&&showHis">
+      <li v-for="(ca,index) in hisList" @click="searchItems(ca)" class="flex_row">
         <span class="imgItem"></span>
-        <span>{{ca.address}}</span>
+        <span>{{ca}}</span>
       </li>
-      <div v-if="hisList.length>0" @click="clearHis" class="bottomDiv flex_row">
+      <div  class="bottomDiv flex_row">
         <!--<span class="imgItem">-->
         <!--<img src="/static/images/map/search.png">-->
         <!--</span>-->
-        <div class="hisBottom">--清空历史记录--</div>
+        <div class="hisBottom" @click="clearHis">--清空历史记录--</div>
         <div @click="hideHis" class="hideHis">▲</div>
       </div>
     </ul>
@@ -114,7 +114,7 @@
 
 
 <script>
-  import {RegularStr} from '../js/render.js'
+  import {RegularStr,SetRecord,GetRecord,ClearRecord} from '../js/render.js'
   import {URLCFG} from '../js/config'
   import smallSpin from "./smallSpin";
   export default{
@@ -141,13 +141,7 @@
 
         //历史记录
         showHis: false,
-        hisList: [
-          {id: 0, address: '历史记录1'},
-          {id: 1, address: '历史记录2'},
-          {id: 2, address: '历史记录3'},
-          {id: 3, address: '历史记录4'},
-          {id: 4, address: '历史记录5'}
-        ],
+        hisList: [],
 
         //详情列表
         showDetail:false,
@@ -182,7 +176,8 @@
     created(){
     },
     mounted(){
-
+      //获取搜索历史记录
+      this.hisList = GetRecord();
     },
     methods: {
       //清空搜索框
@@ -227,12 +222,17 @@
           $this.needSpin = true;//显示spin
 
           var url = URLCFG['searchCtxUrl'];
-          $this.$api.getSearchCtx(url,str).then(function (res) {
-           $this.resultCount = res.total;
-           $this.resultList = res.rows;
-           $this.showResult = true;//显示搜索结果
-           $this.needSpin = false;//隐藏spin
-           })
+          $this.$api.getSearchCtx(url, str).then(function (res) {
+            $this.resultCount = res.total;
+            $this.resultList = res.rows;
+            $this.showResult = true;//显示搜索结果
+            $this.needSpin = false;//隐藏spin
+
+            //记录历史记录到localStorage
+            if(res.total>0){
+              $this.hisList = SetRecord(str)
+            }
+          })
         } else {
 
         }
@@ -311,6 +311,8 @@
       },
       //清空历史记录
       clearHis(){
+        ClearRecord();
+        this.hisList=[];
       }
     },
     beforedestroy(){

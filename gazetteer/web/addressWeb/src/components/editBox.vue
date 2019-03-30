@@ -85,17 +85,13 @@
         <div class="label flex_row">
           <span>相似标准地址</span>
         </div>
-
-
         <div class="selectWrapper autoHeight">
-          <Select v-model="curSelAddress" class="select">
-            <Option v-for="s in matchResult" :value="s.address" >{{ s.address }}</Option>
+          <Select v-model="curSelAddress" class="select"
+                  placeholder="无匹配数据"
+          >
+            <Option v-for="(s,index) in matchResult" :value="s.address" :key="index">{{ s.address }}</Option>
           </Select>
-          <!--<select v-model="curSelAddress" class="select"  size="1">
-            <option v-for="s in matchResult">
-              {{s.address}}
-            </option>
-          </select>-->
+
         </div>
       </div>
 
@@ -105,19 +101,25 @@
           <span>标准地址</span>
         </div>
 
-        <div class="autoHeight flex_row">
+        <div class="autoHeight flex_row" v-if="curSelAddress">
           {{curSelAddress}}
         </div>
+        <div v-if="!curSelAddress" class="autoHeight flex_row" >无匹配数据</div>
       </div>
 
       <!--按钮-->
       <div slot="footer" class="">
-        <Button size="small" @click="backRecord" :class="{forbidden:page==1&&curEditIndex==0}">
+        <Button size="small" @click="backRecord"
+                :disabled="page==1&&curEditIndex==0"
+        >
           <Icon type="ios-arrow-back"></Icon>
         </Button>
         <Button>取消</Button>
         <Button type="primary" @click="submitEdit">保存</Button>
-        <Button size="small" @click="nextRecord" :class="{forbidden:curEditIndex==listCount%10-1&&page==Math.ceil(listCount/10)}">
+        <Button size="small" @click="nextRecord"
+                :disabled="(curEditIndex==listCount%10-1||curEditIndex==9)&&(page==Math.ceil(listCount/10))"
+
+        >
           <Icon type="ios-arrow-forward"></Icon>
         </Button>
       </div>
@@ -207,7 +209,7 @@
             $this.allCommunity = res.rows;
             $this.curCommunity = res['rows'][0]['community'];
             //调用接口获取当前街道，社区下的所有非标准地址
-            $this.getAddressByCommunity()
+            $this.getAddressByCommunity(true,{needSelFirst:true})
           })
 
         }
@@ -218,7 +220,7 @@
         var curCommunity = this.curCommunity;
         var $this = this;
         if (curCommunity) {
-          $this.getAddressByCommunity()
+          $this.getAddressByCommunity(true,{needSelFirst:true})
         }
 
       },
@@ -237,6 +239,8 @@
           $this.$api.getMsg(url, {tablename: $this.curCommunity}).then(function (res) {
             $this.listCount = res.total;//总数
           });
+          //将页面恢复到第1页
+          $this.page=1;
         }
         //查询当前页列表
         var url = URLCFG['getAddressByCommunityUrl'];
@@ -280,7 +284,7 @@
             }else{
               //没有匹配结果
               $this.matchResult=[];
-              $this.curSelAddress='没有匹配结果……'
+              $this.curSelAddress=''
             }
           });
 
@@ -314,7 +318,8 @@
             this.pageChanged(this.page+1,{needSelFirst:true});
             this.curEditIndex = 0
           }
-        }else if(this.curEditIndex<this.listCount%10-1){
+        }else if((this.listCount%10==0&&this.curEditIndex<9)||(this.curEditIndex<this.listCount%10-1)){
+          //是最后一页
           //非最后一条时可以点击下一条
           var index = this.curEditIndex + 1;
           var fid = this.listArr[index]['fid'];
@@ -490,8 +495,8 @@
     height: auto;
   }
 
-  .forbidden{
-    cursor: not-allowed;
+  .editLine:last-child{
+    border: none;
   }
 
 </style>
