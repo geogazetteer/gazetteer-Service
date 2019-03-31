@@ -38,7 +38,7 @@
         <div class="right flex_col">
           <div class="address" v-html="ca.village"></div>
           <div class="small detail">详细地址：{{ca.address}}</div>
-          <div class="small">楼栋编码：{{ca.code}}</div>
+          <!--<div class="small">楼栋编码：{{ca.code}}</div>-->
         </div>
       </li>
 
