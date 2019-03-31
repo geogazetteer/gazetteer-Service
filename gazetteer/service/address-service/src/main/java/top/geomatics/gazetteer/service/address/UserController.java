@@ -5,9 +5,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 //用户模块
+@Api(value="/user",tags="系统用户管理服务")
 @RestController
 @RequestMapping("/user")
 public class UserController {

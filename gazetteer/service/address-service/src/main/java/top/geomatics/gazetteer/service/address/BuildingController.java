@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import top.geomatics.gazetteer.model.BuildingRow;
 import top.geomatics.gazetteer.utilities.database.excel2gpkg.GeopackageReader;
@@ -19,6 +20,7 @@ import top.geomatics.gazetteer.utilities.database.excel2gpkg.GeopackageReader;
 /**
  * @author whudyj
  */
+@Api(value="/building",tags="建筑物地址查询")
 @RestController
 @RequestMapping("/building")
 public class BuildingController {

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.ComparableAddress;
@@ -25,6 +26,7 @@ import top.geomatics.gazetteer.utilities.address.AddressSimilarity;
  * 
  * @author whudyj
  */
+@Api(value="/matcher",tags="地名地址匹配服务")
 @RestController
 @RequestMapping("/matcher")
 public class MatcherController {

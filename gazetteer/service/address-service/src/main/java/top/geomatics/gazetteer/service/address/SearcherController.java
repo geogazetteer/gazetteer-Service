@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import top.geomatics.gazetteer.lucene.LuceneUtil;
 import top.geomatics.gazetteer.model.AddressRow;
@@ -21,6 +22,7 @@ import top.geomatics.gazetteer.model.AddressRow;
  * 
  * @author whudyj
  */
+@Api(value="/address",tags="标准地名地址搜索")
 @RestController
 @RequestMapping("/address")
 public class SearcherController {
