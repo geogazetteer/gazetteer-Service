@@ -138,6 +138,12 @@
 		</dependencies>
 	</dependencyManagement>
 	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -147,7 +153,6 @@
 						<archive>
 							<manifest>
 								<mainClass>top.geomatics.gazetteer.service.address.AddressServiceApplication</mainClass>
-								<addClasspath>true</addClasspath>
 							</manifest>
 						</archive>
 						<classesDirectory>

@@ -3,11 +3,11 @@
 <configuration>
     <!-- 引入外部配置文件 -->
     <properties resource="enterprise_db.properties"></properties>
-  
+  <!--
     <settings>
        <setting name="logImpl" value="STDOUT_LOGGING" /> 
     </settings>
-   
+   -->
     <typeAliases>
         <typeAlias type="top.geomatics.gazetteer.model.EnterpriseRow" alias="EnterpriseRow"/>
         <typeAlias type="top.geomatics.gazetteer.model.AddressModifier" alias="AddressModifier"/>
