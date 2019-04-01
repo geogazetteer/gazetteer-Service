@@ -50,8 +50,8 @@
           },
         });
         var map = new maptalks.Map('baseMap', {
-          center: [114.30, 30.52],
-          zoom: 10,
+          center: [114.051259,22.702632],
+          zoom: 12,
           minZoom: 1,
           maxZoom: 19,
           spatialReference: {
