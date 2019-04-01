@@ -38,6 +38,7 @@
 	<!-- 依赖第三方库的版本 -->
 	<properties>
 		<java.version>11</java.version>
+		<junit.version>4.11</junit.version>
 	</properties>
 	<!-- 软件仓库位置 -->
 	<repositories>
@@ -82,5 +83,23 @@
 	</repositories>
 
 	<!-- 项目依赖 -->
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
