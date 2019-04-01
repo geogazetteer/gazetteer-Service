@@ -32,30 +32,31 @@
 
 
     <!--搜索结果-->
-    <ul class="cardlist resultList" v-show="showResult">
-      <li v-for="(ca,index) in resultList.slice(10*(resultPage-1),10*resultPage)" @click="showDetailList(ca.id)" class="flex_row">
-        <div class="imgItem" :style="{backgroundPosition:(-21*index)+'px 0'}"></div>
-        <div class="right flex_col">
-          <div class="address" v-html="ca.village"></div>
-          <div class="small detail">详细地址：{{ca.address}}</div>
-          <!--<div class="small">楼栋编码：{{ca.code}}</div>-->
-        </div>
-      </li>
-
-      <!--没有搜索结果-->
-      <div v-if="resultList.length==0&&showResult" class="bottomDiv">
-        <!--<span class="imgItem">-->
-        <!--<img src="/static/images/map/search.png">-->
-        <!--</span>-->
-        <span>--没有搜索结果--</span>
-      </div>
-      <!--分页-->
-      <Page :total="resultCount" show-total size="small" class-name="pageClass" @on-change="pageChanged"/>
-    </ul>
+   <div v-show="showResult" class="resultWrapper">
+     <ul class="cardlist resultList"  :style="{maxHeight:maxHeight}">
+       <li v-for="(ca,index) in resultList.slice(10*(resultPage-1),10*resultPage)" @click="showDetailList(ca.id)" class="flex_row">
+         <div class="imgItem" :style="{backgroundPosition:(-21*index)+'px 0'}"></div>
+         <div class="right flex_col">
+           <div class="address" v-html="ca.village"></div>
+           <div class="small detail">详细地址：{{ca.address}}</div>
+           <!--<div class="small">楼栋编码：{{ca.code}}</div>-->
+         </div>
+       </li>
+     </ul>
+     <!--没有搜索结果-->
+     <div v-if="resultList.length==0&&showResult" class="bottomDiv noSuch">
+       <!--<span class="imgItem">-->
+       <!--<img src="/static/images/map/search.png">-->
+       <!--</span>-->
+       <span>--没有搜索结果--</span>
+     </div>
+     <!--分页-->
+     <Page :total="resultCount" show-total size="small" class-name="pageClass" @on-change="pageChanged"/>
+   </div>
 
 
     <!--详情列表-->
-    <div v-if="showDetail" class="detailList">
+    <div v-if="showDetail" class="detailList" >
       <div class="back flex_row" @click="backResult">
         <span class="img"></span>
         <span>返回“{{searchContent}}”的搜索结果</span>
@@ -68,7 +69,7 @@
         <span v-show="hideDetail" class="hideHis" @click="hideDetail=!hideDetail">▼</span>
       </div>
 
-      <div class="content" v-show="!hideDetail">
+      <div class="content" v-show="!hideDetail&&showDetail">
         <div class="line">
           <span class="bold">{{detail.detailList[0].label}}:</span>
           <span>{{detail.detailList[0].value}}</span>
@@ -171,7 +172,11 @@
       }
     },
     components: {smallSpin},
-    computed: {},
+    computed: {
+      maxHeight(){
+        return (document.body.clientHeight*0.8||window.innerHeight*0.8)+'px'
+      }
+    },
     props: {},
     created(){
     },
@@ -374,7 +379,11 @@
   }
 
   /*搜索结果*/
-
+  .resultWrapper{
+    position: absolute;
+    top: 65px;
+    left: 0;
+  }
   .cardlist {
     border-top: 1px solid #f2f2f2;
     height: auto;
@@ -417,6 +426,12 @@
     border-top: 1px solid #f2f2f2;
     text-align: center;
   }
+  .noSuch{
+    padding-bottom: 10px;
+    border: none;
+    padding-top: 0;
+    background: #fff;
+  }
 
   .bottomDiv .hisBottom {
     width: 100%;
@@ -434,7 +449,8 @@
 
   /*搜索结果*/
   .resultList{
-    margin-top: 10px;
+    /*top: 65px;*/
+    /*position: absolute;*/
   }
   .resultList li{
     justify-content: flex-start;
@@ -471,6 +487,8 @@
   .pageClass{
     padding: 5px 10px 0;
     border-top: 1px solid #f2f2f2;
+    background: #fff;
+    width: 320px;
   }
 
 

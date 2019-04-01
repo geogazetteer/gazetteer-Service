@@ -268,7 +268,8 @@
             code: res.rows[0]['code'],
             name: res.rows[0]['name'],
             street: res.rows[0]['street'],
-            community: res.rows[0]['community'],
+            // community: res.rows[0]['community'],
+            community: $this.curCommunity,
             originAddress: res.rows[0]['address']
           };
           $this.showEditModal = true;

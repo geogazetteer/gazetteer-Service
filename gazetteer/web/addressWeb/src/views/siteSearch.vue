@@ -45,7 +45,7 @@ export default {
   left: 20px;
   top: 0;
   z-index: 100;
-  height: 100%;
+  /*height: 100%;*/
 }
 
 </style>
