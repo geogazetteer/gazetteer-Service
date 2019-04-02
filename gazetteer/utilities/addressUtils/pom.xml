@@ -20,11 +20,27 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<commons_text.version>1.5</commons_text.version>
+		<gazetteer.version>0.0.3-SNAPSHOT</gazetteer.version>
+		<opencsv_version>4.5</opencsv_version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
+		</dependency>
+		<!-- 增加model模块依赖 -->
+		<dependency>
+			<groupId>top.geomatics.gazetteer.model</groupId>
+			<artifactId>gs-model</artifactId>
+		</dependency>
+		<!-- 增加database模块依赖 -->
+		<dependency>
+			<groupId>top.geomatics.gazetteer.database</groupId>
+			<artifactId>gs-database</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -33,6 +49,21 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-text</artifactId>
 				<version>${commons_text.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>top.geomatics.gazetteer.model</groupId>
+				<artifactId>gs-model</artifactId>
+				<version>${gazetteer.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>top.geomatics.gazetteer.database</groupId>
+				<artifactId>gs-database</artifactId>
+				<version>${gazetteer.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.opencsv</groupId>
+				<artifactId>opencsv</artifactId>
+				<version>${opencsv_version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
