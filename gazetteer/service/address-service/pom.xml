@@ -58,6 +58,14 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+
 		</dependency>
 		<!-- 增加spring-boot-starter-test依赖 -->
 		<dependency>
@@ -65,6 +73,31 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- slf4j日志 -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.21</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.21</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<!-- 增加繁体转简体依赖 -->
+		<dependency>
+			<groupId>com.luhuiguo</groupId>
+			<artifactId>chinese-utils</artifactId>
+			<version>1.0</version>
+		</dependency>
+
 		<!-- 增加fastjson依赖 -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
