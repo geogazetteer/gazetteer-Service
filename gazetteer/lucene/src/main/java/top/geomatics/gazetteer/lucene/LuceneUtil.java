@@ -65,7 +65,7 @@ public class LuceneUtil {
 
 	/**
 	 * @return IndexWriter
-	 * @throws Exception 异常
+	 * @throws Exception 异常 注释
 	 */
 	private static IndexWriter getWriter() throws Exception {
 		Analyzer analyzer = new IKAnalyzer(true);
