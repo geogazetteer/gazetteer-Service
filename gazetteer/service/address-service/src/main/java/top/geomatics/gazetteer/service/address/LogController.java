@@ -5,9 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 /**
  * @author chenfa
  */
+@ApiIgnore
 @RestController
 @RequestMapping("/log")
 public class LogController {

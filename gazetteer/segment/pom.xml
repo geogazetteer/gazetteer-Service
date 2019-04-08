@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>top.geomatics.gazetteer</groupId>
 		<artifactId>gs-gazetteer</artifactId>
-		<version>0.0.3-SNAPSHOT</version>
+		<version>0.0.4-SNAPSHOT</version>
 	</parent>
 
 	<groupId>top.geomatics.gazetteer.segment</groupId>
@@ -17,7 +17,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gazetteer.version>0.0.3-SNAPSHOT</gazetteer.version>
+		<gazetteer.version>0.0.4-SNAPSHOT</gazetteer.version>
 		<ansj_seg.version>5.1.5</ansj_seg.version>
 		<hanlp.version>portable-1.7.2</hanlp.version>
 		<opencsv_version>4.5</opencsv_version>
