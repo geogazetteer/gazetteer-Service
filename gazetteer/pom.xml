@@ -101,7 +101,7 @@
 			<name>geosolutions repository</name>
 			<url>http://maven.geo-solutions.it/</url>
 			<snapshots>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
 			</snapshots>
 			<releases>
 				<enabled>true</enabled>
