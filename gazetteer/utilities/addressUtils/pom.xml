@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>top.geomatics.gazetteer.utilities</groupId>
 		<artifactId>gs-utilities</artifactId>
-		<version>0.0.3-SNAPSHOT</version>
+		<version>0.0.4-SNAPSHOT</version>
 	</parent>
 
 	<groupId>top.geomatics.gazetteer.utilities.address</groupId>
@@ -20,7 +20,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<commons_text.version>1.5</commons_text.version>
-		<gazetteer.version>0.0.3-SNAPSHOT</gazetteer.version>
+		<gazetteer.version>0.0.4-SNAPSHOT</gazetteer.version>
 		<opencsv_version>4.5</opencsv_version>
 	</properties>
 	<dependencies>

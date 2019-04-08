@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>top.geomatics.gazetteer.utilities</groupId>
 		<artifactId>gs-utilities</artifactId>
-		<version>0.0.3-SNAPSHOT</version>
+		<version>0.0.4-SNAPSHOT</version>
 	</parent>
 	<groupId>top.geomatics.gazetteer.utilities.database</groupId>
 	<artifactId>gs-databaseUtils</artifactId>
@@ -16,7 +16,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gazetteer.version>0.0.3-SNAPSHOT</gazetteer.version>
+		<gazetteer.version>0.0.4-SNAPSHOT</gazetteer.version>
 		<opencsv_version>4.5</opencsv_version>
 		<poi_version>4.0.1</poi_version>
 		<easyexcel.version>1.1.1</easyexcel.version>

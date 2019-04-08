@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>top.geomatics.gazetteer.service</groupId>
 		<artifactId>gs-service</artifactId>
-		<version>0.0.3-SNAPSHOT</version>
+		<version>0.0.4-SNAPSHOT</version>
 	</parent>
 
 	<!-- 本模块Maven坐标 -->
@@ -19,7 +19,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gazetteer.version>0.0.3-SNAPSHOT</gazetteer.version>
+		<gazetteer.version>0.0.4-SNAPSHOT</gazetteer.version>
 		<springfox.version>2.9.2</springfox.version>
 		<fastjson.version>1.2.47</fastjson.version>
 	</properties>
@@ -72,23 +72,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-
-		<!-- slf4j日志 -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.21</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.21</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.2</version>
 		</dependency>
 
 		<!-- 增加繁体转简体依赖 -->

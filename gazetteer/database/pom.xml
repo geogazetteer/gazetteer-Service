@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>top.geomatics.gazetteer</groupId>
 		<artifactId>gs-gazetteer</artifactId>
-		<version>0.0.3-SNAPSHOT</version>
+		<version>0.0.4-SNAPSHOT</version>
 	</parent>
 
 	<!-- 本模块Maven坐标 -->
@@ -17,7 +17,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gazetteer.version>0.0.3-SNAPSHOT</gazetteer.version>
+		<gazetteer.version>0.0.4-SNAPSHOT</gazetteer.version>
 		<mybatis.version>3.5.0</mybatis.version>
 		<sqlite.version>3.25.2</sqlite.version>
 	</properties>
