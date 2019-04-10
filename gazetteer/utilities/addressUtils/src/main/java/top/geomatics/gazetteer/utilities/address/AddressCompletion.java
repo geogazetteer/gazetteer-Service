@@ -165,7 +165,7 @@ public class AddressCompletion {
 	}
 
 	public static String complete(String address) {
-		return complete(address, null, null);
+		return complete(address, "", null);
 	}
 
 	public static String complete(String address, String prefix) {
@@ -173,7 +173,7 @@ public class AddressCompletion {
 	}
 
 	public static String complete(String address, Double x, Double y) {
-		return complete(address, null, null);
+		return complete(address, "", null);
 	}
 
 }
