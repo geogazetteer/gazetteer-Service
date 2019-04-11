@@ -32,20 +32,23 @@
 		<module>utilities</module>
 		<module>service</module>
 		<module>web</module>
-
+		<module>account</module>
 	</modules>
 
-	<!-- 依赖第三方库的版本 -->
+	<!-- 自定义变量 -->
 	<properties>
 		<java.version>11</java.version>
 		<junit.version>4.11</junit.version>
 		<slf4j.version>1.7.25</slf4j.version>
 		<logging.version>1.2</logging.version>
+		<springframework.version>2.5.6</springframework.version>
+		<outputDirectory>../bin</outputDirectory>
 	</properties>
 	<!-- maven 远程仓库位置 -->
 	<repositories>
+		<!-- 中央仓库 -->
 		<repository>
-			<id>central</id><!-- 中央仓库 -->
+			<id>central</id>
 			<name>Central Repository</name>
 			<url>http://repo.maven.apache.org/maven2</url> <!-- http://repo1.maven.org/maven2/ -->
 			<layout>default</layout>
@@ -53,8 +56,9 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		<!-- JBoss -->
 		<repository>
-			<id>jboss</id> <!-- JBoss -->
+			<id>jboss</id>
 			<name>JBoss Repository</name>
 			<url>http://repository.jboss.com/maven2/</url>
 			<releases>
@@ -65,8 +69,9 @@
 			</snapshots>
 			<layout>default</layout>
 		</repository>
+		<!-- Sonatype -->
 		<repository>
-			<id>Sonatype</id> <!-- Sonatype -->
+			<id>Sonatype</id>
 			<name>Sonatype Repository</name>
 			<url>http://repository.sonatype.org/content/groups/public/</url>
 			<layout>default</layout>
@@ -77,9 +82,9 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-
+		<!-- Boundless -->
 		<repository>
-			<id>boundless</id><!-- Boundless -->
+			<id>boundless</id>
 			<name>Boundless Maven Repository</name>
 			<url>https://repo.boundlessgeo.com/main/</url>
 			<snapshots>
@@ -89,15 +94,15 @@
 				<enabled>true</enabled>
 			</releases>
 		</repository>
-
+		<!-- geotools -->
 		<repository>
-			<id>osgeo</id> <!-- geotools -->
+			<id>osgeo</id>
 			<name>Open Source Geospatial Foundation Repository</name>
 			<url>http://download.osgeo.org/webdav/geotools/</url>
 		</repository>
-
+		<!-- geo-solutions -->
 		<repository>
-			<id>geosolutions</id><!-- geosolutions -->
+			<id>geosolutions</id>
 			<name>geosolutions repository</name>
 			<url>http://maven.geo-solutions.it/</url>
 			<snapshots>
@@ -110,30 +115,13 @@
 	</repositories>
 
 	<!-- 项目依赖 -->
-	<dependencies>
-		<!-- https://mvnrepository.com/artifact/junit/junit -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<!-- slf4j日志 -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-		</dependency>
-	</dependencies>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>${junit.version}</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -145,6 +133,52 @@
 				<artifactId>commons-logging</artifactId>
 				<version>${logging.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<version>${springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context-support</artifactId>
+				<version>${springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-web</artifactId>
+				<version>${springframework.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<configuration>
+						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 </project>
