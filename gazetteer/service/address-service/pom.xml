@@ -11,18 +11,11 @@
 	</parent>
 
 	<!-- 本模块Maven坐标 -->
-	<groupId>top.geomatics.gazetteer.service.address</groupId>
 	<artifactId>gs-address-service</artifactId>
 	<packaging>jar</packaging>
 	<name>gazetteer address service</name>
 	<description>address service</description>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gazetteer.version>0.0.4-SNAPSHOT</gazetteer.version>
-		<springfox.version>2.9.2</springfox.version>
-		<fastjson.version>1.2.47</fastjson.version>
-	</properties>
 
 	<dependencies>
 		<!-- 增加model模块依赖 -->
@@ -47,12 +40,12 @@
 		</dependency>
 		<!-- 增加utilities.address模块依赖 -->
 		<dependency>
-			<groupId>top.geomatics.gazetteer.utilities.address</groupId>
-			<artifactId>gs-addressUtils</artifactId>
+			<groupId>top.geomatics.gazetteer.utilities</groupId>
+			<artifactId>gs-address-utilities</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>top.geomatics.gazetteer.utilities.database</groupId>
-			<artifactId>gs-databaseUtils</artifactId>
+			<groupId>top.geomatics.gazetteer.utilities</groupId>
+			<artifactId>gs-database-utilities</artifactId>
 		</dependency>
 		<!-- 增加spring-boot-starter-web依赖 -->
 		<dependency>
@@ -99,60 +92,6 @@
 
 	</dependencies>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>top.geomatics.gazetteer.model</groupId>
-				<artifactId>gs-model</artifactId>
-				<version>${gazetteer.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>top.geomatics.gazetteer.database</groupId>
-				<artifactId>gs-database</artifactId>
-				<version>${gazetteer.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>top.geomatics.gazetteer.segment</groupId>
-				<artifactId>gs-segment</artifactId>
-				<version>${gazetteer.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>top.geomatics.gazetteer.lucene</groupId>
-				<artifactId>gs-lucene</artifactId>
-				<version>${gazetteer.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>
-					top.geomatics.gazetteer.utilities.address
-				</groupId>
-				<artifactId>gs-addressUtils</artifactId>
-				<version>${gazetteer.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>
-					top.geomatics.gazetteer.utilities.database
-				</groupId>
-				<artifactId>gs-databaseUtils</artifactId>
-				<version>${gazetteer.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.springfox</groupId>
-				<artifactId>springfox-swagger2</artifactId>
-				<version>${springfox.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.springfox</groupId>
-				<artifactId>springfox-swagger-ui</artifactId>
-				<version>${springfox.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.alibaba</groupId>
-				<artifactId>fastjson</artifactId>
-				<version>${fastjson.version}</version>
-			</dependency>
-
-		</dependencies>
-	</dependencyManagement>
 	<build>
 		<plugins>
 			<plugin>

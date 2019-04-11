@@ -12,7 +12,6 @@
 	<artifactId>gs-utilities</artifactId>
 	<packaging>pom</packaging>
 	<name>gazetteer utilities</name>
-	<url>https://github.com/geogazetteer/gazetteer-Service</url>
 	<modules>
 		<module>addressUtils</module>
 		<module>databaseUtils</module>

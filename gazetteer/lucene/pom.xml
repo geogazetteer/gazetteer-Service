@@ -12,12 +12,7 @@
 	<groupId>top.geomatics.gazetteer.lucene</groupId>
 	<artifactId>gs-lucene</artifactId>
 	<name>gazetteer lucene</name>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gazetteer.version>0.0.4-SNAPSHOT</gazetteer.version>
-		<lucene.version>4.7.2</lucene.version>
-		<spring.version>5.1.5.RELEASE</spring.version>
-	</properties>
+
 	<dependencies>
 		<!-- 增加model模块依赖 -->
 		<dependency>
@@ -51,43 +46,4 @@
 			<artifactId>ikanalyzer</artifactId>
 		</dependency>
 	</dependencies>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>top.geomatics.gazetteer.model</groupId>
-				<artifactId>gs-model</artifactId>
-				<version>${gazetteer.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>top.geomatics.gazetteer.database</groupId>
-				<artifactId>gs-database</artifactId>
-				<version>${gazetteer.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-context</artifactId>
-				<version>${spring.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.lucene</groupId>
-				<artifactId>lucene-core</artifactId>
-				<version>${lucene.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.lucene</groupId>
-				<artifactId>lucene-queryparser</artifactId>
-				<version>${lucene.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.lucene</groupId>
-				<artifactId>lucene-queries</artifactId>
-				<version>${lucene.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.janeluo</groupId>
-				<artifactId>ikanalyzer</artifactId>
-				<version>2012_u6</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 </project>

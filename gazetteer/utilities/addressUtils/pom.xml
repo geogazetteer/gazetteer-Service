@@ -10,19 +10,11 @@
 		<version>0.0.4-SNAPSHOT</version>
 	</parent>
 
-	<groupId>top.geomatics.gazetteer.utilities.address</groupId>
-	<artifactId>gs-addressUtils</artifactId>
+	<artifactId>gs-address-utilities</artifactId>
 	<packaging>jar</packaging>
 	<name>gazetteer address utilities</name>
 	<description>gazetteer utilities for database</description>
-	<url>https://github.com/geogazetteer/gazetteer-Service</url>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<commons_text.version>1.5</commons_text.version>
-		<gazetteer.version>0.0.4-SNAPSHOT</gazetteer.version>
-		<opencsv_version>4.5</opencsv_version>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -42,29 +34,10 @@
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
 	</dependencies>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-text</artifactId>
-				<version>${commons_text.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>top.geomatics.gazetteer.model</groupId>
-				<artifactId>gs-model</artifactId>
-				<version>${gazetteer.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>top.geomatics.gazetteer.database</groupId>
-				<artifactId>gs-database</artifactId>
-				<version>${gazetteer.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.opencsv</groupId>
-				<artifactId>opencsv</artifactId>
-				<version>${opencsv_version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+
 </project>

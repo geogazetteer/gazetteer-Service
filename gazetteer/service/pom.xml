@@ -16,7 +16,7 @@
 	<name>gazetteer service</name>
 	<description>gazetteer restful service using spring boot</description>
 	<packaging>pom</packaging>
-	
+
 	<!-- 项目包含的模块 -->
 	<modules>
 		<module>address-service</module>

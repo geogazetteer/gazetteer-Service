@@ -14,14 +14,6 @@
 	<artifactId>gs-segment</artifactId>
 	<packaging>jar</packaging>
 	<name>gazetteer word segment</name>
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gazetteer.version>0.0.4-SNAPSHOT</gazetteer.version>
-		<ansj_seg.version>5.1.5</ansj_seg.version>
-		<hanlp.version>portable-1.7.2</hanlp.version>
-		<opencsv_version>4.5</opencsv_version>
-	</properties>
 	<dependencies>
 		<!-- 增加model模块依赖 -->
 		<dependency>
@@ -54,35 +46,6 @@
 		</dependency>
 
 	</dependencies>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>top.geomatics.gazetteer.model</groupId>
-				<artifactId>gs-model</artifactId>
-				<version>${gazetteer.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.ansj</groupId>
-				<artifactId>ansj_seg</artifactId>
-				<version>${ansj_seg.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.hankcs</groupId>
-				<artifactId>hanlp</artifactId>
-				<version>${hanlp.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>top.geomatics.gazetteer.database</groupId>
-				<artifactId>gs-database</artifactId>
-				<version>${gazetteer.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.opencsv</groupId>
-				<artifactId>opencsv</artifactId>
-				<version>${opencsv_version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<build>
 		<resources>
