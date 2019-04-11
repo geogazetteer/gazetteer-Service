@@ -82,6 +82,9 @@ public class LuceneUtil {
 	 */
 	@Scheduled(cron = "0 0 8 1 * ? ")
 	public static void updateIndex() throws Exception {
+		INDEX_PATH=System.getProperty("user.dir");
+		INDEX_PATH=INDEX_PATH.substring(0,INDEX_PATH.indexOf("\\bin"));
+		INDEX_PATH+="\\lucene";
 		dir = FSDirectory.open(new File(INDEX_PATH));
 		IndexWriter writer = getWriter();
 		writer.deleteAll();
@@ -103,9 +106,6 @@ public class LuceneUtil {
 	private static IndexSearcher init() throws IOException {
 		IndexSearcher indexSearcher = null;
 		if (indexSearcher == null) {
-			INDEX_PATH=System.getProperty("user.dir");
-			INDEX_PATH=INDEX_PATH.substring(0,INDEX_PATH.indexOf("\\bin"));
-			INDEX_PATH+="\\lucene";
 			Directory directory = FSDirectory.open(new File(INDEX_PATH));
 			DirectoryReader directoryReader = DirectoryReader.open(directory);
 			indexSearcher = new IndexSearcher(directoryReader);
