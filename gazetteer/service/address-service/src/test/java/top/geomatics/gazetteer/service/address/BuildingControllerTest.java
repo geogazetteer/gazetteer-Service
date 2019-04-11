@@ -30,7 +30,7 @@ public class BuildingControllerTest extends AddressServiceApplicationTests{
 		MultiValueMap <String, String> params = null;
 		params.add("x","503361.375");
 		params.add("y", "2506786.75");
-	    mvc.perform(MockMvcRequestBuilders.get("/query")
+	    mvc.perform(MockMvcRequestBuilders.get("building/query")
 	    		.accept(MediaType.APPLICATION_JSON)
 	    		.params(params)
 	    		)
