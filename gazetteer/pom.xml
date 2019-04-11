@@ -71,6 +71,8 @@
 		<ikanalyzer.version>2012_u6</ikanalyzer.version>
 		<!-- json版本 -->
 		<fastjson.version>1.2.47</fastjson.version>
+		<!-- dom4j版本 -->
+		<dom4j.version>2.1.1</dom4j.version>
 		<!-- 分词版本 -->
 		<ansj_seg.version>5.1.5</ansj_seg.version>
 		<hanlp.version>portable-1.7.2</hanlp.version>
@@ -108,6 +110,17 @@
 			<name>Sonatype Repository</name>
 			<url>http://repository.sonatype.org/content/groups/public/</url>
 			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>sonatype-forge</id>
+			<name>Sonatype Forge</name>
+			<url>http://repository.sonatype.org/content/groups/forge/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -256,6 +269,12 @@
 				<groupId>com.alibaba</groupId>
 				<artifactId>fastjson</artifactId>
 				<version>${fastjson.version}</version>
+			</dependency>
+			<!-- dom4j -->
+			<dependency>
+				<groupId>org.dom4j</groupId>
+				<artifactId>dom4j</artifactId>
+				<version>${dom4j.version}</version>
 			</dependency>
 			<!-- lucene -->
 			<dependency>
