@@ -10,18 +10,18 @@ import com.luhuiguo.chinese.pinyin.PinyinFormat;
  */
 public class Test {
 	public static void main(String[] args) {
-//		String s = "头发发财";
-//		System.out.println(s + " => " + ChineseUtils.toTraditional(s));
+		PreController preController=new PreController();
+		String string="龍華";
+		System.out.println(preController.comToSimple(string));
 		
+		String input="１２３";
+		System.out.println(input);
+		System.out.println(preController.fullToHalf(input));
 		
-		//繁体转中文简体
-		String s = "龍華";
-		System.out.println(s + " => " + ChineseUtils.toSimplified(s));
-//		s = "长江成长";
-//		System.out.println(s + " => " + ChineseUtils.toPinyin(s) + " ("
-//				+ ChineseUtils.toPinyin(s, PinyinFormat.UNICODE_PINYIN_FORMAT)
-//				+ ") - "
-//				+ ChineseUtils.toPinyin(s, PinyinFormat.ABBR_PINYIN_FORMAT));
+		String str="12345";
+		System.out.println(preController.toChinese(str));
+		
+		String  string2="二十三";
+		System.out.println(preController.chineseToNumber(string2));		
 	}
-	
 }
