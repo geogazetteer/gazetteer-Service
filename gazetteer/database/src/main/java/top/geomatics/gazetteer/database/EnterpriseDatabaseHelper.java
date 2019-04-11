@@ -21,7 +21,9 @@ public class EnterpriseDatabaseHelper {
 	static {
 		try {
 			// 使用MyBatis提供的Resources类加载mybatis的配置文件
-			String resource = "enterprise_db_config.xml";
+			String path=System.getProperty("user.dir");
+			path=path.substring(0, path.indexOf("\\bin"));
+			String resource = path+"/conf/enterprise_db_config.xml";
 			InputStream inputStream = Resources.getResourceAsStream(resource);
 			// 构建sqlSession的工厂
 			sessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
