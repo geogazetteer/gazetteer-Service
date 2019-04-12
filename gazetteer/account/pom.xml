@@ -1,20 +1,78 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>top.geomatics.gazetteer</groupId>
-    <artifactId>gs-gazetteer</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
-  </parent>
-  <groupId>top.geomatics.gazetteer.account</groupId>
-  <artifactId>gs-account</artifactId>
-  <packaging>pom</packaging>
-  <name>gazetteer account</name>
-  <description>gazetteer account</description>
-  <modules>
-  	<module>account-email</module>
-  	<module>account-persist</module>
-  	<module>account-captcha</module>
-  	<module>account-service</module>
-  	<module>account-web</module>
-  </modules>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>top.geomatics.gazetteer</groupId>
+		<artifactId>gs-gazetteer</artifactId>
+		<version>0.0.4-SNAPSHOT</version>
+	</parent>
+	<groupId>top.geomatics.gazetteer.account</groupId>
+	<artifactId>gs-account</artifactId>
+	<packaging>pom</packaging>
+	<name>gazetteer account</name>
+	<description>gazetteer account</description>
+
+	<properties>
+		<javax.mail.version>1.4.5</javax.mail.version>
+		<greenmail.version>1.5.10</greenmail.version>
+		<kaptcha.version>2.3</kaptcha.version>
+	</properties>
+
+	<modules>
+		<module>account-email</module>
+		<module>account-persist</module>
+		<module>account-captcha</module>
+		<module>account-service</module>
+		<module>account-web</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>gs-account-email</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>gs-account-persist</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>gs-account-captcha</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>gs-account-service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+			<dependency>
+				<groupId>javax.mail</groupId>
+				<artifactId>mail</artifactId>
+				<version>${javax.mail.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.icegreen</groupId>
+				<artifactId>greenmail</artifactId>
+				<version>${greenmail.version}</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.mail</groupId>
+						<artifactId>javax.mail</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>com.google.code.kaptcha</groupId>
+				<artifactId>kaptcha</artifactId>
+				<version>${kaptcha.version}</version>
+				<classifier>jdk15</classifier>
+			</dependency>
+		</dependencies>
+
+	</dependencyManagement>
 </project>

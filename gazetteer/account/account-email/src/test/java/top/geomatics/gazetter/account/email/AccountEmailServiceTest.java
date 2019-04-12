@@ -20,8 +20,8 @@ public class AccountEmailServiceTest {
 
 	@Before
 	public void startMailServer() throws Exception {
-		greenMail = new GreenMail(ServerSetup.ALL);
-		greenMail.setUser("397095092@qq.com", "eisudkmnsriobghf");
+		greenMail = new GreenMail(ServerSetup.SMTP);
+		greenMail.setUser("397095092@qq.com", "pvjlflqorsbvbgfh");
 		greenMail.start();
 	}
 
@@ -32,7 +32,8 @@ public class AccountEmailServiceTest {
 
 		String subject = "Test Subject";
 		String htmlText = "<h3>Test</h3>";
-		accountEmailService.sendMail("308156782@qq.com", subject, htmlText);
+		accountEmailService.sendMail("whudyj2010@hotmail.com", subject, htmlText);
+		//accountEmailService.sendMail("geodyj@whu.edu.cn", subject, htmlText);
 
 		//boolean b = greenMail.waitForIncomingEmail(2000, 1);
 		//assertTrue(b);

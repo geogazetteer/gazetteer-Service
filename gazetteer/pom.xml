@@ -39,8 +39,6 @@
 	<properties>
 		<!-- 编码 -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- 本项目版本 -->
-		<gazetteer.version>0.0.4-SNAPSHOT</gazetteer.version>
 		<!-- JDK版本 -->
 		<java.version>11</java.version>
 		<!-- JUnit版本 -->
@@ -167,36 +165,36 @@
 			<dependency>
 				<groupId>top.geomatics.gazetteer.model</groupId>
 				<artifactId>gs-model</artifactId>
-				<version>${gazetteer.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>top.geomatics.gazetteer.database</groupId>
 				<artifactId>gs-database</artifactId>
-				<version>${gazetteer.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>top.geomatics.gazetteer.segment</groupId>
 				<artifactId>gs-segment</artifactId>
-				<version>${gazetteer.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>top.geomatics.gazetteer.lucene</groupId>
 				<artifactId>gs-lucene</artifactId>
-				<version>${gazetteer.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>
 					top.geomatics.gazetteer.utilities
 				</groupId>
 				<artifactId>gs-address-utilities</artifactId>
-				<version>${gazetteer.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>
 					top.geomatics.gazetteer.utilities
 				</groupId>
 				<artifactId>gs-database-utilities</artifactId>
-				<version>${gazetteer.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<!-- JUnit -->
 			<dependency>

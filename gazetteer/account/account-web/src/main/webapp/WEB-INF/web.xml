@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="gs-account-web" version="3.0">
+	<display-name>Sample Maven Project: Account Service</display-name>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath:/account-persist.xml
+			classpath:/account-captcha.xml
+			classpath:/account-email.xml
+			classpath:/account-service.xml
+		</param-value>
+	</context-param>
+	<servlet>
+		<servlet-name>CaptchaImageServlet</servlet-name>
+		<servlet-class>top.geomatics.gazetteer.account.web.CaptchaImageServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>SignUpServlet</servlet-name>
+		<servlet-class>top.geomatics.gazetteer.account.web.SignUpServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ActivateServlet</servlet-name>
+		<servlet-class>top.geomatics.gazetteer.account.web.ActivateServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>LoginServlet</servlet-name>
+		<servlet-class>top.geomatics.gazetteer.account.web.LoginServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CaptchaImageServlet</servlet-name>
+		<url-pattern>/captcha_image</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>SignUpServlet</servlet-name>
+		<url-pattern>/signup</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ActivateServlet</servlet-name>
+		<url-pattern>/activate</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>LoginServlet</servlet-name>
+		<url-pattern>/login</url-pattern>
+	</servlet-mapping>
+</web-app>
