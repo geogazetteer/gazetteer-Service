@@ -361,10 +361,58 @@ public class EditorControllerTest extends AddressServiceApplicationTests{
 	@SuppressWarnings("null")
 	public void updateModifierTest() throws Exception{
 		MultiValueMap <String, String> params = null;
-		params.add("modifier", "admin");
+		params.add("new_modifier", "admin");
 	
 
-		mvc.perform(MockMvcRequestBuilders.get("editor/update//modifier{modifier}")
+		mvc.perform(MockMvcRequestBuilders.get("editor/update/modifier/{new_modifier}")
+	    		.accept(MediaType.APPLICATION_JSON)
+	    		.params(params))
+					.andExpect(MockMvcResultMatchers.status().isOk())
+					.andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
+	                .andExpect(MockMvcResultMatchers.jsonPath("$.total").value(""))//获取更新的所有记录数目
+	                .andDo(MockMvcResultHandlers.print())
+	                .andReturn();
+					
+	}
+	
+	@SuppressWarnings("null")
+	public void updateDateTest() throws Exception{
+		MultiValueMap <String, String> params = null;
+		params.add("new_update_date", "");
+
+		mvc.perform(MockMvcRequestBuilders.get("editor/update/update_date/{new_update_date}")
+	    		.accept(MediaType.APPLICATION_JSON)
+	    		.params(params))
+					.andExpect(MockMvcResultMatchers.status().isOk())
+					.andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
+	                .andExpect(MockMvcResultMatchers.jsonPath("$.total").value(""))//获取更新的所有记录数目
+	                .andDo(MockMvcResultHandlers.print())
+	                .andReturn();
+					
+	}
+	
+	@SuppressWarnings("null")
+	public void updateAddressTest() throws Exception{
+		MultiValueMap <String, String> params = null;
+		params.add("new_update_address", "");
+
+		mvc.perform(MockMvcRequestBuilders.get("editor/update/update_address/{new_update_address}")
+	    		.accept(MediaType.APPLICATION_JSON)
+	    		.params(params))
+					.andExpect(MockMvcResultMatchers.status().isOk())
+					.andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
+	                .andExpect(MockMvcResultMatchers.jsonPath("$.total").value(""))//获取更新的所有记录数目
+	                .andDo(MockMvcResultHandlers.print())
+	                .andReturn();
+					
+	}
+	
+	@SuppressWarnings("null")
+	public void updateAddressIdTest() throws Exception{
+		MultiValueMap <String, String> params = null;
+		params.add("new_update_address_id", "");
+
+		mvc.perform(MockMvcRequestBuilders.get("editor/update/update_address_id/{new_update_address_id}")
 	    		.accept(MediaType.APPLICATION_JSON)
 	    		.params(params))
 					.andExpect(MockMvcResultMatchers.status().isOk())
