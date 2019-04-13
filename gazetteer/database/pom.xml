@@ -15,6 +15,11 @@
 	<packaging>jar</packaging>
 	<name>gazetteer database</name>
 
+	<properties>
+		<!-- 打包输出文件的路径 -->
+		<outputDirectory>../../bin</outputDirectory>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>top.geomatics.gazetteer.model</groupId>
@@ -31,24 +36,15 @@
 	</dependencies>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>**/*.properties</include>
-					<include>**/*.xml</include>
-				</includes>
-				<filtering>false</filtering>
-			</resource>
-			<resource>
-				<directory>src/main/java</directory>
-				<includes>
-					<include>**/*.properties</include>
-					<include>**/*.xml</include>
-				</includes>
-				<filtering>false</filtering>
-			</resource>
-		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<outputDirectory>${outputDirectory}</outputDirectory>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 
 

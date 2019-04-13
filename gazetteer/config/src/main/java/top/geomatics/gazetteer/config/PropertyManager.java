@@ -3,20 +3,29 @@
  */
 package top.geomatics.gazetteer.config;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * @author whudyj
@@ -27,7 +36,7 @@ public class PropertyManager {
 	private static final String R_PATH = "gazetteer";
 	private static final String R_CONFIG = "config";
 	private static final String R_NAME = "gazetteer.properties";
-	private static String resourcesPath = "";
+	private static String resourcesPath = getResourcesPath();
 
 	// 统一配置信息
 	// 1、数据库配置信息
@@ -45,6 +54,37 @@ public class PropertyManager {
 	private static final String DB_URL_VALUE_1 = "jdbc:sqlite:d:\\data\\LH_gazetteer.gpkg";
 	private static final String DB_USERNAME_VALUE_1 = "";
 	private static final String DB_PASSWORD_VALUE_1 = "";
+
+	public static boolean readResources() {
+		InputStream in = null;
+		Properties rProperties = new Properties();
+		try {
+			in = new BufferedInputStream(new FileInputStream(resourcesPath));
+			rProperties.load(in);
+			readProperty(rProperties);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return true;
+	}
+
+	public static void readProperty(Properties rProperties) {
+		Iterator<String> it = rProperties.stringPropertyNames().iterator();
+		while (it.hasNext()) {
+			String key = it.next();
+			String value = rProperties.getProperty(key);
+			System.out.println(key + " = " + value);
+		}
+
+	}
 
 	public static void writeProperty(Properties rProperties) {
 		rProperties.setProperty(DB_DRIVER_KEY, DB_DRIVER_VALUE);
@@ -103,26 +143,110 @@ public class PropertyManager {
 		return true;
 	}
 
+	public static String getResourcesPath() {
+		String pathString = getConfigPath();
+		if (pathString.isEmpty()) {
+			pathString = getSettingsPath();
+		}
+		return pathString;
+	}
+
 	/**
 	 * @return String 返回当前用户路径下的资源文件名称
 	 */
-	public static String getResourcesPath() {
+	public static String getSettingsPath() {
 		String pathString = System.getProperty("user.home") + File.separator + R_PATH;
 		pathString = pathString + File.separator + R_NAME;
 		File resFile = new File(pathString);
 		if (!resFile.exists()) {
-			try {
-				boolean b = resFile.createNewFile();
-				if (!b) {
-					// 日志
-					System.out.println(pathString + " resources file does not exist! ");
-					return "";
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				boolean b = resFile.createNewFile();
+//				if (!b) {
+//					// 日志
+//					System.out.println(pathString + " resources file does not exist! ");
+//					return "";
+//				}
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+			return "";
 		}
 		return pathString;
+	}
+
+	public static void updateProperties() {
+		List<String> jarList = getJarPath();
+		for (String fname : jarList) {
+			updateJarFile(fname);
+		}
+	}
+
+	public static void updateJarFile(String fname) {
+		JarFile jf = null;
+		try {
+			jf = new JarFile(fname);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (fname.contains("gs-config")) {
+			JarEntry jEntry = jf.getJarEntry("test1.properties");
+			System.out.println("entry is :" + jEntry);
+			Properties properties = new Properties();
+			try {
+				InputStream is = jf.getInputStream(jEntry);
+				properties.load(is);
+				properties.replace("driver", "geodyj");
+				properties.setProperty("ddd", "gggg");
+				String string = properties.getProperty("driver");
+				System.out.println(string);
+				System.out.println(is.readAllBytes().length);
+				OutputStream out = new ByteArrayOutputStream();
+				is.transferTo(out);
+				out.flush();
+				properties.store(out,"mmmm");
+				is.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+
+		}
+
+	}
+
+	public static List<String> getJarPath() {
+		URL jarUrl = PropertyManager.class.getProtectionDomain().getCodeSource().getLocation();
+		if (null == jarUrl) {
+			// 日志
+			System.out.println("jar path does not exist !");
+			return null;
+		}
+
+		File file = null;
+		try {
+			file = new File(jarUrl.toURI());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		if (!file.exists() || file.isDirectory()) {
+			// 日志
+			System.out.println("jar path is not correct !");
+			return null;
+		}
+		// bin目录
+		String binString = file.getParent();
+		System.out.println(binString);
+		File allFile[] = new File(binString).listFiles();
+		List<String> jarList = new ArrayList<>();
+		for (File f : allFile) {
+			String fname = f.getName();
+			if (fname.endsWith(".jar")) {
+				fname = binString + File.separator + fname;
+				jarList.add(fname);
+				System.out.println(fname);
+			}
+		}
+		return jarList;
 	}
 
 	/**
@@ -155,16 +279,17 @@ public class PropertyManager {
 		pathString = pathString + File.separator + R_NAME;
 		File resFile = new File(pathString);
 		if (!resFile.exists()) {
-			try {
-				boolean b = resFile.createNewFile();
-				if (!b) {
-					// 日志
-					System.out.println(pathString + " resources file does not exist! ");
-					return "";
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				boolean b = resFile.createNewFile();
+//				if (!b) {
+//					// 日志
+//					System.out.println(pathString + " resources file does not exist! ");
+//					return "";
+//				}
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+			return "";
 		}
 		return pathString;
 	}
@@ -268,10 +393,11 @@ public class PropertyManager {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		printPathInfo();
-		getResourcesPath();
-		getConfigPath();
-		writeResources();
+		// printPathInfo();
+		System.out.println(resourcesPath);
+		// readResources();
+		getJarPath();
+		updateProperties();
 	}
 
 }
