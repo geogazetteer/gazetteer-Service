@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>top.geomatics.gazetteer</groupId>
+		<artifactId>gs-gazetteer</artifactId>
+		<version>0.0.4-SNAPSHOT</version>
+	</parent>
+	<groupId>top.geomatics.gazetteer.config</groupId>
+	<artifactId>gs-config</artifactId>
+	<name>gazetteer config</name>
+
+	<properties>
+		<!-- 打包输出文件的路径 -->
+		<outputDirectory>../../bin</outputDirectory>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/configuration</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<outputDirectory>${outputDirectory}</outputDirectory>
+					<archive>
+						<manifest>
+							<mainClass>top.geomatics.gazetteer.config.PropertyManager</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

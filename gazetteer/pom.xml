@@ -33,6 +33,7 @@
 		<module>service</module>
 		<module>web</module>
 		<module>account</module>
+		<module>config</module>
 	</modules>
 
 	<!-- 自定义变量 -->
