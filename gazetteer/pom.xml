@@ -33,10 +33,13 @@
 		<module>service</module>
 		<module>web</module>
 		<module>account</module>
+		<module>config</module>
 	</modules>
 
 	<!-- 自定义变量 -->
 	<properties>
+		<!-- 打包输出文件的路径 -->
+		<outputDirectory>D:\\gazetteer\\bin</outputDirectory>
 		<!-- 编码 -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- JDK版本 -->
@@ -74,8 +77,6 @@
 		<!-- 分词版本 -->
 		<ansj_seg.version>5.1.5</ansj_seg.version>
 		<hanlp.version>portable-1.7.2</hanlp.version>
-
-		<outputDirectory>../bin</outputDirectory>
 	</properties>
 	<!-- maven 远程仓库位置 -->
 	<repositories>
@@ -165,6 +166,11 @@
 			<dependency>
 				<groupId>top.geomatics.gazetteer.model</groupId>
 				<artifactId>gs-model</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>top.geomatics.gazetteer.config</groupId>
+				<artifactId>gs-config</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -368,7 +374,6 @@
 				<version>${geotools.version}</version>
 			</dependency>
 
-
 		</dependencies>
 	</dependencyManagement>
 	<build>
@@ -377,6 +382,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.0</version>
 					<configuration>
 						<source>${java.version}</source>
 						<target>${java.version}</target>
@@ -384,9 +390,46 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.1.1</version>
+					<configuration>
+						<outputDirectory>${outputDirectory}</outputDirectory>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.1.0</version>
 					<configuration>
 						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>3.1.1</version>
+					<executions>
+						<execution>
+							<id>copy-dependencies</id>
+							<phase>package</phase>
+							<goals>
+								<goal>copy-dependencies</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>${outputDirectory}</outputDirectory>
+								<overWriteReleases>false</overWriteReleases>
+								<overWriteSnapshots>true</overWriteSnapshots>
+								<overWriteIfNewer>true</overWriteIfNewer>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<version>2.1.4.RELEASE</version>
+					<configuration>
+						<outputDirectory>${outputDirectory}</outputDirectory>
 					</configuration>
 				</plugin>
 			</plugins>

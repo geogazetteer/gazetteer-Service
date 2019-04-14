@@ -99,34 +99,9 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jar-plugin</artifactId>
-					<configuration>
-						<archive>
-							<manifest>
-								<mainClass>top.geomatics.gazetteer.service.address.AddressServiceApplication</mainClass>
-							</manifest>
-						</archive>
-						<classesDirectory>
-						</classesDirectory>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 		<resources>
 			<resource>
 				<directory>src/resources</directory>
-				<includes>
-					<include>**/*.properties</include>
-					<include>**/*.xml</include>
-				</includes>
-				<filtering>false</filtering>
-			</resource>
-			<resource>
-				<directory>src/main/java</directory>
 				<includes>
 					<include>**/*.properties</include>
 					<include>**/*.xml</include>
