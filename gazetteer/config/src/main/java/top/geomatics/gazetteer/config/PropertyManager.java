@@ -31,9 +31,6 @@ import java.util.jar.JarFile;
  *
  */
 public class PropertyManager {
-
-	
-
 	// 统一资源文件配置
 	private static final String R_PATH = "gazetteer";
 	private static final String R_CONFIG = "config";
@@ -239,7 +236,7 @@ public class PropertyManager {
 		String binString = file.getParent();
 		System.out.println(binString);
 		File allFile[] = new File(binString).listFiles();
-		List<String> jarList = new ArrayList<>();
+		List<String> jarList = new ArrayList<String>();
 		for (File f : allFile) {
 			String fname = f.getName();
 			if (fname.endsWith(".jar")) {
