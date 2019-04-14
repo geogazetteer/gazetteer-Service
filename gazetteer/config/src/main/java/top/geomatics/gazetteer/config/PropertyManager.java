@@ -4,7 +4,6 @@
 package top.geomatics.gazetteer.config;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,6 +31,9 @@ import java.util.jar.JarFile;
  *
  */
 public class PropertyManager {
+
+	
+
 	// 统一资源文件配置
 	private static final String R_PATH = "gazetteer";
 	private static final String R_CONFIG = "config";
@@ -204,7 +206,7 @@ public class PropertyManager {
 				OutputStream out = new ByteArrayOutputStream();
 				is.transferTo(out);
 				out.flush();
-				properties.store(out,"mmmm");
+				properties.store(out, "mmmm");
 				is.close();
 			} catch (IOException e1) {
 				e1.printStackTrace();
@@ -393,11 +395,11 @@ public class PropertyManager {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// printPathInfo();
-		System.out.println(resourcesPath);
+		printPathInfo();
+		// System.out.println(resourcesPath);
 		// readResources();
-		getJarPath();
-		updateProperties();
+		// getJarPath();
+		// updateProperties();
 	}
 
 }

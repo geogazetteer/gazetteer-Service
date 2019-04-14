@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
+import top.geomatics.gazetteer.config.ResourcesManager;
 import top.geomatics.gazetteer.database.AddressMapper;
 import top.geomatics.gazetteer.database.DatabaseHelper;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
@@ -39,8 +40,12 @@ import top.geomatics.gazetteer.model.SimpleAddressRow;
  *
  */
 public class LuceneUtil {
+
+	private static ResourcesManager manager = ResourcesManager.getInstance();
+	private static final String LUCENE_INDEX_PATH = "lucene_index_path";
+
 	@Value("${index.path}")
-	public static String INDEX_PATH = "D:\\data\\lucene_index";
+	public static String INDEX_PATH = manager.getValue(LUCENE_INDEX_PATH);
 	private static Directory dir;
 	private static IndexSearcher indexSearcher;
 	private static final String ADDRESS_ID = "id";
@@ -48,8 +53,7 @@ public class LuceneUtil {
 	private static final String SELECT_FIELDS = "id,address";
 	private static final String TABLE_NAME = "dmdz";
 
-	static
-	{
+	static {
 		try {
 			indexSearcher = init();
 		} catch (IOException e) {
