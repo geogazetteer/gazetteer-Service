@@ -1,7 +1,7 @@
 /**
  * 
  */
-package top.geomatics.gazetteer.database;
+package top.geomatics.gazetteer;
 
 import java.util.HashMap;
 import java.util.List;
