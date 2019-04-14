@@ -15,7 +15,8 @@ import top.geomatics.gazetteer.model.AddressRow;
  * @author whudyj
  *
  */
-public class Test2 {
+public class Test3 {
+
 	private static DatabaseHelper helper = new DatabaseHelper();
 	private static SqlSession session = helper.getSession();
 	private static AddressMapper mapper = session.getMapper(AddressMapper.class);
