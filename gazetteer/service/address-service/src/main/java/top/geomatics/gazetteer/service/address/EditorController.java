@@ -31,7 +31,6 @@ public class EditorController {
 	 * <em>列出需要编辑的地址</em><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/editor/all?fields=fid,code,name,address&tablename=油松社区&limit=10-->
-	 * 
 	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
 	 * @param tablename String 请求参数，指定查询的数据库表，如：油松社区
 	 * @param orderby   String 请求参数，指定查询结果排序方式
