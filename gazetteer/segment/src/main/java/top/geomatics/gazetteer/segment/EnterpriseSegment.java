@@ -34,7 +34,7 @@ public class EnterpriseSegment {
 	private static String FilePath = "E:\\longhua\\wordSegFileRR.csv";//输出的文件地址
 	private static File file = new File(FilePath);
 	
-	private static List<String []> wordSegments = new ArrayList<>();
+	private static List<String []> wordSegments = new ArrayList<String []>();
 	
 	
 	

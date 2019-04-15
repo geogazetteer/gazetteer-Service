@@ -33,7 +33,7 @@ public class ComparableAddress implements Comparable<Object> {
 		this.similarity = similarity;
 	}
 
-	@Override
+	
 	public int compareTo(Object o) {
 		if(o instanceof ComparableAddress){
 			ComparableAddress address = (ComparableAddress) o;

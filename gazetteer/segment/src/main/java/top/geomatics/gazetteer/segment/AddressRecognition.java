@@ -17,8 +17,8 @@ public class AddressRecognition implements Recognition{
 	 * @author gj
 	 */
 	private static final long serialVersionUID = 1L;
-	public static final Set<String> Address_suffix = new HashSet<>();
-	public static final Set<String> Address_nature = new HashSet<>();
+	public static final Set<String> Address_suffix = new HashSet<String>();
+	public static final Set<String> Address_nature = new HashSet<String>();
 	static {
 		Address_suffix.add("大厦");
 		Address_suffix.add("村");
@@ -65,7 +65,7 @@ public class AddressRecognition implements Recognition{
 	
 	//合并需要合并的Term，再组成新的List
 	
-	@Override
+	
 	public void recognition(Result result) {
 		// TODO Auto-generated method stub
 		List<Term> terms = result.getTerms() ;
