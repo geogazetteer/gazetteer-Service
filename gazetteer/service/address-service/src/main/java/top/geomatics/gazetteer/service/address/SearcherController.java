@@ -78,7 +78,7 @@ public class SearcherController {
 			@PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = false) String path_district,
 			@ApiParam(value = "街道，如：民治街道")
 			@PathVariable(value = IControllerConstant.ADDRESS_STREET, required = true) String path_street,
-			@ApiParam(value = "查询字段，如 ,community")
+			@ApiParam(value = "查询字段，如 id,community")
 			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
 			@ApiParam(value = "查询结果排序方式")
 			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
