@@ -14,14 +14,14 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/user")
 public class UserController {
 
-	@ApiOperation(value = "用户注册", notes = "用户注册")
+	@ApiOperation(value = "用户注册", notes = "用户注册，功能暂未实现")
 	@GetMapping("/register")
 	public String register(@RequestParam String username, @RequestParam String password) {
 
 		return "";
 	}
 
-	@ApiOperation(value = "用户登录", notes = "用户登录")
+	@ApiOperation(value = "用户登录", notes = "用户登录，功能暂未实现")
 	@GetMapping("/login")
 	public String login(@RequestParam String username, @RequestParam String password) {
 

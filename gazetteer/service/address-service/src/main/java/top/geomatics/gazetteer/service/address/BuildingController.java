@@ -14,6 +14,7 @@ import com.alibaba.fastjson.JSON;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import top.geomatics.gazetteer.model.BuildingRow;
 import top.geomatics.gazetteer.utilities.database.excel2gpkg.GeopackageReader;
 
@@ -34,10 +35,14 @@ public class BuildingController {
 	 * @param y
 	 * @return
 	 */
-	@ApiOperation(value = "根据坐标查询建筑物", notes = "根据坐标查询建筑物\r\n 示例：x=503361.375 y=2506786.75")
+	@ApiOperation(value = "根据坐标查询建筑物", notes = "根据坐标查询建筑物信息\r\n 示例：/building/query?x=503361.375&y=2506786.75 ")
 	@GetMapping("/query")
-	public String query(@RequestParam(value = "tablename", required = false, defaultValue = "龙华区楼栋") String tablename,
+	public String query(
+			@ApiParam(value = "查询的数据库表，如龙华区楼栋")
+			@RequestParam(value = "tablename", required = false, defaultValue = "龙华区楼栋") String tablename,
+			@ApiParam(value = "指定x坐标，如x=503361.375")
 			@RequestParam(value = "x", required = true) Double x,
+			@ApiParam(value = "指定y坐标，如y=2506786.75")
 			@RequestParam(value = "y", required = true) Double y) {
 		reader2.preQuery("龙华区楼栋");
 		List<BuildingRow> rows = reader2.query2(x, y);
