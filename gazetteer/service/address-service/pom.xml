@@ -66,14 +66,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-		<!-- 增加繁体转简体依赖 -->
-		<dependency>
-			<groupId>com.luhuiguo</groupId>
-			<artifactId>chinese-utils</artifactId>
-			<version>1.0</version>
-		</dependency>
-
 		<!-- 增加fastjson依赖 -->
 		<dependency>
 			<groupId>com.alibaba</groupId>

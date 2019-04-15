@@ -77,6 +77,8 @@
 		<!-- 分词版本 -->
 		<ansj_seg.version>5.1.5</ansj_seg.version>
 		<hanlp.version>portable-1.7.2</hanlp.version>
+		<!-- 汉字处理 -->
+		<chineseUtils.version>1.0</chineseUtils.version>
 	</properties>
 	<!-- maven 远程仓库位置 -->
 	<repositories>
@@ -311,6 +313,12 @@
 				<groupId>com.hankcs</groupId>
 				<artifactId>hanlp</artifactId>
 				<version>${hanlp.version}</version>
+			</dependency>
+			<!-- 汉字处理 -->
+			<dependency>
+				<groupId>com.luhuiguo</groupId>
+				<artifactId>chinese-utils</artifactId>
+				<version>${chineseUtils.version}</version>
 			</dependency>
 			<!-- commons text -->
 			<dependency>

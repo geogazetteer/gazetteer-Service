@@ -34,6 +34,11 @@
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 		</dependency>
+		<!-- 增加汉字处理库依赖 -->
+		<dependency>
+			<groupId>com.luhuiguo</groupId>
+			<artifactId>chinese-utils</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
