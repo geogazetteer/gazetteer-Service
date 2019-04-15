@@ -33,7 +33,7 @@ public class Excel2GPKG {
 	public static void main(String[] args) {
 		if (args.length != 2) {
 			System.out.println("Usage: java -jar XXX.jar D:\\data\\enterprise\\excel\\enterprise1.xlsx"
-					+ "  D:\\data\\enterpriseenterprise_gazetteer.gpkg");
+					+ "  D:\\data\\enterprise1.gpkg");
 			System.exit(0);
 		}
 		String tableName = new File(args[0]).getName();

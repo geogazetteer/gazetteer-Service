@@ -115,7 +115,8 @@ public class GeopackageWriter implements Runnable {
 		}
 		entry = new FeatureEntry();
 		entry.setDataType(Entry.DataType.Feature);
-		entry.setSrid(4547);
+		//entry.setSrid(4547);
+		entry.setSrid(4326);
 		entry.setTableName(tableName);
 		entry.setGeometryColumn("geometry");
 		entry.setGeometryType(Geometries.POINT);
@@ -250,6 +251,7 @@ public class GeopackageWriter implements Runnable {
 
 					featureBuilder.add(point3.getCoordinate().x);
 					featureBuilder.add(point3.getCoordinate().y);
+					//featureBuilder.add(point3);
 					featureBuilder.add(point3);
 				}
 
