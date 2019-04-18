@@ -50,8 +50,8 @@ public class WordSegmenter {
 	 * @param word
 	 * @return
 	 */
-	public List<WordEntry> segment(String word) {
-		List<WordEntry> wordResults = new ArrayList<WordEntry>();
+	public static List<String> segment(String word) {
+		List<String> wordResults = new ArrayList<String>();
 		// 分词结果的一个封装，主要是一个List<Term>的terms
 
 		Result result = DicAnalysis.parse(word); 
@@ -63,9 +63,8 @@ public class WordSegmenter {
 		for (int i = 0; i < terms.size(); i++) {
 			String name = terms.get(i).getName(); // 拿到词
 			if (name.contains("座")||name.contains("室")||name.contains("楼")||name.contains("栋")||name.contains("单元")||name.contains("号")) {
-				String nature = terms.get(i).getNatureStr(); // 拿到词性
-				WordEntry entry = new WordEntry(name, nature);
-				wordResults.add(entry);
+				
+				wordResults.add(name);
 		}
 		}
 	return wordResults;
