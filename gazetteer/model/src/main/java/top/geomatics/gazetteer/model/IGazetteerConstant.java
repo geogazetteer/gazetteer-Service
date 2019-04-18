@@ -209,5 +209,8 @@ public interface IGazetteerConstant {
 			}
 		}
 	};
+	
+	public final static BoundingBox LH_BBOX = new BoundingBox(113.9654368776450042,22.5895874795642015,114.1060976372070002,22.7678404032496005);
+	
 
 }
