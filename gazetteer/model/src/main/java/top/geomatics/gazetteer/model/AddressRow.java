@@ -21,6 +21,7 @@ public class AddressRow {
 	private String update_address_date; // 地址更新日期
 	private String publish; // 地址是否已发布
 	private String create_address_date; // 地址创建日期
+		
 
 	public Integer getId() {
 		return id;
@@ -29,7 +30,7 @@ public class AddressRow {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-
+	
 	public String getAddress_id() {
 		return address_id;
 	}

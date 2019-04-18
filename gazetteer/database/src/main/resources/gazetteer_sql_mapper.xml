@@ -340,6 +340,16 @@
           create_address_date TEXT
           ) 
     </update> 
+    <!--create table-->
+    <update id="createBuildingPositionTable" parameterType="String">  
+        CREATE TABLE ${_parameter} (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          code TEXT,
+          building_id TEXT,
+          longitude REAL,
+          latitude REAL
+          ) 
+    </update> 
     
     <!--insert into table-->
     <insert id="insertAddress" parameterType="map">
@@ -363,7 +373,7 @@
           update_address_date ,
           publish ,
           create_address_date 
-        )
+         )
         values
         (
             #{address_id} ,
@@ -384,6 +394,23 @@
             #{update_address_date} ,
             #{publish} ,
             #{create_address_date}
+         )
+    </insert>
+    <!--insert into table-->
+    <insert id="insertBuildingPosition" parameterType="map">
+        insert into ${sql_tablename}
+        (
+          code ,
+          building_id ,
+           longitude ,
+          latitude
+        )
+        values
+        (
+            #{code} ,
+            #{building_id} ,
+            #{longitude},
+            #{latitude}
          )
     </insert>
 
