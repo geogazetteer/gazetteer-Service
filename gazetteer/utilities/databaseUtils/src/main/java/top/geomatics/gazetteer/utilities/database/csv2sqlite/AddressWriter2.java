@@ -1,10 +1,5 @@
 package top.geomatics.gazetteer.utilities.database.csv2sqlite;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -39,6 +34,7 @@ public class AddressWriter2 implements Runnable {
 		mapper.createAddressTable(sql_tablename);
 		session.commit();
 		map.put("sql_tablename", sql_tablename);
+
 	}
 
 	/*
@@ -49,8 +45,8 @@ public class AddressWriter2 implements Runnable {
 	public void run() {
 		boolean isRunning = true;
 		System.out.println("开始写入数据，请耐心等待......");
-		long startTime=System.currentTimeMillis();   //获取开始时间
-			
+		long startTime = System.currentTimeMillis(); // 获取开始时间
+
 		while (isRunning) {
 			AddressRecord record = null;
 			try {
@@ -98,13 +94,13 @@ public class AddressWriter2 implements Runnable {
 				map.put("publish", record.getValues()[16]);
 				map.put("create_address_date", record.getValues()[17]);
 				mapper.insertAddress(map);
-				count ++;
+				count++;
 			} else {
 				isRunning = false;
 				session.commit(true);
 				System.out.println("写入数据结束！记录数：" + count);
-				long endTime=System.currentTimeMillis(); //获取结束时间
-				System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
+				long endTime = System.currentTimeMillis(); // 获取结束时间
+				System.out.println("程序运行时间： " + (endTime - startTime) + "ms");
 			}
 		}
 	}
