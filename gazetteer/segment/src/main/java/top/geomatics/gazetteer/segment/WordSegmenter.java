@@ -59,15 +59,19 @@ public class WordSegmenter {
 		AddressRecognition re = new AddressRecognition();
 		re.recognition(result);
 
-
 		List<Term> terms = result.getTerms(); // 拿到terms
 		for (int i = 0; i < terms.size(); i++) {
 			String name = terms.get(i).getName(); // 拿到词
-			String nature = terms.get(i).getNatureStr(); // 拿到词性
-			WordEntry entry = new WordEntry(name, nature);
-			wordResults.add(entry);
+			if (name.contains("座")||name.contains("室")||name.contains("楼")||name.contains("栋")||name.contains("单元")||name.contains("号")) {
+				String nature = terms.get(i).getNatureStr(); // 拿到词性
+				WordEntry entry = new WordEntry(name, nature);
+				wordResults.add(entry);
 		}
-
-		return wordResults;
+		}
+	return wordResults;
 	}
+	
+
+	
+	
 }
