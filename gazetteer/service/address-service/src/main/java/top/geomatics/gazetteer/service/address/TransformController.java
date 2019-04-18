@@ -115,7 +115,7 @@ public class TransformController {
     		@RequestParam(value = "chars", required = true)  String input){
  		
 		//繁体转中文简体
-		return JSON.toJSONString(WordSegmenter.segment(input));
+		return JSON.toJSONString(WordSegmenter.houseNumberSegment(input));
 
    }
     
