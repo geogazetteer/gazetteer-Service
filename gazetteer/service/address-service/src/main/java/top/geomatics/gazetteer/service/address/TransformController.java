@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
-import com.luhuiguo.chinese.ChineseUtils;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

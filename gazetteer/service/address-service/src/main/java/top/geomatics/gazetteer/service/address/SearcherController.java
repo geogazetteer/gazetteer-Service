@@ -6,9 +6,14 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.support.jaxrs.FastJsonAutoDiscoverable;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,6 +21,8 @@ import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 import top.geomatics.gazetteer.lucene.LuceneUtil;
 import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.utilities.address.AddressProcessor;
+import top.geomatics.gazetteer.utilities.address.SearcherSettings;
 
 /**
  * <em>搜索服务</em><br>
@@ -24,10 +31,24 @@ import top.geomatics.gazetteer.model.AddressRow;
  * 
  * @author whudyj
  */
-@Api(value="/address",tags="标准地名地址搜索")
+@Api(value = "/address", tags = "标准地名地址搜索")
 @RestController
 @RequestMapping("/address")
 public class SearcherController {
+	private SearcherSettings settings = new SearcherSettings();
+
+	/**
+	 * <em>搜索设置</em><br>
+	 * 
+	 * @param seetings
+	 * @return
+	 */
+	@ApiOperation(value = "搜索设置", notes = "设置搜索选项。示例：/address/searcher/settings")
+	@PutMapping("/searcher/settings")
+	public SearcherSettings searchSettings(@RequestBody SearcherSettings settings) {
+		this.settings = settings;
+		return this.settings;
+	}
 
 	/**
 	 * <em>查询所有地址</em><br>
@@ -45,14 +66,10 @@ public class SearcherController {
 	@ApiOperation(value = "查询所有地址", notes = "查询所有地址。查询速度与地址数据量有关，请尽量缩小查询范围。示例：/address/all?fields=id,address&tablename=民治社区&limit=10")
 	@GetMapping("/all")
 	public String selectAll(
-			@ApiParam(value = "查询字段，如 id,code,address")
-			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
-			@ApiParam(value = "查询的数据库表，如油松社区")
-			@RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
-			@ApiParam(value = "查询结果排序方式")
-			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit,
+			@ApiParam(value = "查询字段，如 id,code,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如油松社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit,
 			@ApiIgnore AddressRow row) {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
@@ -74,16 +91,11 @@ public class SearcherController {
 	@ApiOperation(value = "查询一个街道的所有社区", notes = "按街道查询所有社区，示例：/address/龙华区/民治街道?limit=10")
 	@GetMapping("/{district}/{street}")
 	public String selectByStreetNode(
-			@ApiParam(value = "街道所在的区，固定为龙华区")
-			@PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = false) String path_district,
-			@ApiParam(value = "街道，如：民治街道")
-			@PathVariable(value = IControllerConstant.ADDRESS_STREET, required = true) String path_street,
-			@ApiParam(value = "查询字段，如 id,community")
-			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
-			@ApiParam(value = "查询结果排序方式")
-			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+			@ApiParam(value = "街道所在的区，固定为龙华区") @PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = false) String path_district,
+			@ApiParam(value = "街道，如：民治街道") @PathVariable(value = IControllerConstant.ADDRESS_STREET, required = true) String path_street,
+			@ApiParam(value = "查询字段，如 id,community") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_street, null, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		return ControllerUtils.getResponseBody(rows);
@@ -105,18 +117,12 @@ public class SearcherController {
 	@ApiOperation(value = "查询一个社区的所有地址", notes = "查询一个社区的所有地址，示例：/address/龙华区/民治街道/民治社区?limit=5")
 	@GetMapping("/{district}/{street}/{community}")
 	public String selectByCommunityNode(
-			@ApiParam(value = "街道所在的区，固定为龙华区")
-			@PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = false) String path_district,
-			@ApiParam(value = "街道，如：民治街道")
-			@PathVariable(value = IControllerConstant.ADDRESS_STREET, required = false) String path_street,
-			@ApiParam(value = "社区，如：民治社区")
-			@PathVariable(value = IControllerConstant.ADDRESS_COMMUNITY, required = true) String path_community,
-			@ApiParam(value = "查询字段，如 id,code,address")
-			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
-			@ApiParam(value = "查询结果排序方式")
-			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+			@ApiParam(value = "街道所在的区，固定为龙华区") @PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = false) String path_district,
+			@ApiParam(value = "街道，如：民治街道") @PathVariable(value = IControllerConstant.ADDRESS_STREET, required = false) String path_street,
+			@ApiParam(value = "社区，如：民治社区") @PathVariable(value = IControllerConstant.ADDRESS_COMMUNITY, required = true) String path_community,
+			@ApiParam(value = "查询字段，如 id,code,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_community, null, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		return ControllerUtils.getResponseBody(rows);
@@ -152,42 +158,24 @@ public class SearcherController {
 	@ApiOperation(value = "根据条件精确查询地址", notes = "根据条件精确查询地址，获取满足条件的所有地址信息。示例：/address/searcher/?fields=id,address&tablename=民治社区&address=广东省深圳市龙华区民治街道民治社区沙吓村六巷7栋")
 	@GetMapping("/searcher")
 	public String selectWithConditions(
-			@ApiParam(value = "查询字段，如 id,code,address")
-			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
-			@ApiParam(value = "查询的数据库表，如民治社区")
-			@RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
-			@ApiParam(value = "条件：指定查询的id")
-			@RequestParam(value = IControllerConstant.ADDRESS_DB_ID, required = false) Integer id,
-			@ApiParam(value = "条件：指定查询的省")
-			@RequestParam(value = IControllerConstant.ADDRESS_PROVINCE, required = false, defaultValue = "") String province,
-			@ApiParam(value = "条件：指定查询的市")
-			@RequestParam(value = IControllerConstant.ADDRESS_CITY, required = false, defaultValue = "") String city,
-			@ApiParam(value = "条件：指定查询的区")
-			@RequestParam(value = IControllerConstant.ADDRESS_DISTRICT, required = false, defaultValue = "") String district,
-			@ApiParam(value = "条件：指定查询的街道")
-			@RequestParam(value = IControllerConstant.ADDRESS_STREET, required = false, defaultValue = "") String street,
-			@ApiParam(value = "条件：指定查询的社区")
-			@RequestParam(value = IControllerConstant.ADDRESS_COMMUNITY, required = false, defaultValue = "") String community,
-			@ApiParam(value = "条件：指定查询的地名地址，如：广东省深圳市龙华区民治街道民治社区沙吓村六巷7栋")
-			@RequestParam(value = IControllerConstant.ADDRESS_ADDRESS, required = false, defaultValue = "") String address,
-			@ApiParam(value = "条件：指定查询的地名地址id")
-			@RequestParam(value = IControllerConstant.ADDRESS_ADDRESS_ID, required = false, defaultValue = "") String address_id,
-			@ApiParam(value = "条件：指定查询的建筑物")
-			@RequestParam(value = IControllerConstant.ADDRESS_BUILDING, required = false, defaultValue = "") String building,
-			@ApiParam(value = "条件：指定查询的建筑物id")
-			@RequestParam(value = IControllerConstant.ADDRESS_BUILDING_ID, required = false, defaultValue = "") String building_id,
-			@ApiParam(value = "条件：指定查询的地名地址编码")
-			@RequestParam(value = IControllerConstant.ADDRESS_CODE, required = false, defaultValue = "") String code,
-			@ApiParam(value = "条件：指定查询的道路")
-			@RequestParam(value = IControllerConstant.ADDRESS_ROAD, required = false, defaultValue = "") String road,
-			@ApiParam(value = "条件：指定查询的道路编码")
-			@RequestParam(value = IControllerConstant.ADDRESS_ROAD_NUM, required = false, defaultValue = "") String road_num,
-			@ApiParam(value = "条件：指定查询的小区或村")
-			@RequestParam(value = IControllerConstant.ADDRESS_VILLAGE, required = false, defaultValue = "") String village,
-			@ApiParam(value = "查询结果排序方式")
-			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+			@ApiParam(value = "查询字段，如 id,code,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如民治社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "条件：指定查询的id") @RequestParam(value = IControllerConstant.ADDRESS_DB_ID, required = false) Integer id,
+			@ApiParam(value = "条件：指定查询的省") @RequestParam(value = IControllerConstant.ADDRESS_PROVINCE, required = false, defaultValue = "") String province,
+			@ApiParam(value = "条件：指定查询的市") @RequestParam(value = IControllerConstant.ADDRESS_CITY, required = false, defaultValue = "") String city,
+			@ApiParam(value = "条件：指定查询的区") @RequestParam(value = IControllerConstant.ADDRESS_DISTRICT, required = false, defaultValue = "") String district,
+			@ApiParam(value = "条件：指定查询的街道") @RequestParam(value = IControllerConstant.ADDRESS_STREET, required = false, defaultValue = "") String street,
+			@ApiParam(value = "条件：指定查询的社区") @RequestParam(value = IControllerConstant.ADDRESS_COMMUNITY, required = false, defaultValue = "") String community,
+			@ApiParam(value = "条件：指定查询的地名地址，如：广东省深圳市龙华区民治街道民治社区沙吓村六巷7栋") @RequestParam(value = IControllerConstant.ADDRESS_ADDRESS, required = false, defaultValue = "") String address,
+			@ApiParam(value = "条件：指定查询的地名地址id") @RequestParam(value = IControllerConstant.ADDRESS_ADDRESS_ID, required = false, defaultValue = "") String address_id,
+			@ApiParam(value = "条件：指定查询的建筑物") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING, required = false, defaultValue = "") String building,
+			@ApiParam(value = "条件：指定查询的建筑物id") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING_ID, required = false, defaultValue = "") String building_id,
+			@ApiParam(value = "条件：指定查询的地名地址编码") @RequestParam(value = IControllerConstant.ADDRESS_CODE, required = false, defaultValue = "") String code,
+			@ApiParam(value = "条件：指定查询的道路") @RequestParam(value = IControllerConstant.ADDRESS_ROAD, required = false, defaultValue = "") String road,
+			@ApiParam(value = "条件：指定查询的道路编码") @RequestParam(value = IControllerConstant.ADDRESS_ROAD_NUM, required = false, defaultValue = "") String road_num,
+			@ApiParam(value = "条件：指定查询的小区或村") @RequestParam(value = IControllerConstant.ADDRESS_VILLAGE, required = false, defaultValue = "") String village,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
 		AddressRow row = new AddressRow();
 		if (null != id)
 			row.setId(id);
@@ -252,42 +240,24 @@ public class SearcherController {
 	@ApiOperation(value = "根据条件模糊查询地址", notes = "根据条件模糊查询地址，获取满足条件的所有地址信息。示例：/address/fuzzysearcher/?fields=id,address&tablename=民治社区&address=沙吓村六巷7栋")
 	@GetMapping("/fuzzysearcher")
 	public String fuzzySelectWithConditions(
-			@ApiParam(value = "查询字段，如 id,code,address")
-			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
-			@ApiParam(value = "查询的数据库表，如民治社区")
-			@RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
-			@ApiParam(value = "条件：指定查询的id")
-			@RequestParam(value = IControllerConstant.ADDRESS_DB_ID, required = false) Integer id,
-			@ApiParam(value = "条件：指定查询的省")
-			@RequestParam(value = IControllerConstant.ADDRESS_PROVINCE, required = false, defaultValue = "") String province,
-			@ApiParam(value = "条件：指定查询的市")
-			@RequestParam(value = IControllerConstant.ADDRESS_CITY, required = false, defaultValue = "") String city,
-			@ApiParam(value = "条件：指定查询的区")
-			@RequestParam(value = IControllerConstant.ADDRESS_DISTRICT, required = false, defaultValue = "") String district,
-			@ApiParam(value = "条件：指定模糊查询的街道")
-			@RequestParam(value = IControllerConstant.ADDRESS_STREET, required = false, defaultValue = "") String street,
-			@ApiParam(value = "条件：指定模糊查询的社区")
-			@RequestParam(value = IControllerConstant.ADDRESS_COMMUNITY, required = false, defaultValue = "") String community,
-			@ApiParam(value = "条件：指定模糊查询的地址，如沙吓村六巷7栋")
-			@RequestParam(value = IControllerConstant.ADDRESS_ADDRESS, required = false, defaultValue = "") String address,
-			@ApiParam(value = "条件：指定模糊查询的地址id")
-			@RequestParam(value = IControllerConstant.ADDRESS_ADDRESS_ID, required = false, defaultValue = "") String address_id,
-			@ApiParam(value = "条件：指定模糊查询的建筑物")
-			@RequestParam(value = IControllerConstant.ADDRESS_BUILDING, required = false, defaultValue = "") String building,
-			@ApiParam(value = "条件：指定模糊查询的建筑物id")
-			@RequestParam(value = IControllerConstant.ADDRESS_BUILDING_ID, required = false, defaultValue = "") String building_id,
-			@ApiParam(value = "条件：指定模糊查询的地址编码")
-			@RequestParam(value = IControllerConstant.ADDRESS_CODE, required = false, defaultValue = "") String code,
-			@ApiParam(value = "条件：指定模糊查询的道路")
-			@RequestParam(value = IControllerConstant.ADDRESS_ROAD, required = false, defaultValue = "") String road,
-			@ApiParam(value = "条件：指定模糊查询的道路编码")
-			@RequestParam(value = IControllerConstant.ADDRESS_ROAD_NUM, required = false, defaultValue = "") String road_num,
-			@ApiParam(value = "条件：指定模糊查询的小区或村")
-			@RequestParam(value = IControllerConstant.ADDRESS_VILLAGE, required = false, defaultValue = "") String village,
-			@ApiParam(value = "查询结果排序方式")
-			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+			@ApiParam(value = "查询字段，如 id,code,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如民治社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "条件：指定查询的id") @RequestParam(value = IControllerConstant.ADDRESS_DB_ID, required = false) Integer id,
+			@ApiParam(value = "条件：指定查询的省") @RequestParam(value = IControllerConstant.ADDRESS_PROVINCE, required = false, defaultValue = "") String province,
+			@ApiParam(value = "条件：指定查询的市") @RequestParam(value = IControllerConstant.ADDRESS_CITY, required = false, defaultValue = "") String city,
+			@ApiParam(value = "条件：指定查询的区") @RequestParam(value = IControllerConstant.ADDRESS_DISTRICT, required = false, defaultValue = "") String district,
+			@ApiParam(value = "条件：指定模糊查询的街道") @RequestParam(value = IControllerConstant.ADDRESS_STREET, required = false, defaultValue = "") String street,
+			@ApiParam(value = "条件：指定模糊查询的社区") @RequestParam(value = IControllerConstant.ADDRESS_COMMUNITY, required = false, defaultValue = "") String community,
+			@ApiParam(value = "条件：指定模糊查询的地址，如沙吓村六巷7栋") @RequestParam(value = IControllerConstant.ADDRESS_ADDRESS, required = false, defaultValue = "") String address,
+			@ApiParam(value = "条件：指定模糊查询的地址id") @RequestParam(value = IControllerConstant.ADDRESS_ADDRESS_ID, required = false, defaultValue = "") String address_id,
+			@ApiParam(value = "条件：指定模糊查询的建筑物") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING, required = false, defaultValue = "") String building,
+			@ApiParam(value = "条件：指定模糊查询的建筑物id") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING_ID, required = false, defaultValue = "") String building_id,
+			@ApiParam(value = "条件：指定模糊查询的地址编码") @RequestParam(value = IControllerConstant.ADDRESS_CODE, required = false, defaultValue = "") String code,
+			@ApiParam(value = "条件：指定模糊查询的道路") @RequestParam(value = IControllerConstant.ADDRESS_ROAD, required = false, defaultValue = "") String road,
+			@ApiParam(value = "条件：指定模糊查询的道路编码") @RequestParam(value = IControllerConstant.ADDRESS_ROAD_NUM, required = false, defaultValue = "") String road_num,
+			@ApiParam(value = "条件：指定模糊查询的小区或村") @RequestParam(value = IControllerConstant.ADDRESS_VILLAGE, required = false, defaultValue = "") String village,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
 		AddressRow row = new AddressRow();
 		if (null != id)
 			row.setId(id);
@@ -337,16 +307,11 @@ public class SearcherController {
 	@ApiOperation(value = "根据地址ID查询", notes = "根据地址ID查询，获取对应地址ID的所有地址信息。示例：/address/address_id/63EEDE6B9E9D6A3AE0538CC0C0C07BB0")
 	@GetMapping("/address_id/{address_id}")
 	public String selectByAddressId(
-			@ApiParam(value = "查询的地址ID，如63EEDE6B9E9D6A3AE0538CC0C0C07BB0")
-			@PathVariable(value = IControllerConstant.ADDRESS_ADDRESS_ID, required = true) String address_id,
-			@ApiParam(value = "查询字段，如 id,code,address")
-			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
-			@ApiParam(value = "查询的数据库表，如油松社区")
-			@RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
-			@ApiParam(value = "查询结果排序方式")
-			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+			@ApiParam(value = "查询的地址ID，如63EEDE6B9E9D6A3AE0538CC0C0C07BB0") @PathVariable(value = IControllerConstant.ADDRESS_ADDRESS_ID, required = true) String address_id,
+			@ApiParam(value = "查询字段，如 id,code,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如油松社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
 		AddressRow aRow = new AddressRow();
 		aRow.setAddress_id(address_id);
 
@@ -368,16 +333,11 @@ public class SearcherController {
 	@ApiOperation(value = "根据地址编码查询", notes = "根据地址编码查询，获取对应地址编码的所有地址信息。示例：/address/code/44030600960102T0117?limit=5")
 	@GetMapping("/code/{code}")
 	public String selectByCode(
-			@ApiParam(value = "查询的地址编码，如44030600960102T0117")
-			@PathVariable(value = IControllerConstant.ADDRESS_CODE, required = true) String code,
-			@ApiParam(value = "查询字段，如 id,code,address")
-			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
-			@ApiParam(value = "查询的数据库表，如油松社区")
-			@RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
-			@ApiParam(value = "查询结果排序方式")
-			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+			@ApiParam(value = "查询的地址编码，如44030600960102T0117") @PathVariable(value = IControllerConstant.ADDRESS_CODE, required = true) String code,
+			@ApiParam(value = "查询字段，如 id,code,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如油松社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
 		AddressRow aRow = new AddressRow();
 		aRow.setCode(code);
 		return selectAll(fields, tablename, orderby, limit, aRow);
@@ -398,16 +358,11 @@ public class SearcherController {
 	@ApiOperation(value = "根据街道名称查询", notes = "根据街道名称查询，获取对应街道的所有地址信息。示例：/address/street/民治街道?limit=5")
 	@GetMapping("/street/{street}")
 	public String selectByStreet(
-			@ApiParam(value = "查询的街道名称，如民治街道")
-			@PathVariable(value = IControllerConstant.ADDRESS_STREET, required = true) String street,
-			@ApiParam(value = "查询字段，如 id,code,address")
-			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
-			@ApiParam(value = "查询的数据库表，如油松社区")
-			@RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
-			@ApiParam(value = "查询结果排序方式")
-			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+			@ApiParam(value = "查询的街道名称，如民治街道") @PathVariable(value = IControllerConstant.ADDRESS_STREET, required = true) String street,
+			@ApiParam(value = "查询字段，如 id,code,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如油松社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
 		AddressRow aRow = new AddressRow();
 		aRow.setStreet(street);
 		return selectAll(fields, tablename, orderby, limit, aRow);
@@ -428,16 +383,11 @@ public class SearcherController {
 	@ApiOperation(value = "根据社区名称查询", notes = "根据社区名称查询，获取对应社区的所有地址信息。示例：/address/community/龙塘社区?limit=5")
 	@GetMapping("/community/{community}")
 	public String selectByCommunity(
-			@ApiParam(value = "查询的社区名称，如龙塘社区")
-			@PathVariable(value = IControllerConstant.ADDRESS_COMMUNITY, required = true) String community,
-			@ApiParam(value = "查询字段，如 id,code,address")
-			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
-			@ApiParam(value = "查询的数据库表，如龙塘社区")
-			@RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
-			@ApiParam(value = "查询结果排序方式")
-			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+			@ApiParam(value = "查询的社区名称，如龙塘社区") @PathVariable(value = IControllerConstant.ADDRESS_COMMUNITY, required = true) String community,
+			@ApiParam(value = "查询字段，如 id,code,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如龙塘社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
 		AddressRow aRow = new AddressRow();
 		aRow.setCommunity(community);
 		return selectAll(fields, tablename, orderby, limit, aRow);
@@ -458,16 +408,11 @@ public class SearcherController {
 	@ApiOperation(value = "根据建筑物ID查询", notes = "根据建筑物ID查询，获取对应建筑物的所有地址信息。示例：/address/buildingID/44030600960102T0117?limit=5")
 	@GetMapping("/buildingID/{building_id}")
 	public String selectByBuildingId(
-			@ApiParam(value = "查询的建筑物ID，如44030600960102T0117")
-			@PathVariable(value = IControllerConstant.ADDRESS_BUILDING_ID, required = true) String building_id,
-			@ApiParam(value = "查询字段，如 id,code,address")
-			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
-			@ApiParam(value = "查询的数据库表，如龙塘社区")
-			@RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
-			@ApiParam(value = "查询结果排序方式")
-			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+			@ApiParam(value = "查询的建筑物ID，如44030600960102T0117") @PathVariable(value = IControllerConstant.ADDRESS_BUILDING_ID, required = true) String building_id,
+			@ApiParam(value = "查询字段，如 id,code,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如龙塘社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
 		AddressRow aRow = new AddressRow();
 		aRow.setBuilding_id(building_id);
 		return selectAll(fields, tablename, orderby, limit, aRow);
@@ -488,16 +433,11 @@ public class SearcherController {
 	@ApiOperation(value = "根据建筑物名称查询", notes = "根据建筑物名称查询，获取对应建筑物的所有地址信息。示例：/address/building/L25号铁皮房?limit=5")
 	@GetMapping("/building/{building}")
 	public String selectByBuilding(
-			@ApiParam(value = "查询的建筑物名称，如L25号铁皮房")
-			@PathVariable(value = IControllerConstant.ADDRESS_BUILDING, required = true) String building,
-			@ApiParam(value = "查询字段，如 id,code,address")
-			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
-			@ApiParam(value = "查询的数据库表，如龙塘社区")
-			@RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
-			@ApiParam(value = "查询结果排序方式")
-			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+			@ApiParam(value = "查询的建筑物名称，如L25号铁皮房") @PathVariable(value = IControllerConstant.ADDRESS_BUILDING, required = true) String building,
+			@ApiParam(value = "查询字段，如 id,code,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如龙塘社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
 		AddressRow aRow = new AddressRow();
 		aRow.setBuilding(building);
 		return selectAll(fields, tablename, orderby, limit, aRow);
@@ -518,16 +458,11 @@ public class SearcherController {
 	@ApiOperation(value = "根据小区或村名称查询", notes = "根据小区或村名称查询，获取对应小区或村名的所有地址信息。示例：/address/village/上塘农贸建材市场?limit=5")
 	@GetMapping("/village/{village}")
 	public String selectByVillage(
-			@ApiParam(value = "查询的小区或村名称，如上塘农贸建材市场")
-			@PathVariable(value = IControllerConstant.ADDRESS_VILLAGE, required = true) String village,
-			@ApiParam(value = "查询字段，如 id,code,address")
-			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
-			@ApiParam(value = "查询的数据库表，如龙塘社区")
-			@RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
-			@ApiParam(value = "查询结果排序方式")
-			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+			@ApiParam(value = "查询的小区或村名称，如上塘农贸建材市场") @PathVariable(value = IControllerConstant.ADDRESS_VILLAGE, required = true) String village,
+			@ApiParam(value = "查询字段，如 id,code,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如龙塘社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
 		AddressRow aRow = new AddressRow();
 		aRow.setVillage(village);
 		return selectAll(fields, tablename, orderby, limit, aRow);
@@ -548,16 +483,11 @@ public class SearcherController {
 	@ApiOperation(value = "根据道路名称查询", notes = "根据道路名称查询，获取对应道路的所有地址信息。示例：/address/road/下围工业二路?limit=5")
 	@GetMapping("/road/{road}")
 	public String selectByRoad(
-			@ApiParam(value = "查询的道路名称，如下围工业二路")
-			@PathVariable(value = IControllerConstant.ADDRESS_ROAD, required = true) String road,
-			@ApiParam(value = "查询字段，如 id,code,address")
-			@RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
-			@ApiParam(value = "查询的数据库表，如龙塘社区")
-			@RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
-			@ApiParam(value = "查询结果排序方式")
-			@RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+			@ApiParam(value = "查询的道路名称，如下围工业二路") @PathVariable(value = IControllerConstant.ADDRESS_ROAD, required = true) String road,
+			@ApiParam(value = "查询字段，如 id,code,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如龙塘社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
 		AddressRow aRow = new AddressRow();
 		aRow.setRoad(road);
 		return selectAll(fields, tablename, orderby, limit, aRow);
@@ -566,9 +496,7 @@ public class SearcherController {
 	/**
 	 * <em>根据关键词进行模糊查询</em><br>
 	 * examples:<br>
-	 * <!--
-	 * http://localhost:8083/address/hint?keywords=龙华&limit=10
-	 * -->
+	 * <!-- http://localhost:8083/address/hint?keywords=龙华&limit=10 -->
 	 * 
 	 * @param keywords String 请求参数，查询关键词，多个关键词以空格分隔
 	 * @param limit    Integer 请求参数，最多查询记录个数
@@ -577,10 +505,9 @@ public class SearcherController {
 	@ApiOperation(value = "根据关键词进行模糊查询", notes = "根据关键词进行模糊查询，示例：/address/hint?keywords=龙华&limit=10")
 	@GetMapping("/hint")
 	public String selectAddressByKeywords(
-			@ApiParam(value = "查询关键词，多个关键词以空格分隔，如：龙华")
-			@RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据")
-			@RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "1000") Integer limit) {
+			@ApiParam(value = "查询关键词，多个关键词以空格分隔，如：龙华") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "1000") Integer limit) {
+		keywords = AddressProcessor.transform(keywords, this.settings);
 		return ControllerUtils.getResponseBody4(LuceneUtil.search(keywords, limit));
 	}
 
@@ -595,8 +522,7 @@ public class SearcherController {
 	@ApiOperation(value = "根据id查询详细信息", notes = "根据id查询详细信息，示例：/address/id/1")
 	@GetMapping("/id/{id}")
 	public String selectById(
-			@ApiParam(value = "指定查询的地址数据库id")
-			@PathVariable(value = "id", required = true) Integer id) {
+			@ApiParam(value = "指定查询的地址数据库id") @PathVariable(value = "id", required = true) Integer id) {
 		Long start = System.currentTimeMillis();
 		List<AddressRow> row = ControllerUtils.mapper.selectById(id);
 		Long end = System.currentTimeMillis();
@@ -615,8 +541,7 @@ public class SearcherController {
 	@ApiOperation(value = "根据一组id查询详细信息", notes = "根据一组id查询详细信息，示例：/address/ids?in=1,2,3")
 	@GetMapping("/ids")
 	public String selectByIds(
-			@ApiParam(value = "指定查询的地址数据库id，以,分隔")
-			@RequestParam(value = "in", required = true) String ids) {
+			@ApiParam(value = "指定查询的地址数据库id，以,分隔") @RequestParam(value = "in", required = true) String ids) {
 		List<Integer> idList = new ArrayList<Integer>();
 		String listString[] = ids.split(",");
 		for (String str : listString) {

@@ -90,7 +90,7 @@ public class AddressProcessor {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * 繁体转简体
 	 * 
@@ -98,20 +98,20 @@ public class AddressProcessor {
 	 * @return
 	 */
 	public static String comToSimple(String s) {
-    	//String s = "头发发财";
-    	//System.out.println(s + " => " + ChineseUtils.toTraditional(s));
-		
-		//繁体转中文简体
+		// String s = "头发发财";
+		// System.out.println(s + " => " + ChineseUtils.toTraditional(s));
+
+		// 繁体转中文简体
 		return ChineseUtils.toSimplified(s);
 
-		//s = "长江成长";
+		// s = "长江成长";
 //		System.out.println(s + " => " + ChineseUtils.toPinyin(s) + " ("
 //				+ ChineseUtils.toPinyin(s, PinyinFormat.UNICODE_PINYIN_FORMAT)
 //				+ ") - "
 //				+ ChineseUtils.toPinyin(s, PinyinFormat.ABBR_PINYIN_FORMAT));
-    }
+	}
 
-	//数字转汉字
+	// 数字转汉字
 //	public String toChinese(String string) {
 //    String[] s1 = { "零", "一", "二", "三", "四", "五", "六", "七", "八", "九" };
 //    String[] s2 = { "十", "百", "千", "万", "十", "百", "千", "亿", "十", "百", "千" };
@@ -129,22 +129,36 @@ public class AddressProcessor {
 //     }
 //     return result;
 // }
-	
+
+	public static String transform(String address, SearcherSettings settings) {
+		String newAddress = address;
+		if (settings.isComplexChar()) {
+			newAddress = comToSimple(newAddress);
+		}
+		if (settings.isFullChar()) {
+			newAddress = fullToHalf(newAddress);
+		}
+		if (settings.isChineseNumber()) {
+			newAddress = chineseToNumber(newAddress).toString();
+		}
+		return newAddress;
+	}
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String string="龍華";
+		String string = "龍華";
 		System.out.println(AddressProcessor.comToSimple(string));
-		
-		String input="１2３";
+
+		String input = "１2３";
 		System.out.println(input);
 		System.out.println(AddressProcessor.fullToHalf(input));
-		
+
 //		String str="12345";
 //		System.out.println(preController.toChinese(str));
-		
-		String  string2="二十三";
+
+		String string2 = "二十三";
 		System.out.println(AddressProcessor.chineseToNumber(string2));
 
 	}
