@@ -2,7 +2,7 @@
  * Created by lixiaochao on 2019/3/21.
  */
 
-const serverUrl = 'http://localhost:8083/';//服务器地址
+const serverUrl = 'http://http://119.3.72.23:8083/';//服务器地址
 var ProxyServlet = 'http://localhost:9192/ProxyServlet/proxyHandler?url=';//代理服务器地址
 const URLCFG={
   searchCtxUrl:serverUrl+'address/hint',//搜索联想，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
@@ -20,6 +20,9 @@ const URLCFG={
   getEditInfoUrl:serverUrl+'editor/fid',
   //查询当前地址匹配的标准地址
   getMatchListUrl:serverUrl+'matcher/address',//(param:tablename=油松社区&keywords=%25万亨达大厦%25&min_sim=0.1&pagesize=10)
+
+  //搜索设置（设置开启繁体、全角数字转换等）
+  traditionalTransUrl:serverUrl+'transform/complex?',//繁体转简体（param：chars=chars）
 };
 
 const geoServerUrl='http://119.3.72.23:8085/';//geoserver服务地址

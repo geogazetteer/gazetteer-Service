@@ -332,7 +332,7 @@ function InitMapboxMap(div,option) {
       center: option.center?option.center:[114.051259,22.702632],
       minZoom: 0,
       maxZoom: 18,
-      zoom: option.zoom?option.zoom:10,
+      zoom: option.zoom?option.zoom:8,
       renderWorldCopies: false,
       isAttributionControl: false
     });

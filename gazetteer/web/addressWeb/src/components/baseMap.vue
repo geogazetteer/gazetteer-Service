@@ -48,6 +48,7 @@
         $this.showLoading=true;
         //初始化房屋面
         InitMapboxMap('map', {
+          zoom:13,
           onLoad(map) {
             //添加资源
             map.addSource('longhua', {

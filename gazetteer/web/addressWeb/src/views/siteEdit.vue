@@ -4,7 +4,6 @@
 
 <template>
   <div class="wrapper">
-   <base-map :markerCoord="markerCoord"></base-map>
     <!--编辑框-->
     <edit-box @setMarkCoord="onGetMarkCoord"  class="leftView"></edit-box>
 
@@ -12,24 +11,19 @@
 </template>
 
 <script>
-  import baseMap from '../components/baseMap.vue'
   import editBox from '../components/editBox.vue'
 export default {
   name: 'home',
   components: {
-    baseMap,editBox
+    editBox
   },
   created(){
   },
   data () {
     return {
-      markerCoord:[],
     }
   },
   methods:{
-    onGetMarkCoord(coordArr){
-      this.markerCoord = coordArr
-    },
   }
 }
 </script>

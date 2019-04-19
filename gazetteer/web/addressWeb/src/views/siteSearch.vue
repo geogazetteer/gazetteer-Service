@@ -4,7 +4,6 @@
 
 <template>
   <div class="wrapper">
-   <base-map :markerCoord="markerCoord"></base-map>
     <!--搜索框-->
     <search-box @setMarkCoord="onGetMarkCoord"  class="leftView"></search-box>
 
@@ -14,25 +13,21 @@
 </template>
 
 <script>
-  import baseMap from '../components/baseMap.vue'
   import searchBox from '../components/searchBox.vue'
   import toolBox from '../components/toolBox.vue'
 export default {
   name: 'home',
   components: {
-    baseMap,searchBox,toolBox
+    searchBox,toolBox
   },
   created(){
   },
   data () {
     return {
-      markerCoord:[],
     }
   },
   methods:{
-    onGetMarkCoord(coordArr){
-      this.markerCoord = coordArr
-    }
+
   }
 }
 </script>
