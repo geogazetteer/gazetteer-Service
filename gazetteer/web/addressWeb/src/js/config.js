@@ -25,8 +25,8 @@ const URLCFG={
 const MAPURL={
   //腾讯底图
   mapTile_tx:domain+":8080/crs/tecentMapCrsConvert?tilecache=true&x={x}&y={y}&z={z}",
-  // building_vec_tile:domain+":8085/geoserver/gwc/service/tms/1.0.0/gazetteer%3Abuilding@EPSG%3A4326%3A512@pbf/{z}/{x}/{y}.pbf"
-  building_vec_tile:"http://119.3.72.23:8085/geoserver/gwc/service/wmts?layer=gazetteer:longhua_building&style=&tilematrixset=EPSG_4326_512&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/png&TileMatrix=EPSG_4326_512:{z}&TileCol={x}&TileRow={y}"
+  building_vec_tile:"http://119.3.72.23:8085/geoserver/gwc/service/tms/1.0.0/gazetteer%3Alonghua_building_4326@EPSG_4326_512@pbf/{z}/{x}/{y}.pbf"
+  // building_vec_tile:"http://119.3.72.23:8085/geoserver/gwc/service/wmts?layer=gazetteer:longhua_building&style=&tilematrixset=EPSG_4326_512&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/png&TileMatrix=EPSG_4326_512:{z}&TileCol={x}&TileRow={y}"
 };
 //编辑模块，左侧街道社区selector配置
 const EDITSELECTORCFG={
