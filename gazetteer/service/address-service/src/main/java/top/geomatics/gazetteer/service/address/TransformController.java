@@ -11,6 +11,7 @@ import com.luhuiguo.chinese.ChineseUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import top.geomatics.gazetteer.segment.WordSegmenter;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 
 /**
@@ -97,5 +98,25 @@ public class TransformController {
 //	        }
 //	        return result;
 //	    }
+	
+	/**
+	 * <em>识别地址中的门牌号，返回门牌号</em><br>
+	 * examples:<br>
+	 * <!--http://localhost:8083/transform/houseNumber?chars=深圳市龙华区大浪街道同胜社区石观工业区19栋3楼
+	 * -->
+	 * 
+	 * @param input
+	 * @return
+	 */
+	@ApiOperation(value = "识别门牌号", notes = "识别门牌号，示例：/transform/houseNumber?chars=深圳市龙华区大浪街道同胜社区石观工业区19栋3楼")
+	@GetMapping("/houseNumber")
+    public String recognizeHouse(
+    		@ApiParam(value = "地址，如深圳市龙华区大浪街道同胜社区石观工业区19栋3楼")
+    		@RequestParam(value = "chars", required = true)  String input){
+ 		
+		//繁体转中文简体
+		return JSON.toJSONString(WordSegmenter.segment(input));
+
+   }
     
 }

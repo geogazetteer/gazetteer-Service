@@ -56,6 +56,10 @@ public interface AddressMapper {
 	public void createAddressTable(String tableName);
 
 	public void insertAddress(Map<String, Object> map);
+	
+	public void createBuildingPositionTable(String tableName);
+
+	public void insertBuildingPosition(Map<String, Object> map);
 
 	public void createDistrictTable(String tableName);
 
