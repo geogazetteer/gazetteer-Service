@@ -51,6 +51,11 @@ public class AddressRecognition implements Recognition{
 		Address_suffix.add("坑");
 		Address_suffix.add("园");
 		Address_suffix.add("大道");
+		Address_suffix.add("栋");
+		Address_suffix.add("室");
+		Address_suffix.add("单元");
+		Address_suffix.add("座");
+		Address_suffix.add("号");
 		
 		Address_nature.add("pron");
 		Address_nature.add("dict");
@@ -158,6 +163,8 @@ public class AddressRecognition implements Recognition{
 		result.setTerms(list) ;
 	
 	}
+	
+	
 	
 
 }
