@@ -15,6 +15,7 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -23,22 +24,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 //数据导入导出
 @Api(value = "/data", tags = "地址数据上传下载")
 @Controller
-@RequestMapping("/data")
 public class DataController {
 	
 	/*获取file.html页面
      */
-    @RequestMapping("/file")
-    public String file(){
-        return "file";
-    }
+//    @RequestMapping("/file")
+//    public String file(){
+//        return "file";
+//    }
 	
     @ApiOperation(value = "上传地址数据", notes = "上传地址数据")
-    @RequestMapping("/fileUpload")
+    @PostMapping("/fileUpload")
     @ResponseBody 
     public String fileUpload(@RequestParam("fileName") MultipartFile file){
         if(file.isEmpty()){
@@ -66,8 +67,9 @@ public class DataController {
     }
     
     @ApiOperation(value = "下载地址数据", notes = "下载地址数据")
-    @RequestMapping("/download/{id}") //id为文件名
-    public void download(@PathVariable("id") String id, HttpServletRequest request, HttpServletResponse response) {
+    @GetMapping("/download/{id}") //id为文件名
+    public void download(@ApiParam(value = "测试，文件名输入test")
+    		@PathVariable("id") String id, HttpServletRequest request, HttpServletResponse response) {
     	//文件地址
     	String folder = "D:/data/upload";
         try (

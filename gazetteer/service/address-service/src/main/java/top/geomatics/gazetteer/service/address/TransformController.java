@@ -64,9 +64,7 @@ public class TransformController {
 	/**
 	 * <em>汉字数字转换为阿拉伯数字，示例：一,二,三</em><br>
 	 * examples:<br>
-	 * <!--http://localhost:8083/transform/digital?chars=百
-	 * -->
-	 * 
+	 * <!--http://localhost:8083/transform/digital?chars=百-->
 	 * @param input
 	 * @return
 	 */
@@ -78,26 +76,6 @@ public class TransformController {
         
         return JSON.toJSONString(AddressProcessor.chineseToNumber(input));
     }
-	
-//	@ApiOperation(value = "数字转汉字", notes = "数字转汉字")
-//	@GetMapping("/toChinese")
-//	public String toChinese(String string) {
-//	       String[] s1 = { "零", "一", "二", "三", "四", "五", "六", "七", "八", "九" };
-//	       String[] s2 = { "十", "百", "千", "万", "十", "百", "千", "亿", "十", "百", "千" };
-//
-//	       String result = "";
-//	       int n = string.length();
-//	       for (int i = 0; i < n; i++) {
-//	           int num = string.charAt(i) - '0';
-//
-//	           if (i != n - 1 && num != 0) {
-//	               result += s1[num] + s2[n - 2 - i];
-//	           } else {
-//	               result += s1[num];
-//	           }
-//	        }
-//	        return result;
-//	    }
 	
 	/**
 	 * <em>识别地址中的门牌号，返回门牌号</em><br>
@@ -113,7 +91,6 @@ public class TransformController {
     public String recognizeHouse(
     		@ApiParam(value = "地址，如深圳市龙华区大浪街道同胜社区石观工业区19栋3楼")
     		@RequestParam(value = "chars", required = true)  String input){
- 		
 		//繁体转中文简体
 		return JSON.toJSONString(WordSegmenter.segment(input));
 
