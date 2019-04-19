@@ -2,8 +2,8 @@
  * Created by lixiaochao on 2019/3/21.
  */
 
-const domain='http://119.3.72.23';
-const serverUrl = 'http://localhost:8083/';
+const serverUrl = 'http://localhost:8083/';//服务器地址
+var ProxyServlet = 'http://localhost:9192/ProxyServlet/proxyHandler?url=';//代理服务器地址
 const URLCFG={
   searchCtxUrl:serverUrl+'address/hint',//搜索联想，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
   searchAddressUrl:serverUrl+'address/hint',//搜索，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
@@ -22,11 +22,14 @@ const URLCFG={
   getMatchListUrl:serverUrl+'matcher/address',//(param:tablename=油松社区&keywords=%25万亨达大厦%25&min_sim=0.1&pagesize=10)
 };
 
+const geoServerUrl='http://119.3.72.23:8085/';//geoserver服务地址
 const MAPURL={
-  //腾讯底图
-  mapTile_tx:domain+":8080/crs/tecentMapCrsConvert?tilecache=true&x={x}&y={y}&z={z}",
-  building_vec_tile:"http://119.3.72.23:8085/geoserver/gwc/service/tms/1.0.0/gazetteer%3Alonghua_building_4326@EPSG_4326_512@pbf/{z}/{x}/{y}.pbf"
-  // building_vec_tile:"http://119.3.72.23:8085/geoserver/gwc/service/wmts?layer=gazetteer:longhua_building&style=&tilematrixset=EPSG_4326_512&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/png&TileMatrix=EPSG_4326_512:{z}&TileCol={x}&TileRow={y}"
+  //底图
+  mapTile:ProxyServlet+"http://localhost:9192/mapboxLayer/{z}/{x}/{y}.pbf",
+  //字体
+  glyphs:ProxyServlet+"http://localhost:9192/myfonts/{fontstack}/{range}.pbf",
+  //房屋面
+  building_vec_tile:geoServerUrl+"geoserver/gwc/service/tms/1.0.0/gazetteer%3ALH_building_4490@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
 };
 //编辑模块，左侧街道社区selector配置
 const EDITSELECTORCFG={

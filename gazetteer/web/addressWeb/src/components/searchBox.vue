@@ -116,7 +116,7 @@
 
 <script>
   import {RegularStr,SetRecord,GetRecord,ClearRecord} from '../js/render.js'
-  import {URLCFG} from '../js/config'
+  import {URLCFG} from '../../static/config.js'
   import smallSpin from "./smallSpin";
   export default{
     name: 'searchBox',

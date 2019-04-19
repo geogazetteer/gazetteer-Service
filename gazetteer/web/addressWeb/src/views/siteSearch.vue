@@ -7,16 +7,20 @@
    <base-map :markerCoord="markerCoord"></base-map>
     <!--搜索框-->
     <search-box @setMarkCoord="onGetMarkCoord"  class="leftView"></search-box>
+
+    <!--工具箱-->
+    <tool-box class="toolBox"></tool-box>
   </div>
 </template>
 
 <script>
   import baseMap from '../components/baseMap.vue'
   import searchBox from '../components/searchBox.vue'
+  import toolBox from '../components/toolBox.vue'
 export default {
   name: 'home',
   components: {
-    baseMap,searchBox
+    baseMap,searchBox,toolBox
   },
   created(){
   },
@@ -46,6 +50,15 @@ export default {
   top: 0;
   z-index: 100;
   /*height: 100%;*/
+}
+.toolBox{
+  position: absolute;
+  right:100px;
+  top: 20px;
+  z-index: 10001;
+  height: 48px;
+  display: flex;
+  align-items: center;
 }
 
 </style>

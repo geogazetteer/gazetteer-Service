@@ -4,22 +4,11 @@
 <template xmlns:v-bind="http://www.w3.org/1999/xhtml">
 
   <div class='baseMapWrapper'>
-    <div id="map">
-     <!-- <div class="ol-viewport" data-view="3"
-           style="position: relative; overflow: hidden; width: 100%; height: 100%; touch-action: none;">
-        &lt;!&ndash;<canvas class="ol-unselectable" width="1161" height="517"&ndash;&gt;
-                &lt;!&ndash;style="width: 100%; height: 100%; display: block;"></canvas>&ndash;&gt;
-        &lt;!&ndash;<div class="ol-overlaycontainer"></div>&ndash;&gt;
-        <div class="ol-overlaycontainer-stopevent">
+    <div id="map"></div>
+    <!--<div style="position: absolute;bottom: 10px;left:10px;color:blue;font-size: 20px" id="coords"></div>-->
 
-          <div class="ol-mouse-position">114.02729272842407,22.650740146636963</div>
-          &lt;!&ndash;<div id="scale" class="ol-scale-value">Scale = 1 : 17K</div>&ndash;&gt;
-        </div>
-      </div>-->
-    </div>
-
-    <!--<div id="baseMap"></div>&lt;!&ndash;地图&ndash;&gt;-->
-    <div style="position: absolute;bottom: 10px;left:10px;color:blue;font-size: 20px" id="coords"></div>
+    <!--加载中-->
+    <Spin fix size="large" v-if="showLoading" style="background-color: rgba(255,255,255,.35);"></Spin>
   </div>
 
 
@@ -28,50 +17,104 @@
 
 <script>
 
-  import {InitOlVecMap,InitMapboxMap} from '../js/render.js'
+  import {InitOlVecMap, InitMapboxMap} from '../js/render.js'
+  import {MAPURL} from "../../static/config.js";
 
-  export default{
+  export default {
     name: 'baseMap',
     data() {
-      return {}
+      return {
+        showLoading:false
+      }
     },
     components: {},
     computed: {},
     props: {
-      markerCoord:{
-        type:Array
+      markerCoord: {
+        type: Array
       }
     },
-    created(){
+    created() {
     },
-    mounted(){
+
+    mounted() {
       this.initMap();
     },
     methods: {
       //地图初始化
-      initMap(){
+      initMap() {
         var $this = this;
 
+        $this.showLoading=true;
         //初始化房屋面
-        //InitOlVecMap();
-        InitMapboxMap()
+        InitMapboxMap('map', {
+          onLoad(map) {
+            //添加资源
+            map.addSource('longhua', {
+              //龙华房屋面
+              "type": "vector",
+              "scheme": "tms",
+              "tiles": [MAPURL['building_vec_tile']],
+            });
+            //添加房屋面图层
+            map.addLayer(
+              //房屋面
+              {
+                "id": "border",
+                "type": "line",
+                "source-layer": "LH_building_4490",
+                "source": "longhua",
+                "layout": {
+                  "line-join": "round",
+                  "line-cap": "round"
+                },
+                "paint": {
+                  "line-color": '#5A92D9',
+                  "line-width": 2
+                },
+              });
+
+            map.addLayer({
+              "id": "region",
+              "type": "fill",
+              "source-layer": "LH_building_4490",
+              "source": "longhua",
+              "layout": {},
+              "paint": {
+                'fill-opacity': 0
+              },
+            });
+
+            map.on('click', 'region', function (e) {
+              var p = e.features[0].properties;
+
+              console.log(JSON.stringify(p))
+            });
+            map.on('mousemove', function (e) {
+              //document.getElementById('coords').innerHTML='缩放层级：'+map.getZoom()+'</br>'+e.lngLat.lng+';'+e.lngLat.lat
+            });
+
+            $this.showLoading=false
+
+          }
+        })
       },
 
     },
-    beforedestroy(){
+    beforedestroy() {
       if (this.baseMap) {
         this.baseMap.remove();
       }
     },
     watch: {
       //监听mark坐标变化
-      markerCoord:{
-       handler:function (val, oldVal) {
-         this.baseMap.setCenter(val);//设置地图中心
-         this.siteMarker.setCoordinates(val);//设置点坐标
-       },
-       immediate:false
-       }
+      markerCoord: {
+        handler: function (val, oldVal) {
+          this.baseMap.setCenter(val);//设置地图中心
+          this.siteMarker.setCoordinates(val);//设置点坐标
+        },
+        immediate: false
+      }
     }
   }
 </script>
@@ -93,5 +136,9 @@
     height: 100%;
   }
 
-  .ol-scale-value {top: 24px; right: 8px; position: absolute; }
+  .ol-scale-value {
+    top: 24px;
+    right: 8px;
+    position: absolute;
+  }
 </style>
