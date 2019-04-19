@@ -50,7 +50,7 @@ public class WordSegmenter {
 	 * @param word
 	 * @return
 	 */
-	public static List<String> segment(String word) {
+	public static List<String> houseNumberSegment(String word) {
 		List<String> wordResults = new ArrayList<String>();
 		// 分词结果的一个封装，主要是一个List<Term>的terms
 
@@ -67,6 +67,24 @@ public class WordSegmenter {
 				wordResults.add(name);
 		}
 		}
+	return wordResults;
+	}
+	
+	public static List<String> segment(String word) {
+		List<String> wordResults = new ArrayList<String>();
+		// 分词结果的一个封装，主要是一个List<Term>的terms
+
+		Result result = DicAnalysis.parse(word); 
+		// 对不标准地址进行分词
+		AddressRecognition re = new AddressRecognition();
+		re.recognition(result);
+
+		List<Term> terms = result.getTerms(); // 拿到terms
+		for (int i = 0; i < terms.size(); i++) {
+			String name = terms.get(i).getName(); // 拿到词
+				wordResults.add(name);
+		}
+		
 	return wordResults;
 	}
 	

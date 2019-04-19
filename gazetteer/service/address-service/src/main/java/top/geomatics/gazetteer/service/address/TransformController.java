@@ -91,7 +91,7 @@ public class TransformController {
     		@ApiParam(value = "地址，如深圳市龙华区大浪街道同胜社区石观工业区19栋3楼")
     		@RequestParam(value = "chars", required = true)  String input){
 		//繁体转中文简体
-		return JSON.toJSONString(WordSegmenter.segment(input));
+		return JSON.toJSONString(WordSegmenter.houseNumberSegment(input));
 
    }
     
