@@ -196,6 +196,22 @@ public class AddressProcessor {
 	}
 
 	/**
+	 * <em>通假字转换</em><br>
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String exchangeWords(String input) {
+		String newString = input;
+		for (String key : IExchangeableWords.WORDS_MAP.keySet()) {
+			if (input.contains(key)) {
+				newString = newString.replace(key, IExchangeableWords.WORDS_MAP.get(key));
+			}
+		}
+		return newString;
+	}
+
+	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
