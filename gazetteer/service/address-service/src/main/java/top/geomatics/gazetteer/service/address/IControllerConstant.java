@@ -20,7 +20,8 @@ public interface IControllerConstant {
 	public static final String TABLE_NAME = "tablename";
 	public static final String TABLE_FIELDS = "fields";
 	public static final String QUERY_KEYWORDS = "keywords";
-
+	public static final String PAGE_NUMBER = "pageNo";
+	public static final String PAGE_COUNT = "pageCount";
 	public static final String ADDRESS_DB_ID = "id";
 	public static final String ADDRESS_PROVINCE = "province";
 	public static final String ADDRESS_CITY = "city";

@@ -143,6 +143,9 @@ public class AddressProcessor {
 		if (settings.isChineseNumber()) {
 			newAddress = chineseToNumber(newAddress).toString();
 		}
+		if (settings.isInterchangeable()) {
+			newAddress = exchangeWords(newAddress).toString();
+		}
 		return newAddress;
 	}
 
@@ -163,7 +166,7 @@ public class AddressProcessor {
 		}
 		String xString = coordString[0];
 		String yString = coordString[1];
-		if ((!xString.matches("[0-9]{3}.[0-9]{6,}")) || (!yString.matches("[0-9]{3}.[0-9]{6,}"))) {
+		if ((!xString.matches("[0-9]{3}.[0-9]{6,}")) || (!yString.matches("[0-9]{2}.[0-9]{6,}"))) {
 			return flag;
 		}
 		double x = Double.parseDouble(xString);
@@ -176,6 +179,39 @@ public class AddressProcessor {
 		}
 		flag = true;
 		return flag;
+	}
+
+	/**
+	 * <em>判断是否含有敏感词</em><br>
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static boolean isSensitiveWords(String input) {
+		boolean flag = false;
+		for (String str : ISensitiveWords.WORDS_LIST) {
+			flag = input.contains(str);
+			if (flag) {
+				break;
+			}
+		}
+		return flag;
+	}
+
+	/**
+	 * <em>通假字转换</em><br>
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String exchangeWords(String input) {
+		String newString = input;
+		for (String key : IExchangeableWords.WORDS_MAP.keySet()) {
+			if (input.contains(key)) {
+				newString = newString.replace(key, IExchangeableWords.WORDS_MAP.get(key));
+			}
+		}
+		return newString;
 	}
 
 	/**
@@ -194,8 +230,9 @@ public class AddressProcessor {
 
 		String string2 = "二十三";
 		System.out.println(AddressProcessor.chineseToNumber(string2));
-		
+
 		System.out.println(isCoordinatesExpression("113.9654368776450042,22.5895874795642015"));
+		System.out.println(isSensitiveWords("基地组织"));
 
 	}
 

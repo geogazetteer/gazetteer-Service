@@ -3,7 +3,6 @@
  */
 package top.geomatics.gazetteer.model;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -190,10 +189,9 @@ public interface IGazetteerConstant {
 		 * 
 		 */
 		private static final long serialVersionUID = 3410904873848011932L;
-
 		{
 			for (int i = 0; i < STREET_ARRAY.length; i++) {
-				STREET_MAP.put(STREET_ARRAY[i], STREET_CODE_ARRAY[i]);
+				put(STREET_ARRAY[i], STREET_CODE_ARRAY[i]);
 			}
 		}
 	};
@@ -202,15 +200,14 @@ public interface IGazetteerConstant {
 		 * 
 		 */
 		private static final long serialVersionUID = 3410904873848011933L;
-
 		{
 			for (int i = 0; i < COMMUNITY_LIST.size(); i++) {
-				STREET_MAP.put(COMMUNITY_LIST.get(i), COMMUNITY_CODE_LIST.get(i));
+				put(COMMUNITY_LIST.get(i), COMMUNITY_CODE_LIST.get(i));
 			}
 		}
 	};
-	
-	public final static BoundingBox LH_BBOX = new BoundingBox(113.9654368776450042,22.5895874795642015,114.1060976372070002,22.7678404032496005);
-	
+
+	public final static BoundingBox LH_BBOX = new BoundingBox(113.9654368776450042, 22.5895874795642015,
+			114.1060976372070002, 22.7678404032496005);
 
 }

@@ -7,15 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.session.SqlSession;
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -25,12 +19,9 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import top.geomatics.gazetteer.config.ResourcesManager;
-import top.geomatics.gazetteer.database.AddressMapper;
-import top.geomatics.gazetteer.database.DatabaseHelper;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 
 /**
@@ -46,63 +37,20 @@ public class LuceneUtil {
 
 	@Value("${index.path}")
 	public static String INDEX_PATH = manager.getValue(LUCENE_INDEX_PATH);
-	private static Directory dir;
 	private static IndexSearcher indexSearcher;
 	private static final String ADDRESS_ID = "id";
 	private static final String ADDRESS = "address";
-	private static final String SELECT_FIELDS = "id,address";
-	private static final String TABLE_NAME = "dmdz";
-
+	private static Map<String, String> mapQuery;
+	private static Integer total;
 	static {
 		try {
+			mapQuery = new HashMap<String, String>();
 			indexSearcher = init();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	private static QueryParser queryParser = new QueryParser(Version.LUCENE_47, ADDRESS, new IKAnalyzer(true));
-
-	private static DatabaseHelper helper = new DatabaseHelper();
-	private static SqlSession session = helper.getSession();
-	private static AddressMapper mapper = session.getMapper(AddressMapper.class);
-	private static Map<String, Object> map = new HashMap<String, Object>();
-
-	/**
-	 * @return IndexWriter
-	 * @throws Exception 异常 注释
-	 */
-	private static IndexWriter getWriter() throws Exception {
-		Analyzer analyzer = new IKAnalyzer(true);
-		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_47, analyzer);
-		iwc.setRAMBufferSizeMB(16);
-		IndexWriter writer = new IndexWriter(dir, iwc);
-		return writer;
-	}
-
-	/**
-	 * <em>更新索引</em>
-	 * 
-	 * @throws Exception 异常
-	 */
-	@Scheduled(cron = "0 0 8 1 * ? ")
-	public static void updateIndex() throws Exception {
-		dir = FSDirectory.open(new File(INDEX_PATH));
-		IndexWriter writer = getWriter();
-		writer.deleteAll();
-
-		map.put("sql_fields", SELECT_FIELDS);
-		map.put("sql_tablename", TABLE_NAME);
-
-		List<SimpleAddressRow> rows = mapper.findSimpleEquals(map);
-
-		for (SimpleAddressRow row : rows) {
-			Document doc = new Document();
-			doc.add(new StringField(ADDRESS_ID, row.getId().toString(), Field.Store.YES));
-			doc.add(new TextField(ADDRESS, row.getAddress(), Field.Store.YES));
-			writer.addDocument(doc);
-		}
-		writer.close();
-	}
 
 	private static IndexSearcher init() throws IOException {
 		IndexSearcher indexSearcher = null;
@@ -152,4 +100,72 @@ public class LuceneUtil {
 		return list;
 	}
 
+	/**
+	 * 分页搜索
+	 * 
+	 * @param keywords
+	 * @param pageNow
+	 * @param pageSize
+	 * @return
+	 */
+	public static Map<String, Object> searchByPage(String keywords, int pageNow, int pageSize) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+//			   判断是否已经从这条关键词走过如果走过就不需要再查总数量了
+			if (mapQuery.get(keywords) == null) {
+				mapQuery = new HashMap<String, String>();
+				mapQuery.put(keywords, "true");
+				Query query = queryParser.parse(keywords);
+				TopDocs topDocs1 = indexSearcher.search(query, 100000000);
+				total = topDocs1.totalHits;
+			}
+			List<SimpleAddressRow> list = new ArrayList<SimpleAddressRow>();
+			int start = (pageNow - 1) * pageSize;
+			// 查询数据， 结束页面自前的数据都会查询到，但是只取本页的数据
+			Query query = queryParser.parse(keywords);
+			map.put("total", total);
+			TopDocs topDocs = indexSearcher.search(query, start);
+			// 获取到上一页最后一条
+			ScoreDoc preScore = topDocs.scoreDocs[start - 1];
+
+			// 查询最后一条后的数据的一页数据
+			topDocs = indexSearcher.searchAfter(preScore, query, pageSize);
+
+			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+				Document doc = indexSearcher.doc(scoreDoc.doc);
+				SimpleAddressRow row = new SimpleAddressRow();
+				row.setId(Integer.parseInt(doc.get(ADDRESS_ID)));
+				row.setAddress(doc.get(ADDRESS));
+				list.add(row);
+			}
+			map.put("datalist", list);
+			Long end = System.currentTimeMillis();
+			System.out.println("lucene wasted time: " + (end - start) + "ms");
+
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return map;
+
+		/*
+		 * ScoreDoc[] scores = topDocs.scoreDocs; System.out.println("查询到的条数\t" +
+		 * topDocs.totalHits); //读取数据 for (int i = 0; i < scores.length; i++) { Document
+		 * doc = reader.document(scores[i].doc); System.out.println(doc.get("id") + ":"
+		 * + doc.get("username") + ":" + doc.get("email")); } } catch (Exception e) {
+		 * e.printStackTrace(); } finally { coloseReader(reader); }
+		 */
+	}
+
+	public static void main(String[] args) {
+		Map<String, Object> map = searchByPage("民治街道", 10, 10);
+		List<SimpleAddressRow> s = (List<SimpleAddressRow>) map.get("datalist");
+		for (SimpleAddressRow sp : s) {
+			System.out.println(sp.getAddress());
+			System.out.println(sp.getId());
+		}
+	}
 }
