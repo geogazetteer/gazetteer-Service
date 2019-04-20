@@ -122,4 +122,21 @@ public class TransformController {
 
 	}
 
+	/**
+	 * <em>通假字转换，示例：得=德</em><br>
+	 * examples:<br>
+	 * <!--http://localhost:8083/transform/exterchangeable?chars=广东省深圳市龙华区龙华街道清湖社区清沙路8号力得威公司宿舍楼
+	 * -->
+	 * 
+	 * @param input
+	 * @return
+	 */
+	@ApiOperation(value = "通假字转换", notes = "通假字转换，示例：/exterchangeable?chars=广东省深圳市龙华区龙华街道清湖社区清沙路8号力得威公司宿舍楼")
+	@GetMapping("/complex")
+	public String exchangeWords(
+			@ApiParam(value = "通假字转换，示例：得=德") @RequestParam(value = "chars", required = true) String input) {
+		return JSON.toJSONString(AddressProcessor.exchangeWords(input));
+
+	}
+
 }
