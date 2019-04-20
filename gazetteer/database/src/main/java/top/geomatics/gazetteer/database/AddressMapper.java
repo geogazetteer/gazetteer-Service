@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.model.BuildingPositionRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 
 /**
@@ -49,6 +50,8 @@ public interface AddressMapper {
 	public List<AddressRow> findEquals(Map<String, Object> map);
 
 	public List<AddressRow> findLike(Map<String, Object> map);
+	
+	public List<BuildingPositionRow> findBuildingEquals(Map<String, Object> map);
 
 	// 创建更新数据库表
 	public void dropTable(String tableName);

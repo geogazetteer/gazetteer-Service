@@ -19,6 +19,10 @@
 			<artifactId>gs-database</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>top.geomatics.gazetteer.config</groupId>
+			<artifactId>gs-config</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>top.geomatics.gazetteer.segment</groupId>
 			<artifactId>gs-segment</artifactId>
 		</dependency>
