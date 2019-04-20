@@ -510,6 +510,29 @@ public class SearcherController {
 		keywords = AddressProcessor.transform(keywords, this.settings);
 		return ControllerUtils.getResponseBody4(LuceneUtil.search(keywords, limit));
 	}
+	
+	/**
+	 * <em>根据关键词进行模糊查询分页展示</em><br>
+	 * examples:<br>
+	 * <!-- http://localhost:8083//address/hint_page?keywords=民治街道&pageNo=10&pageSize=10 -->
+	 * 
+	 * @param keywords String 请求参数，查询关键词，多个关键词以空格分隔
+	 * @param pageNo   Integer 页面
+	 * @param pageSize Integer 页面的大小 
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据关键词进行模糊查询分页展示", notes = "根据关键词进行模糊查询，示例：/address/hint?keywords=龙华&limit=10")
+	@GetMapping("/hint_page")
+	public String selectAddressByKeywords(
+					@ApiParam(value = "查询关键词，多个关键词以空格分隔，如：龙华") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
+					@ApiParam(value = "页码") @RequestParam(value = IControllerConstant.PAGE_NUMBER, required = true, defaultValue = "1")Integer pageNow,
+					@ApiParam(value = "页容量") @RequestParam(value = IControllerConstant.PAGE_NUMBER, required = true, defaultValue = "1") Integer pageSize ) {	
+				return JSON.toJSONString(LuceneUtil.searchByPage(keywords, pageNow, pageSize));
+				
+	}
+			
+	
+	
 
 	/**
 	 * <em>根据数据库id进行查询</em><br>
