@@ -18,7 +18,6 @@
 <script>
 
   import {InitOlVecMap, InitMapboxMap} from '../js/render.js'
-  import {MAPURL} from "../../static/config.js";
 
   export default {
     name: 'baseMap',

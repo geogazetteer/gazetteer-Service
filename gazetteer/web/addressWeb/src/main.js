@@ -6,7 +6,7 @@ import router from './router'
 import iView from 'iview';
 import api from './fetch/api.js';
 import 'iview/dist/styles/iview.css';
-
+import store from './vuex/store'
 
 Vue.config.productionTip = false
 Vue.config.devtools = true
@@ -16,6 +16,7 @@ Vue.prototype.$api = api;
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })

@@ -132,7 +132,6 @@
 
 
 <script>
-  import {EDITSELECTORCFG, URLCFG} from '../../static/config.js'
   import SmallSpin from "./smallSpin";
 
   export default {

@@ -1,4 +1,3 @@
-import {MAPURL} from '../config'
 const MAPSTYLE={
   "version": 8,
   "name": "Basic Template",
@@ -23,7 +22,7 @@ const MAPSTYLE={
         ]
     }
   },
-  "sprite": "http://localhost:8087/static/sprite/sprite",
+  "sprite": "http://localhost:8087/static/mapgis/sprite/sprite",
   "glyphs": MAPURL['glyphs'],
   "layers": [
     {
