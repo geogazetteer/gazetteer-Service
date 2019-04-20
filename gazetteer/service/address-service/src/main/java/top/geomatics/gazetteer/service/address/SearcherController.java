@@ -19,7 +19,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
+import top.geomatics.gazetteer.lucene.GeoNameSearcher;
 import top.geomatics.gazetteer.lucene.LuceneUtil;
+import top.geomatics.gazetteer.lucene.POISearcher;
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.address.SearcherSettings;
@@ -508,31 +510,42 @@ public class SearcherController {
 			@ApiParam(value = "查询关键词，多个关键词以空格分隔，如：龙华") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
 			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "1000") Integer limit) {
 		keywords = AddressProcessor.transform(keywords, this.settings);
+		if (this.settings.isGeoName()) {
+			return ControllerUtils.getResponseBody4(GeoNameSearcher.search(keywords, limit));
+		}
+		if (this.settings.isPOI()) {
+			return ControllerUtils.getResponseBody4(POISearcher.search(keywords, limit));
+		}
+
 		return ControllerUtils.getResponseBody4(LuceneUtil.search(keywords, limit));
 	}
-	
+
 	/**
 	 * <em>根据关键词进行模糊查询分页展示</em><br>
 	 * examples:<br>
-	 * <!-- http://localhost:8083/address/hint_page?keywords=民治街道&pageNo=10&pageSize=10 -->
+	 * <!-- http://localhost:8083/address/hint/1?keywords=民治街道&pageNo=10&pageSize=10
+	 * -->
 	 * 
+	 * @param index    Integer 页面索引
 	 * @param keywords String 请求参数，查询关键词，多个关键词以空格分隔
-	 * @param pageNo   Integer 页面
-	 * @param pageSize Integer 页面的大小 
+	 * @param limit    Integer 页面的大小
 	 * @return String 返回JSON格式的查询结果
 	 */
-	@ApiOperation(value = "根据关键词进行模糊查询分页展示", notes = "根据关键词进行模糊查询分页展示，示例：/address/hint_page?keywords=龙华民治&pageNo=10&pageSize=10")
-	@GetMapping("/hint_page")
+	@ApiOperation(value = "根据关键词进行模糊查询分页展示", notes = "根据关键词进行模糊查询分页展示，示例：/address/hint/page/1?keywords=龙华民治&limit=10")
+	@GetMapping("/hint/page/{index}")
 	public String selectAddressByKeywords(
-					@ApiParam(value = "查询关键词，多个关键词以空格分隔，如：龙华") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
-					@ApiParam(value = "页码") @RequestParam(value = IControllerConstant.PAGE_NUMBER, required = true, defaultValue = "1")Integer pageNow,
-					@ApiParam(value = "页容量") @RequestParam(value = IControllerConstant.PAGE_NUMBER, required = true, defaultValue = "1") Integer pageSize ) {	
-				return JSON.toJSONString(LuceneUtil.searchByPage(keywords, pageNow, pageSize));
-				
+			@ApiParam(value = "当前页面索引，从1开始") @PathVariable(value = "index", required = true) Integer index,
+			@ApiParam(value = "查询关键词，多个关键词以空格分隔，如：龙华") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
+			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = true, defaultValue = "10") Integer limit) {
+		keywords = AddressProcessor.transform(keywords, this.settings);
+		if (this.settings.isGeoName()) {
+			return ControllerUtils.getResponseBody4(GeoNameSearcher.search(keywords, limit));// 暂时没有分页
+		}
+		if (this.settings.isPOI()) {
+			return ControllerUtils.getResponseBody4(POISearcher.search(keywords, limit));// 暂时没有分页
+		}
+		return JSON.toJSONString(LuceneUtil.searchByPage(keywords, index, limit));
 	}
-			
-	
-	
 
 	/**
 	 * <em>根据数据库id进行查询</em><br>
