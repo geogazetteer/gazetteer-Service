@@ -5,10 +5,11 @@
 <template>
   <div class="wrapper">
     <!--搜索框-->
-    <search-box @setMarkCoord="onGetMarkCoord"  class="leftView"></search-box>
+    <search-box   class="leftView"></search-box>
 
     <!--工具箱-->
     <tool-box class="toolBox"></tool-box>
+
   </div>
 </template>
 
@@ -21,6 +22,7 @@ export default {
     searchBox,toolBox
   },
   created(){
+
   },
   data () {
     return {
@@ -50,7 +52,7 @@ export default {
   position: absolute;
   right:100px;
   top: 20px;
-  z-index: 10001;
+  z-index: 100;
   height: 48px;
   display: flex;
   align-items: center;

@@ -116,8 +116,8 @@
 
 <script>
   import {RegularStr,SetRecord,GetRecord,ClearRecord} from '../js/render.js'
-  import {URLCFG} from '../../static/config.js'
   import smallSpin from "./smallSpin";
+  import { mapGetters } from 'vuex'
   export default{
     name: 'searchBox',
     data() {
@@ -173,6 +173,7 @@
     },
     components: {smallSpin},
     computed: {
+      ...mapGetters(['isOpenCoordinate']) ,// 动态计算属性，相当于this.$store.getters.isOpenCoordinate
       maxHeight(){
         return (document.body.clientHeight*0.8||window.innerHeight*0.8)+'px'
       }
@@ -193,6 +194,15 @@
         this.needSpin = false;
         this.showResult = false;
         this.showDetail=false;
+      },
+      //判断输入是否含有敏感词，判断坐标等
+      testChar(url,str,onSuccess){
+        url=url||URLCFG['isSensitiveUrl'];//默认为判断敏感词
+        this.$api.getMsg(url,{chars:str}).then(function (res) {
+          if(onSuccess){
+            onSuccess(res)
+          }
+        });
       },
       //获取搜索联想
       getCardList(){
@@ -220,25 +230,56 @@
         var $this = this;
         var str = typeof curStr=='string'?curStr:RegularStr($this.searchContent);//输入的搜索内容(去除空格)
         if (str) {
-          $this.searchContent = str;//更新搜索框的内容
           $this.showResult = false;//隐藏结果
           $this.showHis = false;//隐藏历史记录
           $this.showCard = false;//隐藏联想
-          $this.needSpin = true;//显示spin
+          //判断是否含有敏感词
+          $this.testChar(null,str,function (res) {
+            if(res){
+              //含有敏感词，提出警告
+              $this.$Modal.warning({
+                title: '含有敏感词！',
+                width:240
+              });
 
-          var url = URLCFG['searchCtxUrl'];
-          $this.$api.getSearchCtx(url, str).then(function (res) {
-            $this.resultCount = res.total;
-            $this.resultList = res.rows;
-            $this.showResult = true;//显示搜索结果
-            $this.needSpin = false;//隐藏spin
+            }else{
+              //不含有敏感词
+              //开启了坐标识别时，判断坐标值是否合法
+              if($this.isOpenCoordinate){
+                $this.testChar(URLCFG['isCoordinateUrl'],str,function (res) {
+                  if(res){
+                    //是合法的坐标值
+                    $this.resultCount = 0;
+                    $this.resultList = [];
+                    $this.showResult = true;//显示搜索结果
+                  }else{
+                    //不是合法的坐标值，弹出警告
+                    $this.$Modal.warning({
+                      title: '请输入合法的坐标值\n如:113.9754368,22.599587479',
+                      width:320
+                    });
+                  }
+                })
+              }else{
+                //未开启坐标识别
+                $this.searchContent = str;//更新搜索框的内容
+                $this.needSpin = true;//开启spin
 
-            //记录历史记录到localStorage
-            if(res.total>0){
-              $this.hisList = SetRecord(str)
+                var url = URLCFG['searchCtxUrl'];
+                $this.$api.getSearchCtx(url, str).then(function (res) {
+                  $this.resultCount = res.total;
+                  $this.resultList = res.rows;
+                  $this.showResult = true;//显示搜索结果
+                  $this.needSpin = false;//隐藏spin
+
+                  //记录历史记录到localStorage
+                  if(res.total>0){
+                    $this.hisList = SetRecord(str)
+                  }
+                })
+              }
             }
-          })
-        } else {
+          });
 
         }
       },

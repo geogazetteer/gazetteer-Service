@@ -2,9 +2,8 @@
 import axios from 'axios';
 import qs from 'qs';
 import Promise from 'pinkie-promise';
-//import config from './config';
 
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoed;charset=UTF-8';
+
 //axios.defaults.baseURL = `${config.BASE_URL}/njData/data`;
 
 export function fetch(method, url, params) {
@@ -21,7 +20,9 @@ export function fetch(method, url, params) {
                     reject(error)
                 })
         } else if (method == 'post') {
-            axios.post(url + "?" + qs.stringify(params))
+          axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoed;charset=UTF-8';
+
+          axios.post(url ,qs.stringify(params))
                 .then(response => {
                     resolve(JSON.parse(JSON.stringify(response.data)));
                 }, err => {
@@ -30,6 +31,16 @@ export function fetch(method, url, params) {
                 .catch((error) => {
                     reject(error)
                 })
+        }else if(method=='put'){
+          axios.put(url ,params)
+            .then(response => {
+              resolve(JSON.parse(JSON.stringify(response.data)));
+            }, err => {
+              reject(err);
+            })
+            .catch((error) => {
+              reject(error)
+            })
         }
     })
 }
@@ -75,5 +86,11 @@ export default {
       min_sim:0.1,
       limit:10
     })
+  },
+
+  //搜索设置
+  //http://119.3.72.23:8083/address/searcher/settings
+  setSettings(setObj){
+    return fetch('put', URLCFG['setSetUrl'] ,setObj)
   }
 };

@@ -314,7 +314,6 @@ function InitOlVecMap(){
   });
 }
 import mapboxgl from 'mapbox-gl'
-import {MAPURL} from '../../static/config'
 /**
  * Created by lixiaochao on 2019/3/7.
  */
