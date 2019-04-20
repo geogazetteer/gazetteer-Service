@@ -5,13 +5,17 @@ package top.geomatics.gazetteer.utilities.database.gpkg;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.geotools.data.simple.SimpleFeatureReader;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
+import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.geopkg.FeatureEntry;
 import org.geotools.geopkg.GeoPackage;
-import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
@@ -30,7 +34,9 @@ public class GPKGReader {
 
 	private static FeatureEntry entry;
 	private static String geoCol;
-	private static FilterFactory2 ff = null;
+	private static FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
+	private static GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
+	private static final String CZWCODE_STRING = "CZWCODE";
 
 	public GPKGReader(String pdkgFilePath) {
 		super();
@@ -50,7 +56,6 @@ public class GPKGReader {
 			e.printStackTrace();
 		}
 		geoCol = entry.getGeometryColumn();
-		ff = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
 	}
 
 	public void close() {
@@ -66,7 +71,7 @@ public class GPKGReader {
 	}
 
 	/**
-	 * <em>返回建筑物面的内部点坐标</em><br>
+	 * <em>根据建筑物编码计算质心点坐标</em><br>
 	 * 
 	 * @param czwCode
 	 * @return
@@ -74,7 +79,7 @@ public class GPKGReader {
 	public GeoPoint query(String czwCode) {
 		GeoPoint point = null;
 		try {
-			Filter filter = ff.equals(ff.property("CZWCODE"), ff.literal(czwCode));
+			Filter filter = ff.equals(ff.property(CZWCODE_STRING), ff.literal(czwCode));
 			SimpleFeatureReader feaReader = geoPackage.reader(entry, filter, null);
 			while (feaReader.hasNext()) {
 				SimpleFeature feature = feaReader.next();
@@ -92,6 +97,36 @@ public class GPKGReader {
 			e.printStackTrace();
 		}
 		return point;
+	}
+
+	/**
+	 * <em>根据坐标获得建筑物编码</em><br>
+	 * 
+	 * @param czwCode
+	 * @return
+	 */
+	public List<String> query(double x, double y) {
+		List<String> czwcodes = new ArrayList<>();
+		try {
+			Filter filter = ff.not(ff.isNull(ff.property(geoCol)));
+			Point point = geometryFactory.createPoint(new Coordinate(x, y));
+			ff.contains(geoCol, (org.opengis.geometry.Geometry) point);
+			SimpleFeatureReader feaReader = geoPackage.reader(entry, filter, null);
+			while (feaReader.hasNext()) {
+				SimpleFeature feature = feaReader.next();
+				Object g = feature.getAttribute(CZWCODE_STRING);// 几何
+				if (g instanceof String) {
+					String tempString = g.toString();
+					if (tempString != null && !tempString.isEmpty() && tempString.length() == 19) {
+						czwcodes.add(tempString);
+					}
+				}
+			}
+			feaReader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return czwcodes;
 	}
 
 }
