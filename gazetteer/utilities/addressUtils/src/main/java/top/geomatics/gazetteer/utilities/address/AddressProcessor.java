@@ -143,6 +143,9 @@ public class AddressProcessor {
 		if (settings.isChineseNumber()) {
 			newAddress = chineseToNumber(newAddress).toString();
 		}
+		if (settings.isInterchangeable()) {
+			newAddress = exchangeWords(newAddress).toString();
+		}
 		return newAddress;
 	}
 
