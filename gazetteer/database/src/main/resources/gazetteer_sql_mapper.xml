@@ -1,452 +1,503 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="top.geomatics.gazetteer.database.AddressMapper">
-    <!--added by dyj 20190316-->
-    
-    <!--通过id查询所有字段-->
-    <select id="selectById" parameterType="int" resultType="AddressRow">
-        SELECT * FROM dmdz where id = #{id}
-    </select>
+<mapper
+	namespace="top.geomatics.gazetteer.database.AddressMapper">
+	<!--added by dyj 20190316 -->
 
-    <!--通过ids查询所有字段-->
-    <select id="selectByIds" resultType="AddressRow">
-        SELECT * FROM dmdz where id in 
-        <foreach collection="list" index="index" item="id" open="(" separator="," close=")">  
-            #{id}  
-        </foreach>  
-    </select>
-    
-    <!--选择所有字段-->
-    <select id="selectAll" parameterType="String" resultType="AddressRow">
-        SELECT T.*
-        FROM #{tablename} T
-    </select>
-    <select id="selectAllWithLimit"  resultType="AddressRow">
-        SELECT T.*
-        FROM #{tablename} T
-        LIMIT #{limit}
-    </select>
-    <!--选择address字段-->
-    <select id="selectAllAddress" parameterType="String" resultType="String">
-        SELECT T.address
-        FROM #{tablename} T 
-    </select>
-    <select id="selectAllAddressWithLimit" resultType="String">
-        SELECT T.address
-        FROM #{tablename} T 
-        LIMIT #{limit}
-    </select>
-    <!--选择address_id字段-->
-    <select id="selectAllAddressID" parameterType="String" resultType="String">
-        SELECT T.address_id
-        FROM #{tablename} T 
-    </select>
-    <select id="selectAllAddressIDWithLimit" resultType="String">
-        SELECT T.address_id
-        FROM #{tablename} T 
-        LIMIT #{limit}
-    </select>
-    <!--选择building_id字段-->
-    <select id="selectAllBuildingID" parameterType="String" resultType="String">
-        SELECT T.building_id
-        FROM #{tablename} T 
-    </select>
-    <select id="selectAllBuildingIDWithLimit" resultType="String">
-        SELECT T.building_id
-        FROM #{tablename} T 
-        LIMIT #{limit}
-    </select>
-    <!--选择building字段-->
-    <select id="selectAllBuilding" parameterType="String" resultType="String">
-        SELECT T.building
-        FROM #{tablename} T 
-    </select>
-    <select id="selectAllBuildingWithLimit" resultType="String">
-        SELECT T.building
-        FROM #{tablename} T 
-        LIMIT #{limit}
-    </select>
-    <!--选择code字段-->
-    <select id="selectAllCode" parameterType="String" resultType="String">
-        SELECT T.code
-        FROM #{tablename} T 
-    </select>
-    <select id="selectAllCodeWithLimit" resultType="String">
-        SELECT T.code
-        FROM #{tablename} T 
-        LIMIT #{limit}
-    </select>
-    <!--选择street字段-->
-    <select id="selectAllStreet" parameterType="String" resultType="String">
-        SELECT T.street
-        FROM #{tablename} T 
-    </select>
-    <select id="selectAllStreetWithLimit" resultType="String">
-        SELECT T.street
-        FROM #{tablename} T 
-        LIMIT #{limit}
-    </select>
-    <!--选择community字段-->
-    <select id="selectAllCommunity" parameterType="String" resultType="String">
-        SELECT T.community
-        FROM #{tablename} T 
-    </select>
-    <select id="selectAllCommunityWithLimit" resultType="String">
-        SELECT T.community
-        FROM #{tablename} T 
-        LIMIT #{limit}
-    </select>
-    <!--选择road字段-->
-    <select id="selectAllRoad" parameterType="String" resultType="String">
-        SELECT T.road
-        FROM #{tablename} T 
-    </select>
-    <select id="selectAllRoadWithLimit" resultType="String">
-        SELECT T.road
-        FROM #{tablename} T 
-        LIMIT #{limit}
-    </select>
-    <!--选择village字段-->
-    <select id="selectAllVillage" parameterType="String" resultType="String">
-        SELECT T.village
-        FROM #{tablename} T 
-    </select>
-    <select id="selectAllVillageWithLimit" resultType="String">
-        SELECT T.village
-        FROM #{tablename} T 
-        LIMIT #{limit}
-    </select>
+	<!--通过id查询所有字段 -->
+	<select id="selectById" parameterType="int"
+		resultType="AddressRow">
+		SELECT * FROM dmdz where id = #{id}
+	</select>
 
-    <!--动态SQL-->
-    <select id="findEquals" resultType="AddressRow">
-        SELECT ${sql_fields}
-        FROM ${sql_tablename}  
-        <where>
-            <if test="id != null">
-                id = #{id}
-            </if> 
-            <if test="province != null">
-                province = #{province}
-            </if>
-            <if test="city != null">
-                AND city = #{city}
-            </if> 
-            <if test="district != null">
-                AND district = #{district}
-            </if> 
-            <if test="street != null">
-                AND street = #{street}
-            </if> 
-            <if test="community != null">
-                AND community = #{community}
-            </if> 
-            <if test="address != null">
-                AND address = #{address}
-            </if>
-            <if test="address_id != null">
-                AND address_id = #{address_id}
-            </if>
-            <if test="building != null">
-                AND building = #{building}
-            </if>
-            <if test="building_id != null">
-                AND building_id = #{building_id}
-            </if>
-            <if test="code != null">
-                AND code = #{code}
-            </if>     
-            <if test="road != null">
-                AND road = #{road}
-            </if> 
-            <if test="road_num != null">
-                AND road_num = #{road_num}
-            </if>
-            <if test="village != null">
-                AND village = #{village}
-            </if>  
-        </where>
-        <if test="sql_orderBy != null">
-                ORDER BY  ${sql_orderBy}
-        </if>
-        <if test="sql_limit != null">
-                LIMIT  #{sql_limit}
-        </if>
-    </select>
-    <!--动态SQL，返回简单地址-->
-    <select id="findSimpleEquals" resultType="SimpleAddressRow">
-        SELECT ${sql_fields}
-        FROM ${sql_tablename}  
-        <where>
-            <if test="id != null">
-                id = #{id}
-            </if> 
-            <if test="province != null">
-                province = #{province}
-            </if>
-            <if test="city != null">
-                AND city = #{city}
-            </if> 
-            <if test="district != null">
-                AND district = #{district}
-            </if> 
-            <if test="street != null">
-                AND street = #{street}
-            </if> 
-            <if test="community != null">
-                AND community = #{community}
-            </if> 
-            <if test="address != null">
-                AND address = #{address}
-            </if>
-            <if test="address_id != null">
-                AND address_id = #{address_id}
-            </if>
-            <if test="building != null">
-                AND building = #{building}
-            </if>
-            <if test="building_id != null">
-                AND building_id = #{building_id}
-            </if>
-            <if test="code != null">
-                AND code = #{code}
-            </if>     
-            <if test="road != null">
-                AND road = #{road}
-            </if> 
-            <if test="road_num != null">
-                AND road_num = #{road_num}
-            </if>
-            <if test="village != null">
-                AND village = #{village}
-            </if>  
-        </where>
-        <if test="sql_orderBy != null">
-                ORDER BY  ${sql_orderBy}
-        </if>
-        <if test="sql_limit != null">
-                LIMIT  #{sql_limit}
-        </if>
-    </select>
-    <select id="findLike" resultType="AddressRow">
-        SELECT ${sql_fields}
-        FROM ${sql_tablename} 
-        <where> 
-            <if test="province != null">
-                province LIKE #{province}
-            </if>
-            <if test="city != null">
-                AND city LIKE #{city}
-            </if> 
-            <if test="district != null">
-                AND district LIKE #{district}
-            </if> 
-            <if test="street != null">
-                AND street LIKE #{street}
-            </if> 
-            <if test="community != null">
-                AND community LIKE #{community}
-            </if> 
-            <if test="address != null">
-                AND address LIKE #{address}
-            </if>
-            <if test="address_id != null">
-                AND address_id LIKE #{address_id}
-            </if>
-            <if test="building != null">
-                AND building LIKE #{building}
-            </if>
-            <if test="building_id != null">
-                AND building_id LIKE #{building_id}
-            </if>
-            <if test="code != null">
-                AND code LIKE #{code}
-            </if>     
-            <if test="road != null">
-                AND road LIKE #{road}
-            </if> 
-            <if test="road_num != null">
-                AND road_num LIKE #{road_num}
-            </if>
-            <if test="village != null">
-                AND village LIKE #{village}
-            </if>  
-        </where>
-        <if test="sql_orderBy != null">
-                ORDER BY  ${sql_orderBy}
-        </if>
-        <if test="sql_limit != null">
-                LIMIT  #{sql_limit}
-        </if>
-    </select>
-    <!--ended by dyj 20190316-->
-    
-    <!--
-    <select id="selectByAddress" parameterType="String" resultType="AddressRow">
-        select * from dmdz where address = #{address}
-    </select>
-    
-    <select id="selectByCode" parameterType="String" resultType="AddressRow">
-        select * from dmdz where code = #{code}
-    </select>
-    
-    <select id="selectstreets"  resultType="AddressRow">
-        select distinct street from dmdz 
-    </select>
-    
-    <select id="selectcommunities"  resultType="AddressRow">
-        select distinct community from dmdz 
-    </select>
-    
-    <select id="selectbuildings"  resultType="AddressRow">
-        select distinct building from dmdz 
-    </select>
-    <select id="selecthouses"  resultType="AddressRow">
-        select distinct house_id from dmdz 
-    </select>
-    <select id="selectAddress" resultType="AddressRow">
-        select * from dmdz limit 10
-    </select>
-    <select id="selectAddressForDictionary" resultType="AddressRow">
-        select street,community,road,road_num,village,building,address from dmdz
-    </select>
-    -->
+	<!--通过ids查询所有字段 -->
+	<select id="selectByIds" resultType="AddressRow">
+		SELECT * FROM dmdz where id in
+		<foreach collection="list" index="index" item="id" open="("
+			separator="," close=")">
+			#{id}
+		</foreach>
+	</select>
 
-    <!--drop table-->
-    <update id="dropTable" parameterType="String">  
-        DROP TABLE IF EXISTS ${_parameter} 
-    </update>  
-    
-    <!--create table-->
-    <update id="createAddressTable" parameterType="String">  
-        CREATE TABLE ${_parameter} (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          address_id TEXT,
-          code TEXT,
-          building_id TEXT,
-          house_id TEXT,
-          province TEXT,
-          city TEXT,
-          district TEXT,
-          street TEXT,
-          community TEXT,
-          road TEXT,
-          road_num TEXT,
-          village TEXT,
-          building TEXT,
-          floor TEXT,
-          address TEXT,
-          update_address_date TEXT,
-          publish TEXT,
-          create_address_date TEXT
-          ) 
-    </update> 
-    <!--create table-->
-    <update id="createBuildingPositionTable" parameterType="String">  
-        CREATE TABLE ${_parameter} (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          code TEXT,
-          building_id TEXT,
-          longitude REAL,
-          latitude REAL
-          ) 
-    </update> 
-    
-    <!--insert into table-->
-    <insert id="insertAddress" parameterType="map">
-        insert into ${sql_tablename}
-        (
-          address_id ,
-          code ,
-          building_id ,
-          house_id ,
-          province ,
-          city ,
-          district ,
-          street ,
-          community ,
-          road ,
-          road_num ,
-          village ,
-          building ,
-          floor ,
-          address ,
-          update_address_date ,
-          publish ,
-          create_address_date 
-         )
-        values
-        (
-            #{address_id} ,
-            #{code} ,
-            #{building_id} ,
-            #{house_id} ,
-            #{province} ,
-            #{city} ,
-            #{district} ,
-            #{street} ,
-            #{community} ,
-            #{road} ,
-            #{road_num} ,
-            #{village} ,
-            #{building} ,
-            #{floor} ,
-            #{address} ,
-            #{update_address_date} ,
-            #{publish} ,
-            #{create_address_date}
-         )
-    </insert>
-    <!--insert into table-->
-    <insert id="insertBuildingPosition" parameterType="map">
-        insert into ${sql_tablename}
-        (
-          code ,
-          building_id ,
-           longitude ,
-          latitude
-        )
-        values
-        (
-            #{code} ,
-            #{building_id} ,
-            #{longitude},
-            #{latitude}
-         )
-    </insert>
+	<!--选择所有字段 -->
+	<select id="selectAll" parameterType="String"
+		resultType="AddressRow">
+		SELECT T.*
+		FROM #{tablename} T
+	</select>
+	<select id="selectAllWithLimit" resultType="AddressRow">
+		SELECT T.*
+		FROM #{tablename} T
+		LIMIT #{limit}
+	</select>
+	<!--选择address字段 -->
+	<select id="selectAllAddress" parameterType="String"
+		resultType="String">
+		SELECT T.address
+		FROM #{tablename} T
+	</select>
+	<select id="selectAllAddressWithLimit" resultType="String">
+		SELECT T.address
+		FROM #{tablename} T
+		LIMIT #{limit}
+	</select>
+	<!--选择address_id字段 -->
+	<select id="selectAllAddressID" parameterType="String"
+		resultType="String">
+		SELECT T.address_id
+		FROM #{tablename} T
+	</select>
+	<select id="selectAllAddressIDWithLimit" resultType="String">
+		SELECT T.address_id
+		FROM #{tablename} T
+		LIMIT #{limit}
+	</select>
+	<!--选择building_id字段 -->
+	<select id="selectAllBuildingID" parameterType="String"
+		resultType="String">
+		SELECT T.building_id
+		FROM #{tablename} T
+	</select>
+	<select id="selectAllBuildingIDWithLimit" resultType="String">
+		SELECT T.building_id
+		FROM #{tablename} T
+		LIMIT #{limit}
+	</select>
+	<!--选择building字段 -->
+	<select id="selectAllBuilding" parameterType="String"
+		resultType="String">
+		SELECT T.building
+		FROM #{tablename} T
+	</select>
+	<select id="selectAllBuildingWithLimit" resultType="String">
+		SELECT T.building
+		FROM #{tablename} T
+		LIMIT #{limit}
+	</select>
+	<!--选择code字段 -->
+	<select id="selectAllCode" parameterType="String"
+		resultType="String">
+		SELECT T.code
+		FROM #{tablename} T
+	</select>
+	<select id="selectAllCodeWithLimit" resultType="String">
+		SELECT T.code
+		FROM #{tablename} T
+		LIMIT #{limit}
+	</select>
+	<!--选择street字段 -->
+	<select id="selectAllStreet" parameterType="String"
+		resultType="String">
+		SELECT T.street
+		FROM #{tablename} T
+	</select>
+	<select id="selectAllStreetWithLimit" resultType="String">
+		SELECT T.street
+		FROM #{tablename} T
+		LIMIT #{limit}
+	</select>
+	<!--选择community字段 -->
+	<select id="selectAllCommunity" parameterType="String"
+		resultType="String">
+		SELECT T.community
+		FROM #{tablename} T
+	</select>
+	<select id="selectAllCommunityWithLimit" resultType="String">
+		SELECT T.community
+		FROM #{tablename} T
+		LIMIT #{limit}
+	</select>
+	<!--选择road字段 -->
+	<select id="selectAllRoad" parameterType="String"
+		resultType="String">
+		SELECT T.road
+		FROM #{tablename} T
+	</select>
+	<select id="selectAllRoadWithLimit" resultType="String">
+		SELECT T.road
+		FROM #{tablename} T
+		LIMIT #{limit}
+	</select>
+	<!--选择village字段 -->
+	<select id="selectAllVillage" parameterType="String"
+		resultType="String">
+		SELECT T.village
+		FROM #{tablename} T
+	</select>
+	<select id="selectAllVillageWithLimit" resultType="String">
+		SELECT T.village
+		FROM #{tablename} T
+		LIMIT #{limit}
+	</select>
 
-    <update id="createDistrictTable" parameterType="String">  
-        CREATE TABLE ${_parameter} (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          street TEXT
-          ) 
-    </update> 
-    
-    <insert id="insertDistrict" parameterType="map">
-        insert into ${sql_tablename}
-        (
-          street 
-        )
-        values
-        (
-            #{street}
-         )
-    </insert>
-    <update id="createStreetTable" parameterType="String">  
-        CREATE TABLE ${_parameter} (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          community TEXT
-          ) 
-    </update> 
-    
-    <insert id="insertStreet" parameterType="map">
-        insert into ${sql_tablename}
-        (
-          community 
-        )
-        values
-        (
-            #{community}
-         )
-    </insert>
+	<!--动态SQL -->
+	<select id="findEquals" resultType="AddressRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="province != null">
+				province = #{province}
+			</if>
+			<if test="city != null">
+				AND city = #{city}
+			</if>
+			<if test="district != null">
+				AND district = #{district}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="community != null">
+				AND community = #{community}
+			</if>
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+			<if test="address_id != null">
+				AND address_id = #{address_id}
+			</if>
+			<if test="building != null">
+				AND building = #{building}
+			</if>
+			<if test="building_id != null">
+				AND building_id = #{building_id}
+			</if>
+			<if test="code != null">
+				AND code = #{code}
+			</if>
+			<if test="road != null">
+				AND road = #{road}
+			</if>
+			<if test="road_num != null">
+				AND road_num = #{road_num}
+			</if>
+			<if test="village != null">
+				AND village = #{village}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<if test="sql_limit != null">
+			LIMIT #{sql_limit}
+		</if>
+	</select>
+	<!--动态SQL，返回简单地址 -->
+	<select id="findSimpleEquals" resultType="SimpleAddressRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="province != null">
+				province = #{province}
+			</if>
+			<if test="city != null">
+				AND city = #{city}
+			</if>
+			<if test="district != null">
+				AND district = #{district}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="community != null">
+				AND community = #{community}
+			</if>
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+			<if test="address_id != null">
+				AND address_id = #{address_id}
+			</if>
+			<if test="building != null">
+				AND building = #{building}
+			</if>
+			<if test="building_id != null">
+				AND building_id = #{building_id}
+			</if>
+			<if test="code != null">
+				AND code = #{code}
+			</if>
+			<if test="road != null">
+				AND road = #{road}
+			</if>
+			<if test="road_num != null">
+				AND road_num = #{road_num}
+			</if>
+			<if test="village != null">
+				AND village = #{village}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<if test="sql_limit != null">
+			LIMIT #{sql_limit}
+		</if>
+	</select>
+	<select id="findLike" resultType="AddressRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="province != null">
+				province LIKE #{province}
+			</if>
+			<if test="city != null">
+				AND city LIKE #{city}
+			</if>
+			<if test="district != null">
+				AND district LIKE #{district}
+			</if>
+			<if test="street != null">
+				AND street LIKE #{street}
+			</if>
+			<if test="community != null">
+				AND community LIKE #{community}
+			</if>
+			<if test="address != null">
+				AND address LIKE #{address}
+			</if>
+			<if test="address_id != null">
+				AND address_id LIKE #{address_id}
+			</if>
+			<if test="building != null">
+				AND building LIKE #{building}
+			</if>
+			<if test="building_id != null">
+				AND building_id LIKE #{building_id}
+			</if>
+			<if test="code != null">
+				AND code LIKE #{code}
+			</if>
+			<if test="road != null">
+				AND road LIKE #{road}
+			</if>
+			<if test="road_num != null">
+				AND road_num LIKE #{road_num}
+			</if>
+			<if test="village != null">
+				AND village LIKE #{village}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<if test="sql_limit != null">
+			LIMIT #{sql_limit}
+		</if>
+	</select>
+	<!--动态SQL -->
+	<select id="findBuildingEquals" resultType="BuildingPositionRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="code != null">
+				AND code = #{code}
+			</if>
+			<if test="building_id != null">
+				AND building_id = #{building_id}
+			</if>
+			<if test="longitude != null">
+				AND longitude = #{longitude}
+			</if>
+			<if test="latitude != null">
+				AND latitude = #{latitude}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<if test="sql_limit != null">
+			LIMIT #{sql_limit}
+		</if>
+	</select>
+	<!--动态SQL -->
+	<select id="findBuildingByPoint" resultType="BuildingPositionRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="code != null">
+				AND code = #{code}
+			</if>
+			<if test="building_id != null">
+				AND building_id = #{building_id}
+			</if>
+			<if test="longitude != null">
+				AND longitude &lt; #{longitude} + 0.0000001 AND longitude &gt; #{longitude} - 0.0000001
+			</if>
+			<if test="latitude != null">
+				AND latitude &lt; #{latitude} + 0.0000001 AND latitude &gt; #{latitude} - 0.0000001
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<if test="sql_limit != null">
+			LIMIT #{sql_limit}
+		</if>
+	</select>
+	<!--ended by dyj 20190316 -->
+
+	<!-- <select id="selectByAddress" parameterType="String" resultType="AddressRow"> 
+		select * from dmdz where address = #{address} </select> <select id="selectByCode" 
+		parameterType="String" resultType="AddressRow"> select * from dmdz where 
+		code = #{code} </select> <select id="selectstreets" resultType="AddressRow"> 
+		select distinct street from dmdz </select> <select id="selectcommunities" 
+		resultType="AddressRow"> select distinct community from dmdz </select> <select 
+		id="selectbuildings" resultType="AddressRow"> select distinct building from 
+		dmdz </select> <select id="selecthouses" resultType="AddressRow"> select 
+		distinct house_id from dmdz </select> <select id="selectAddress" resultType="AddressRow"> 
+		select * from dmdz limit 10 </select> <select id="selectAddressForDictionary" 
+		resultType="AddressRow"> select street,community,road,road_num,village,building,address 
+		from dmdz </select> -->
+
+	<!--drop table -->
+	<update id="dropTable" parameterType="String">
+		DROP TABLE IF EXISTS ${_parameter}
+	</update>
+
+	<!--create table -->
+	<update id="createAddressTable" parameterType="String">
+		CREATE TABLE ${_parameter} (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		address_id TEXT,
+		code TEXT,
+		building_id TEXT,
+		house_id TEXT,
+		province TEXT,
+		city TEXT,
+		district TEXT,
+		street TEXT,
+		community TEXT,
+		road TEXT,
+		road_num TEXT,
+		village TEXT,
+		building TEXT,
+		floor TEXT,
+		address TEXT,
+		update_address_date TEXT,
+		publish TEXT,
+		create_address_date TEXT
+		)
+	</update>
+	<!--create table -->
+	<update id="createBuildingPositionTable" parameterType="String">
+		CREATE TABLE ${_parameter} (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		code TEXT,
+		building_id TEXT,
+		longitude REAL,
+		latitude REAL
+		)
+	</update>
+
+	<!--insert into table -->
+	<insert id="insertAddress" parameterType="map">
+		insert into ${sql_tablename}
+		(
+		address_id ,
+		code ,
+		building_id ,
+		house_id ,
+		province ,
+		city ,
+		district ,
+		street ,
+		community ,
+		road ,
+		road_num ,
+		village ,
+		building ,
+		floor ,
+		address ,
+		update_address_date ,
+		publish ,
+		create_address_date
+		)
+		values
+		(
+		#{address_id} ,
+		#{code} ,
+		#{building_id} ,
+		#{house_id} ,
+		#{province} ,
+		#{city} ,
+		#{district} ,
+		#{street} ,
+		#{community} ,
+		#{road} ,
+		#{road_num} ,
+		#{village} ,
+		#{building} ,
+		#{floor} ,
+		#{address} ,
+		#{update_address_date} ,
+		#{publish} ,
+		#{create_address_date}
+		)
+	</insert>
+	<!--insert into table -->
+	<insert id="insertBuildingPosition" parameterType="map">
+		insert into ${sql_tablename}
+		(
+		code ,
+		building_id ,
+		longitude ,
+		latitude
+		)
+		values
+		(
+		#{code} ,
+		#{building_id} ,
+		#{longitude},
+		#{latitude}
+		)
+	</insert>
+
+	<update id="createDistrictTable" parameterType="String">
+		CREATE TABLE ${_parameter} (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		street TEXT
+		)
+	</update>
+
+	<insert id="insertDistrict" parameterType="map">
+		insert into ${sql_tablename}
+		(
+		street
+		)
+		values
+		(
+		#{street}
+		)
+	</insert>
+	<update id="createStreetTable" parameterType="String">
+		CREATE TABLE ${_parameter} (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		community TEXT
+		)
+	</update>
+
+	<insert id="insertStreet" parameterType="map">
+		insert into ${sql_tablename}
+		(
+		community
+		)
+		values
+		(
+		#{community}
+		)
+	</insert>
 
 </mapper>

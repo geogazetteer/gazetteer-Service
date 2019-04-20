@@ -17,6 +17,7 @@ import top.geomatics.gazetteer.database.DatabaseHelper;
 import top.geomatics.gazetteer.database.EnterpriseAddressMapper;
 import top.geomatics.gazetteer.database.EnterpriseDatabaseHelper;
 import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.model.BuildingPositionRow;
 import top.geomatics.gazetteer.model.ComparableAddress;
 import top.geomatics.gazetteer.model.EnterpriseRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
@@ -209,6 +210,22 @@ public class ControllerUtils {
 	 */
 	public static String getResponseBody4(List<SimpleAddressRow> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
+		responseString += JSON.toJSONString(rows);
+		responseString += "}";
+		return responseString;
+
+	}
+	/**
+	 * @param rows
+	 * @return
+	 */
+	public static String getResponseBody5(List<BuildingPositionRow> rows) {
+		/*
+		 * { "total": 3, "rows": [ { "id": 0, "name": "Item 0", "price": "$0" }, { "id":
+		 * 1, "name": "Item 1", "price": "$1" } ] }
+		 */
+		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
+		// 使用阿里巴巴的fastjson
 		responseString += JSON.toJSONString(rows);
 		responseString += "}";
 		return responseString;

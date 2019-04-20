@@ -18,8 +18,8 @@
 
 
 	<dependencies>
-	    <!-- 增加thymeleaf依赖 -->
-	    <dependency>
+		<!-- 增加thymeleaf依赖 -->
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
@@ -64,6 +64,12 @@
 				</exclusion>
 			</exclusions>
 
+		</dependency>
+		<!-- 增加POI依赖 -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>4.0.0</version>
 		</dependency>
 		<!-- 增加spring-boot-starter-test依赖 -->
 		<dependency>

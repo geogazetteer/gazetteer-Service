@@ -4,6 +4,8 @@
 
 <template>
   <div class="wrapper">
+    <!--地图-->
+    <base-map ></base-map>
     <router-view></router-view>
     <toggle class="toggle"></toggle>
     <!--个人中心-->
@@ -14,11 +16,12 @@
 <script>
 import toggle from '../components/toggleBox';
 import userCenter from '../components/userCenter'
+import baseMap from '../components/baseMap.vue'
 
 export default {
   name: 'home',
   components: {
-    toggle,userCenter
+    baseMap,toggle,userCenter
   },
   created(){
     this.$router.push("siteSearch");//跳转地名搜索

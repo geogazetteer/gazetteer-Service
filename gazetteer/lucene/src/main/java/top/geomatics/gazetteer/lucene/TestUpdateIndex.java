@@ -4,7 +4,7 @@ public class TestUpdateIndex {
 	public static void main(String[] args) {
 		System.out.println("开始更新索引......");
 		try {
-			LuceneUtil.updateIndex();
+			AddressIndexer.updateIndex();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -25,7 +25,12 @@ export default new Router({
     {
       path: '/AddressWebService',
       name: 'webService',
-      component:  resolve => require(['@/views/webService'], resolve)
+      component:  resolve => require(['@/views/webService'], resolve),
+    },
+    {
+      path: '/batchHandle',
+      name: 'batchHandle',
+      component:  resolve => require(['@/views/batchHandle'], resolve),
     },
   ]
 })

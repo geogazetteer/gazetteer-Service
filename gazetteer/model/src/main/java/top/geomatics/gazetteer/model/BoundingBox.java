@@ -20,6 +20,12 @@ public class BoundingBox {
 		this.maxx = maxx;
 		this.maxy = maxy;
 	}
+	
+
+	public BoundingBox() {
+		super();
+	}
+
 
 	public Double getMinx() {
 		return minx;

@@ -314,96 +314,40 @@ function InitOlVecMap(){
   });
 }
 import mapboxgl from 'mapbox-gl'
-import {MAPURL} from './config'
+/**
+ * Created by lixiaochao on 2019/3/7.
+ */
+
+
 
 //用mapbox记载天地图和房屋面
-function InitMapboxMap() {
-  var map = new mapboxgl.Map({
-    container: 'map',
-    style: {
-      "version": 8,
-      //            "scheme": "xyz",
-      "sources": {
-        //天地图
-        'tdt_vec': {
-          type: "raster",
-          scheme: 'xyz',
-          tiles: ['http://t2.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=b0ac8e412f12c8e709241af20d5c93ec']
-        },
-        //天地图注记
-        tdt_cia:{
-          type: "raster",
-          scheme: 'xyz',
-          tiles:['http://t2.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=b0ac8e412f12c8e709241af20d5c93ec']
-        },
-        //龙华房屋面
-        "longhua": {
-          "type": "vector",
-          "scheme": "tms",
-          "tiles": ['http://119.3.72.23:8085/geoserver/gwc/service/tms/1.0.0/gazetteer%3ALH_building_4490@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf'],
-          //"tileSize": 512
-        }
-      },
-      "layers": [
-        //天地图
-        {
-          'id':'tdt_tile',
-          type:'raster',
-          source:'tdt_vec'
-        },
-        {
-          id:'tdt_tile_cia',
-          type:'raster',
-          source:'tdt_cia'
-        },
-
-        //房屋面
-        {
-          "id": "border",
-          "type": "line",
-          "source-layer": "LH_building_4490",
-          "source": "longhua",
-          "layout": {
-            "line-join": "round",
-            "line-cap": "round"
-          },
-          "paint": {
-            "line-color": '#5A92D9',
-            "line-width": 2
-          },
-        },
-        {
-          "id": "region",
-          "type": "fill",
-          "source-layer": "LH_building_4490",
-          "source": "longhua",
-          "layout": {
-
-          },
-          "paint": {
-            'fill-opacity':0
-          },
-        }
-      ]
-    },
-    center: [114.051259,22.702632],
-    minZoom: 0,
-    maxZoom: 18,
-    zoom: 10,
-    renderWorldCopies: false,
-    isAttributionControl: false
-  });
-
-  map.on('load',function(){
-    map.on('click','region',function(e){
-      var p = e.features[0].properties;
-
-      console.log(JSON.stringify(p))
+import {MAPSTYLE} from '../../static/mapgis/styleCfg.js'
+function InitMapboxMap(div,option) {
+  option=option||{};
+  if(div){
+    var map = new mapboxgl.Map({
+      container: div,
+      style:MAPSTYLE,
+      center: option.center?option.center:[114.051259,22.702632],
+      minZoom: 0,
+      maxZoom: 18,
+      zoom: option.zoom?option.zoom:8,
+      renderWorldCopies: false,
+      isAttributionControl: false
     });
-    map.on('mousemove',function (e) {
-      document.getElementById('coords').innerHTML='缩放层级：'+map.getZoom()+'</br>'+e.lngLat.lng+';'+e.lngLat.lat
+    map.on('load',function(){
+      if(option.onLoad){
+        option.onLoad(map)
+      }
     });
-  })
+
+    if(option.onSuccess){
+      option.onSuccess(map)
+    }
+  }else{
+    throw 'InitMapboxMap缺少div'
+  }
+
 }
 
 

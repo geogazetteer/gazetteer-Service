@@ -5,6 +5,8 @@ package top.geomatics.gazetteer.utilities.address;
 
 import com.luhuiguo.chinese.ChineseUtils;
 
+import top.geomatics.gazetteer.model.IGazetteerConstant;
+
 /**
  * @author whudyj
  *
@@ -141,7 +143,91 @@ public class AddressProcessor {
 		if (settings.isChineseNumber()) {
 			newAddress = chineseToNumber(newAddress).toString();
 		}
+		if (settings.isInterchangeable()) {
+			newAddress = exchangeWords(newAddress).toString();
+		}
 		return newAddress;
+	}
+
+	/**
+	 * <em>判断输入是否为113.9654368776450042,22.5895874795642015形式的坐标</em><br>
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static boolean isCoordinatesExpression(String input) {
+		boolean flag = false;
+		if (!input.contains(",")) {
+			return flag;
+		}
+		String coordString[] = input.split(",");
+		if (2 != coordString.length) {
+			return flag;
+		}
+		String xString = coordString[0];
+		String yString = coordString[1];
+		if ((!xString.matches("[0-9]{3}.[0-9]{6,}")) || (!yString.matches("[0-9]{2}.[0-9]{6,}"))) {
+			return flag;
+		}
+		double x = Double.parseDouble(xString);
+		double y = Double.parseDouble(yString);
+		if (x < IGazetteerConstant.LH_BBOX.getMinx() || x > IGazetteerConstant.LH_BBOX.getMaxx()) {
+			return flag;
+		}
+		if (y < IGazetteerConstant.LH_BBOX.getMiny() || y > IGazetteerConstant.LH_BBOX.getMaxy()) {
+			return flag;
+		}
+		flag = true;
+		return flag;
+	}
+
+	/**
+	 * <em>判断是否含有敏感词</em><br>
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static boolean isSensitiveWords(String input) {
+		boolean flag = false;
+		for (String str : ISensitiveWords.WORDS_LIST) {
+			flag = input.contains(str);
+			if (flag) {
+				break;
+			}
+		}
+		return flag;
+	}
+
+	/**
+	 * <em>通假字转换</em><br>
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String exchangeWords(String input) {
+		String newString = input;
+		for (String key : IExchangeableWords.WORDS_MAP.keySet()) {
+			if (input.contains(key)) {
+				newString = newString.replace(key, IExchangeableWords.WORDS_MAP.get(key));
+			}
+		}
+		return newString;
+	}
+	
+	/**
+	 * <em>同义词转换</em><br>
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String exchangeSmeanWords(String input) {
+		String newString = input;
+		for (String key : SMeanExchangeableWords.WORDS_MAP.keySet()) {
+			if (input.contains(key)) {
+				newString = newString.replace(key, SMeanExchangeableWords.WORDS_MAP.get(key));
+			}
+		}
+		return newString;
 	}
 
 	/**
@@ -160,6 +246,9 @@ public class AddressProcessor {
 
 		String string2 = "二十三";
 		System.out.println(AddressProcessor.chineseToNumber(string2));
+
+		System.out.println(isCoordinatesExpression("113.9654368776450042,22.5895874795642015"));
+		System.out.println(isSensitiveWords("基地组织"));
 
 	}
 
