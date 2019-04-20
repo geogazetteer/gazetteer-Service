@@ -50,7 +50,7 @@ export default {
 }
 .toolBox{
   position: absolute;
-  right:100px;
+  right:80px;
   top: 20px;
   z-index: 100;
   height: 48px;

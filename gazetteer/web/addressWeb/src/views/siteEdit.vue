@@ -5,7 +5,7 @@
 <template>
   <div class="wrapper">
     <!--编辑框-->
-    <edit-box @setMarkCoord="onGetMarkCoord"  class="leftView"></edit-box>
+    <edit-box  class="leftView"></edit-box>
 
   </div>
 </template>
@@ -39,7 +39,6 @@ export default {
   position: absolute;
   left: 20px;
   z-index: 100;
-  height: 100%;
 }
 
 
