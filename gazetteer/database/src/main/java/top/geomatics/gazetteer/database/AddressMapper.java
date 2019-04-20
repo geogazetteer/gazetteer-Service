@@ -6,7 +6,10 @@ package top.geomatics.gazetteer.database;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Select;
+
 import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.model.BuildingPositionRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 
 /**
@@ -49,7 +52,18 @@ public interface AddressMapper {
 	public List<AddressRow> findEquals(Map<String, Object> map);
 
 	public List<AddressRow> findLike(Map<String, Object> map);
+	
+	@Select("select code from building_position where longitude=#{arg0} and latitude=#{arg1}")
+	public String findAddressCodeBycoordinate(Double longitutde,Double latitude);
 
+	@Select("select address from dmdz where code=#{arg0}")
+	public String findAddressBycoordinate(String code);
+	
+	@Select("select code from dmdz where address=#{arg0}")
+	public String findLonLatCodeByaddress(String address);
+	
+	@Select("select longitude,latitude from building_position where code=#{arg0}")
+	public  BuildingPositionRow findLonLatByCode(String code);
 	// 创建更新数据库表
 	public void dropTable(String tableName);
 
