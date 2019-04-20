@@ -20,6 +20,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 import top.geomatics.gazetteer.config.ResourcesManager;
 import top.geomatics.gazetteer.database.AddressMapper;
 import top.geomatics.gazetteer.database.DatabaseHelper;
@@ -78,18 +83,86 @@ public class AddressIndexer {
 
 		for (SimpleAddressRow row : rows) {
 			Document doc = new Document();
+			String address=row.getAddress();
+			String addressRep=address;
+			String pinyinAddress="";
+			if(address!=null&&!address.equals("")) {
+				if(addressRep.contains("、")) {
+					addressRep=addressRep.replaceAll("、", "");
+				}if(addressRep.contains("—")) {
+					addressRep=addressRep.replaceAll("—", "");
+				}if(addressRep.contains("〈")) {
+					addressRep=addressRep.replaceAll("〈", "");
+				}if(addressRep.contains("〉")) {
+					addressRep=addressRep.replaceAll("〉", "");
+				}if(addressRep.contains("-")) {
+					addressRep=addressRep.replaceAll("-", "");
+				}if(addressRep.contains("。")) {
+					addressRep=addressRep.replaceAll("。", "");
+				}if(addressRep.contains("“")) {
+					addressRep=addressRep.replaceAll("“", "");
+				}if(addressRep.contains("”")) {
+					addressRep=addressRep.replaceAll("”", "");
+				}if(addressRep.contains("\\(")) {
+					addressRep=addressRep.replaceAll("\\(", "");
+				}if(addressRep.contains("\\)")) {
+					addressRep=addressRep.replaceAll("\\)", "");
+				}if(addressRep.contains("①")) {
+					addressRep=addressRep.replaceAll("①", "");
+				}if(addressRep.contains("②")) {
+					addressRep=addressRep.replaceAll("②", "");
+				}if(addressRep.contains("·")) {
+					addressRep=addressRep.replaceAll("·", "");
+				}if(addressRep.contains("～")) {
+					addressRep=addressRep.replaceAll("～", "");
+				}if(addressRep.contains("Ⅰ")) {
+					addressRep=addressRep.replaceAll("Ⅰ", "1");
+				}if(addressRep.contains("ˉ")) {
+					addressRep=addressRep.replaceAll("ˉ", "");
+				}if(addressRep.contains("–")) {
+					addressRep=addressRep.replaceAll("–", "");
+				}
+				 pinyinAddress=ToPinyin(addressRep);
+			}
 			doc.add(new StringField(ADDRESS_ID, row.getId().toString(), Field.Store.YES));
-			doc.add(new TextField(ADDRESS, row.getAddress(), Field.Store.YES));
+			doc.add(new TextField(ADDRESS,address+pinyinAddress, Field.Store.YES));
 			writer.addDocument(doc);
 		}
 		writer.close();
 	}
 
 	public static void main(String[] args) {
-		try {
+	/*	try {
 			AddressIndexer.updateIndex();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
+		System.out.println("广东省深圳市龙华区大浪街道龙平社区龙军花园A1、A2栋".contains("、"));
 	}
+	
+	/**
+	      * 汉字转为拼音
+	      * @param chinese
+	      * @return
+	      */
+	     public static String ToPinyin(String chinese){          
+	         String pinyinStr = "";  
+	         char[] newChar = chinese.toCharArray();  
+	         HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();  
+	         defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);  
+	         defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);  
+	         for (int i = 0; i < newChar.length; i++) {  
+	             if (newChar[i] > 128) {  
+	                 try {  
+	                     pinyinStr += PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0];  
+	                 } catch (BadHanyuPinyinOutputFormatCombination e) {  
+	                     e.printStackTrace();  
+	                 }  
+	             }else{  
+	                 pinyinStr += newChar[i];  
+	             }  
+	         }  
+	         return pinyinStr;  
+	     }  
+	     
 }

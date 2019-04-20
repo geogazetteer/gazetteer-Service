@@ -23,6 +23,12 @@
 			<groupId>top.geomatics.gazetteer.config</groupId>
 			<artifactId>gs-config</artifactId>
 		</dependency>
+		<!-- 增加中文转拼音工具包 -->
+		<dependency>
+			<groupId>com.belerweb</groupId>
+			<artifactId>pinyin4j</artifactId>
+			<version>2.5.0</version>
+		</dependency>
 		<!-- 增加database模块依赖 -->
 		<dependency>
 			<groupId>top.geomatics.gazetteer.database</groupId>
