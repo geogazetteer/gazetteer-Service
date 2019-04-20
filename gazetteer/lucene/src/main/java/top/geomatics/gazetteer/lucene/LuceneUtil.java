@@ -16,6 +16,7 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -52,9 +53,11 @@ public class LuceneUtil {
 	private static final String ADDRESS = "address";
 	private static final String SELECT_FIELDS = "id,address";
 	private static final String TABLE_NAME = "dmdz";
-
+	private static Map<String,String> mapQuery;
+	private static Integer total;
 	static {
 		try {
+			mapQuery=new HashMap<String, String>();
 			indexSearcher = init();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -162,35 +165,51 @@ public class LuceneUtil {
 	 */
 	   public static Map<String,Object> searchByPage(String keywords,int pageNow, int pageSize) {
 		   Map<String,Object> map=new HashMap<String,Object>();
-		   List<SimpleAddressRow> list = new ArrayList<SimpleAddressRow>();
-	        try {	
-	        	Query query = queryParser.parse(keywords);
-	            int start = (pageNow - 1) * pageSize;
-	            // 查询数据， 结束页面自前的数据都会查询到，但是只取本页的数据
-	            TopDocs topDocs1 =indexSearcher.search(query,100000000);
-	            Integer total=topDocs1.totalHits;
-	            map.put("total", total);
-	            TopDocs topDocs = indexSearcher.search(query, start);
-	            //获取到上一页最后一条
-	            ScoreDoc preScore = topDocs.scoreDocs[start-1];
+		   try {
+//			   判断是否已经从这条关键词走过如果走过就不需要再查总数量了
+			if(mapQuery.get(keywords)==null) {
+				   mapQuery=new HashMap<String, String>();
+				   mapQuery.put(keywords, "true");
+				   Query query = queryParser.parse(keywords);
+				   TopDocs topDocs1 =indexSearcher.search(query,100000000);
+			       total=topDocs1.totalHits;
+			   }
+			   List<SimpleAddressRow> list = new ArrayList<SimpleAddressRow>();
+			        int start = (pageNow - 1) * pageSize;
+			        // 查询数据， 结束页面自前的数据都会查询到，但是只取本页的数据
+			        Query query = queryParser.parse(keywords);
+			        map.put("total", total);
+			        TopDocs topDocs = indexSearcher.search(query, start);
+			        //获取到上一页最后一条
+			        ScoreDoc preScore = topDocs.scoreDocs[start-1];
 
-	            //查询最后一条后的数据的一页数据
-	            topDocs = indexSearcher.searchAfter(preScore, query, pageSize);
-	            
-	            for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-					Document doc = indexSearcher.doc(scoreDoc.doc);
-					SimpleAddressRow row = new SimpleAddressRow();
-					row.setId(Integer.parseInt(doc.get(ADDRESS_ID)));
-					row.setAddress(doc.get(ADDRESS));
-					list.add(row);
-				}
-	            map.put("datalist",list);
-				Long end = System.currentTimeMillis();
-				System.out.println("lucene wasted time: " + (end - start) + "ms");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			        //查询最后一条后的数据的一页数据
+			        topDocs = indexSearcher.searchAfter(preScore, query, pageSize);
+			        
+			        for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+						Document doc = indexSearcher.doc(scoreDoc.doc);
+						SimpleAddressRow row = new SimpleAddressRow();
+						row.setId(Integer.parseInt(doc.get(ADDRESS_ID)));
+						row.setAddress(doc.get(ADDRESS));
+						list.add(row);
+					}
+			        map.put("datalist",list);
+					Long end = System.currentTimeMillis();
+					System.out.println("lucene wasted time: " + (end - start) + "ms");
+				
+				
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
 			return map;
+		}
 	            
 	            /*ScoreDoc[] scores = topDocs.scoreDocs;
 	            System.out.println("查询到的条数\t" + topDocs.totalHits);
