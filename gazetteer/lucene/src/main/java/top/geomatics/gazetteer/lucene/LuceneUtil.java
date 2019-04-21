@@ -120,17 +120,22 @@ public class LuceneUtil {
 				total = topDocs1.totalHits;
 			}
 			List<SimpleAddressRow> list = new ArrayList<SimpleAddressRow>();
+			TopDocs topDocs =null;
+			
 			int start = (pageNow - 1) * pageSize;
 			// 查询数据， 结束页面自前的数据都会查询到，但是只取本页的数据
 			Query query = queryParser.parse(keywords);
 			map.put("total", total);
-			TopDocs topDocs = indexSearcher.search(query, start);
-			// 获取到上一页最后一条
-			ScoreDoc preScore = topDocs.scoreDocs[start - 1];
+			if(pageNow==1) {
+				topDocs = indexSearcher.search(query, pageSize);
+			}else {
+				TopDocs topDocs1 = indexSearcher.search(query, start);
+				// 获取到上一页最后一条
+				ScoreDoc preScore = topDocs1.scoreDocs[start - 1];
 
-			// 查询最后一条后的数据的一页数据
-			topDocs = indexSearcher.searchAfter(preScore, query, pageSize);
-
+				// 查询最后一条后的数据的一页数据
+				topDocs = indexSearcher.searchAfter(preScore, query, pageSize);
+			}
 			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 				Document doc = indexSearcher.doc(scoreDoc.doc);
 				SimpleAddressRow row = new SimpleAddressRow();
