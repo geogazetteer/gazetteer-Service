@@ -12,7 +12,7 @@ import org.apache.commons.collections.map.HashedMap;
 public interface SMeanExchangeableWords {
 	
 	
-		public static final String[] WORDS_ARRAY = { "粤=广东省","南粤=广东省","鹏城=深圳", "路=大道", "小区=社区", "深=深圳", "设计之都=深圳",
+		public static final String[] WORDS_ARRAY = { "粤=广东省","南粤=广东省","鹏城=深圳", "路=大道", "小区=社区", "设计之都=深圳",
 														"时尚之城=深圳", "创客之城=深圳", "志愿者之城=深圳","弄堂=街道","胡同=街道","街巷=街道"
 				};
 		public static final Map<String, String> WORDS_MAP = new HashMap<String, String>() {
@@ -29,7 +29,6 @@ public interface SMeanExchangeableWords {
 						continue;
 					}
 					put(words[0], words[1]);
-					put(words[1], words[0]);
 				}
 			}
 
