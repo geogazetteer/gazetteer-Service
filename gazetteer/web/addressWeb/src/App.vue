@@ -8,7 +8,7 @@
 export default {
   name: 'App',
   created(){
-    this.$router.push("/");//跳转地名搜索
+    //this.$router.push("/");//跳转地名搜索
   }
 }
 </script>

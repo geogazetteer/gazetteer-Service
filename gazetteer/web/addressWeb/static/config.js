@@ -27,16 +27,21 @@ const URLCFG={
   isSensitiveUrl:serverUrl+'transform/sensitive',//(param:chars=chars)
   //判断是否为正确的坐标
   isCoordinateUrl:serverUrl+'transform/coordinate',//(param:chars=chars)
+  //根据坐标查code
+  getCodeByPointUrl:serverUrl+'building/codes',//(param:x=114.017776720804&y=22.6390350934369)
+  //根据code搜索
+  searchByCodeUrl:serverUrl+'address/code',//(param:code)
 };
 
 const geoServerUrl='http://119.3.72.23:8085/';//geoserver服务地址
+const webUrl=ProxyServlet+'http://localhost:9192/';
 const MAPURL={
   //雪碧图
-  sprite:'http://localhost:8087/static/mapjs/sptite/sprite',
+  sprite:webUrl+'sprite/sprite',
   //底图
-  mapTile:ProxyServlet+"http://localhost:9192/mapboxLayer/{z}/{x}/{y}.pbf",
+  mapTile:webUrl+"mapboxLayer/{z}/{x}/{y}.pbf",
   //字体
-  glyphs:ProxyServlet+"http://localhost:9192/myfonts/{fontstack}/{range}.pbf",
+  glyphs:webUrl+"myfonts/{fontstack}/{range}.pbf",
   //房屋面
   building_vec_tile:geoServerUrl+"geoserver/gwc/service/tms/1.0.0/gazetteer%3ALH_building_4490@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
 };
@@ -63,3 +68,7 @@ const SETDICT={
   "地址范围识别": 'withtin'
 };
 
+const BATCHSERVICE={
+  modelUrl:'http://119.3.72.23:8087/files/downloads/批量处理模版.xlsx',//模板地址
+  uploadUrl:'http://119.3.72.23:8083/fileUpload',//文件上传
+};

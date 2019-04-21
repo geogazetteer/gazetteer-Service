@@ -187,6 +187,8 @@ body {
   justify-content: center;
   align-items: center;
 }
+
+/*编辑 modal*/
 .editLine .select div{
   height: auto !important;
   width: 100% !important;
@@ -206,4 +208,14 @@ body {
   width: 100%;
   overflow-x: visible;
   white-space: inherit;
+}
+
+/*文字溢出*/
+.ellipsis{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+.ivu-icon:hover{
+  color:#3385ff !important;
 }

@@ -3,7 +3,7 @@
 */
 
 <template>
-  <div class="wrapper">
+  <div class="editWrapper">
     <!--编辑框-->
     <edit-box  class="leftView"></edit-box>
 
@@ -30,7 +30,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.wrapper{
+.editWrapper{
   width: 100%;
   height: 100%;
   overflow-y: hidden;

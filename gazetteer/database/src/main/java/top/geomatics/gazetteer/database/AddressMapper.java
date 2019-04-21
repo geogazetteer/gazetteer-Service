@@ -58,7 +58,7 @@ public interface AddressMapper {
 	public List<BuildingPositionRow> findBuildingByPoint(Map<String, Object> map);
 
 	@Select("select code from building_position where longitude=#{arg0} and latitude=#{arg1}")
-	public String findAddressCodeBycoordinate(Double longitutde,Double latitude);
+	public String findAddressCodeBycoordinate(String longitutde,String latitude);
 
 	@Select("select address from dmdz where code=#{arg0}")
 	public String findAddressBycoordinate(String code);
