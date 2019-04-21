@@ -237,10 +237,7 @@
           $this.testChar(null,str,function (res) {
             if(res){
               //含有敏感词，提出警告
-              $this.$Modal.warning({
-                title: '含有敏感词！',
-                width:240
-              });
+              $this.$Message.warning('含有敏感词');
 
             }else{
               //不含有敏感词
@@ -374,8 +371,40 @@
             //未开启坐标识别
             $this.searchContent = str;//更新搜索框的内容
             $this.needSpin = true;//开启spin
+            $this.showResult = false;//隐藏结果
+            $this.showHis = false;//隐藏历史记录
+            $this.showCard = false;//隐藏联想
 
-            var url = URLCFG['searchCtxUrl'];
+            //根据坐标查找code
+            $this.$api.getCodeByPoint(val[0],val[1]).then(function (res) {
+              if(res.length>0){
+                var code=res[0];
+
+                //根据code搜索
+                $this.$api.searchByCode(code).then(function (res) {
+                  if(res['rows'].length>0){
+                    $this.resultCount = res.total;
+                    $this.resultList = res.rows;
+                    $this.showResult = true;//显示搜索结果
+                    $this.needSpin = false;//隐藏spin
+                  }else{
+                    //搜索结果为空
+                    $this.resultCount =0;
+                    $this.resultList = [];
+                    $this.showResult = true;//显示搜索结果
+                    $this.needSpin = false;//隐藏spin
+                  }
+                })
+              }else{
+                $this.$Message.warning('没有匹配到建筑物！');
+                $this.resultCount =0;
+                $this.resultList = [];
+                $this.showResult = true;//显示搜索结果
+                $this.needSpin = false;//隐藏spin
+              }
+
+            })
+           /* var url = URLCFG['searchCtxUrl'];
             $this.$api.getSearchCtx(url, str).then(function (res) {
               $this.resultCount = res.total;
               $this.resultList = res.rows;
@@ -386,7 +415,9 @@
               if(res.total>0){
                 $this.hisList = SetRecord(str)
               }
-            })
+            })*/
+
+
           }
 
         },

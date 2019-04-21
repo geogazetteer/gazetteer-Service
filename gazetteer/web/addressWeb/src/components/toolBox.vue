@@ -9,7 +9,7 @@
         <Icon type="ios-pin" size="24" color="#989898" v-if="!canSelPoint"  title="搜索地图上点" @click="openSelPoint(1)"/>
       </div>
       <!--批量处理-->
-      <div class="iconWrap flex_col">
+      <div class="iconWrap flex_col hoverBlue">
         <Icon type="ios-folder-open" color="#989898" size="24"  title="批量处理" @click="goToBatch"/>
       </div>
       <div class="iconWrap flex_col">
@@ -98,7 +98,9 @@
         "poialias": false,
         "withtin": false
       };
-      this.$api.setSettings(setObj)
+      this.$api.setSettings(setObj);
+      //关闭地图点选
+      this.updateCanSelPoint(false)
     },
     mounted(){
 
@@ -150,7 +152,12 @@
 
       //跳转到批量处理
       goToBatch(){
-        this.$router.push('/batchHandle')
+        // this.$router.push('/batchHandle')
+        //新窗口打开
+        let routeUrl = this.$router.resolve({
+          path: "/batchHandle",
+        });
+        window.open(routeUrl .href, '_blank');
       },
       //打开地图选点
       openSelPoint(canSel){

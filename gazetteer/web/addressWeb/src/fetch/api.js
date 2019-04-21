@@ -6,7 +6,7 @@ import Promise from 'pinkie-promise';
 
 //axios.defaults.baseURL = `${config.BASE_URL}/njData/data`;
 
-export function fetch(method, url, params) {
+export function fetch(method, url, params,option) {
     return new Promise((resolve, reject) => {
         if (method == 'get') {
             axios.get(url, { params: params })
@@ -20,9 +20,9 @@ export function fetch(method, url, params) {
                     reject(error)
                 })
         } else if (method == 'post') {
-          axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoed;charset=UTF-8';
-
-          axios.post(url ,qs.stringify(params))
+          //axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoed;charset=UTF-8';
+          option=option||{};
+          axios.post(url ,params,option)
                 .then(response => {
                     resolve(JSON.parse(JSON.stringify(response.data)));
                 }, err => {
@@ -92,5 +92,14 @@ export default {
   //http://119.3.72.23:8083/address/searcher/settings
   setSettings(setObj){
     return fetch('put', URLCFG['setSetUrl'] ,setObj)
+  },
+
+  //坐标反查服务,先根据坐标找code，再根据code搜索
+  getCodeByPoint(x,y){
+      return fetch('get',URLCFG['getCodeByPointUrl']+'?x='+x+'&y='+y)
+  },
+  //根据code搜索
+  searchByCode(code){
+    return fetch('get',URLCFG['searchByCodeUrl']+'/'+code)
   }
 };

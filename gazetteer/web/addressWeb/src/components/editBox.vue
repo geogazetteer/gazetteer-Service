@@ -86,10 +86,17 @@
           <span>相似标准地址</span>
         </div>
         <div class="selectWrapper autoHeight">
-          <Select v-model="curSelAddress" class="select"
+          <Select v-model="curSelAddress.address" class="select"
                   placeholder="无匹配数据"
           >
-            <Option v-for="(s,index) in matchResult" :value="s.address" :key="index">{{ s.address }}</Option>
+            <Option v-for="(s,index) in matchResult" :value="s.address" :key="index"
+                    :label="s.address">
+                <span>{{ s.address }}</span>
+                <Progress
+                          :stroke-width="7" title="相似度"
+                          :percent="s.similarity*100" class="similar_row"/><!--相似度 similarity-->
+            </Option>
+
           </Select>
 
         </div>
@@ -101,10 +108,12 @@
           <span>标准地址</span>
         </div>
 
-        <div class="autoHeight flex_row" v-if="curSelAddress">
-          {{curSelAddress}}
+        <div class="autoHeight flex_row" v-if="curSelAddress.address">
+          <span>{{curSelAddress.address}}</span>
+          <Progress vertical :stroke-width="7" title="相似度"
+                    :percent="curSelAddress.similarity*100" class="similar"/><!--相似度 similarity-->
         </div>
-        <div v-if="!curSelAddress" class="autoHeight flex_row" >无匹配数据</div>
+        <div v-if="!curSelAddress.address" class="autoHeight flex_row" >无匹配数据</div>
       </div>
 
       <!--按钮-->
@@ -175,7 +184,7 @@
         },
 
         matchResult: [],//相似标准地址
-        curSelAddress: '',//当前选择的匹配结果
+        curSelAddress: {},//当前选择的匹配结果
 
       }
     },
@@ -259,7 +268,7 @@
       //编辑开关
       toggleEditModal(fid,index) {
         var $this = this;
-        $this.curSelAddress='';
+        $this.curSelAddress={};
         //调用接口查询编辑信息
         var url = URLCFG['getEditInfoUrl'];
         $this.$api.getEditMsg(url, fid, $this.curCommunity).then(function (res) {
@@ -280,11 +289,11 @@
           $this.$api.getMatchList(match_url, keyword).then(function (res) {
             if(res.rows&&res.rows.length>0){
               $this.matchResult = res.rows;
-              $this.curSelAddress = res.rows[0]['address'];//默认选择第一个
+              $this.curSelAddress = res.rows[0];//默认选择第一个
             }else{
               //没有匹配结果
               $this.matchResult=[];
-              $this.curSelAddress=''
+              $this.curSelAddress={}
             }
           });
 
@@ -489,6 +498,17 @@
   .editLine .selectWrapper {
     position: relative;
     padding: 5px 0 10px 5px;
+  }
+  /*相似度*/
+  .similar{
+    border-left: 1px solid #f3f3f3;
+    color: #3385ff;
+    text-align: center;
+  }
+  .similar_row{
+    border-top: 1px solid #f3f3f3;
+    color: #3385ff;
+    text-align: center;
   }
   .editLine .select {
     width: 100%;
