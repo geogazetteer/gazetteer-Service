@@ -21,7 +21,6 @@ import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
-import org.opengis.geometry.Geometry;
 
 import top.geomatics.gazetteer.model.GeoPoint;
 

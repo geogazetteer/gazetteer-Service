@@ -319,6 +319,34 @@
 			LIMIT #{sql_limit}
 		</if>
 	</select>
+	<!--动态SQL -->
+	<select id="findBuildingByPoint" resultType="BuildingPositionRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="code != null">
+				AND code = #{code}
+			</if>
+			<if test="building_id != null">
+				AND building_id = #{building_id}
+			</if>
+			<if test="longitude != null">
+				AND longitude &lt; #{longitude} + 0.0000001 AND longitude &gt; #{longitude} - 0.0000001
+			</if>
+			<if test="latitude != null">
+				AND latitude &lt; #{latitude} + 0.0000001 AND latitude &gt; #{latitude} - 0.0000001
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<if test="sql_limit != null">
+			LIMIT #{sql_limit}
+		</if>
+	</select>
 	<!--ended by dyj 20190316 -->
 
 	<!-- <select id="selectByAddress" parameterType="String" resultType="AddressRow"> 
