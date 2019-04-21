@@ -551,7 +551,7 @@ public class SearcherController {
 	/**
 	 * <em>根据关键词进行模糊查询分页展示(加上了同音字搜索功能)</em><br>
 	 * examples:<br>
-	 * <!-- http://localhost:8083/address/hint/1?keywords=民治街道&pageNo=10&pageSize=10
+	 * <!-- http://localhost:8083/address/hint/page/pinyin/2?keywords=神针是&limit=10
 	 * -->
 	 * 
 	 * @param index    Integer 页面索引
@@ -559,14 +559,15 @@ public class SearcherController {
 	 * @param limit    Integer 页面的大小
 	 * @return String 返回JSON格式的查询结果
 	 */
-	@ApiOperation(value = "根据关键词进行模糊查询分页展示", notes = "根据关键词进行模糊查询分页展示，示例：/address/hint/page/1?keywords=龙华民治&limit=10")
+	@ApiOperation(value = "根据关键词进行模糊查询分页展示", notes = "根据关键词进行模糊查询分页展示，示例：/address/hint/page/pinyin/2?keywords=神针是&limit=10")
 	@GetMapping("/hint/page/pinyin/{index}")
 	public String selectAddressByKeywordsAndpinyin(
 			@ApiParam(value = "当前页面索引，从1开始") @PathVariable(value = "index", required = true) Integer index,
 			@ApiParam(value = "查询关键词，多个关键词以空格分隔，如：龙华") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
 			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = true, defaultValue = "10") Integer limit) {
 		String pinyin=AddressIndexer.ToPinyin(keywords);
-		return JSON.toJSONString(LuceneUtil.searchByPage(keywords+pinyin, index, limit));
+		
+		return JSON.toJSONString(LuceneUtil.searchByPinyin(pinyin, index, limit));
 	}
 
 	/**

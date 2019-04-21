@@ -1,6 +1,7 @@
 package top.geomatics.gazetteer.lucene;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import top.geomatics.gazetteer.config.ResourcesManager;
 import top.geomatics.gazetteer.database.AddressMapper;
 import top.geomatics.gazetteer.database.DatabaseHelper;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
+import top.geomatics.gazetteer.segment.WordSegmenter;
 
 /**
  * <em>建立地址索引</em>
@@ -46,6 +48,7 @@ public class AddressIndexer {
 	private static Directory dir;
 	private static final String ADDRESS_ID = "id";
 	private static final String ADDRESS = "address";
+	private static final String ADDRESSPINYIN = "address_pinyin";
 	private static final String SELECT_FIELDS = "id,address";
 	private static final String TABLE_NAME = "dmdz";
 	private static DatabaseHelper helper = new DatabaseHelper();
@@ -85,7 +88,7 @@ public class AddressIndexer {
 			Document doc = new Document();
 			String address=row.getAddress();
 			String addressRep=address;
-			String pinyinAddress="";
+			List<String> pinyinAddress=new ArrayList<String>();
 			if(address!=null&&!address.equals("")) {
 				if(addressRep.contains("、")) {
 					addressRep=addressRep.replaceAll("、", "");
@@ -122,10 +125,16 @@ public class AddressIndexer {
 				}if(addressRep.contains("–")) {
 					addressRep=addressRep.replaceAll("–", "");
 				}
-				 pinyinAddress=ToPinyin(addressRep);
+				List<String>list=WordSegmenter.segment(addressRep);
+				for(String s:list) {
+					pinyinAddress.add(ToPinyin(s));
+				}
 			}
 			doc.add(new StringField(ADDRESS_ID, row.getId().toString(), Field.Store.YES));
-			doc.add(new TextField(ADDRESS,address+pinyinAddress, Field.Store.YES));
+			doc.add(new TextField(ADDRESS,address, Field.Store.YES));
+			for(String str:pinyinAddress) {
+				doc.add(new StringField(ADDRESSPINYIN, str, Field.Store.YES));
+			}
 			writer.addDocument(doc);
 		}
 		writer.close();
@@ -137,7 +146,11 @@ public class AddressIndexer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}*/
-		System.out.println("广东省深圳市龙华区大浪街道龙平社区龙军花园A1、A2栋".contains("、"));
+		List<String>strings=WordSegmenter.segment("广东省深圳市龙华区大浪街道龙平社区龙军花园A1A2栋");
+		for(String s:strings) {
+			
+			System.out.println(ToPinyin(s));
+		}
 	}
 	
 	/**
