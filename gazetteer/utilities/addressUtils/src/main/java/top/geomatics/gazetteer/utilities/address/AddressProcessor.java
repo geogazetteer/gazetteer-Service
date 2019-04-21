@@ -213,6 +213,22 @@ public class AddressProcessor {
 		}
 		return newString;
 	}
+	
+	/**
+	 * <em>同义词转换</em><br>
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String exchangeSmeanWords(String input) {
+		String newString = input;
+		for (String key : SMeanExchangeableWords.WORDS_MAP.keySet()) {
+			if (input.contains(key)) {
+				newString = newString.replace(key, SMeanExchangeableWords.WORDS_MAP.get(key));
+			}
+		}
+		return newString;
+	}
 
 	/**
 	 * @param args
