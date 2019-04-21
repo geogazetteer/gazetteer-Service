@@ -59,7 +59,7 @@
     <div v-if="showDetail" class="detailList" >
       <div class="back flex_row" @click="backResult">
         <span class="img"></span>
-        <span>返回“{{searchContent}}”的搜索结果</span>
+        <span class="ellipsis">返回“{{searchContent}}”的搜索结果</span>
       </div>
 
       <div class="bottomDiv title flex_row">
@@ -173,7 +173,7 @@
     },
     components: {smallSpin},
     computed: {
-      ...mapGetters(['isOpenCoordinate']) ,// 动态计算属性，相当于this.$store.getters.isOpenCoordinate
+      ...mapGetters(['isOpenCoordinate','searchPointCoordArr']) ,// 动态计算属性，相当于this.$store.getters.isOpenCoordinate
       maxHeight(){
         return (document.body.clientHeight*0.8||window.innerHeight*0.8)+'px'
       }
@@ -365,6 +365,33 @@
 
     },
     watch: {
+      //监听地图选点的坐标
+      searchPointCoordArr: {
+        handler: function (val, oldVal) {
+          if(val){
+            var $this = this;
+            var str=val.join(',');
+            //未开启坐标识别
+            $this.searchContent = str;//更新搜索框的内容
+            $this.needSpin = true;//开启spin
+
+            var url = URLCFG['searchCtxUrl'];
+            $this.$api.getSearchCtx(url, str).then(function (res) {
+              $this.resultCount = res.total;
+              $this.resultList = res.rows;
+              $this.showResult = true;//显示搜索结果
+              $this.needSpin = false;//隐藏spin
+
+              //记录历史记录到localStorage
+              if(res.total>0){
+                $this.hisList = SetRecord(str)
+              }
+            })
+          }
+
+        },
+        immediate: false
+      }
     }
   }
 </script>

@@ -22,7 +22,7 @@ const MAPSTYLE={
         ]
     }
   },
-  "sprite": "http://localhost:8087/static/mapgis/sprite/sprite",
+  "sprite": MAPURL['sprite'],
   "glyphs": MAPURL['glyphs'],
   "layers": [
     {

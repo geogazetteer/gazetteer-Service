@@ -31,6 +31,8 @@ const URLCFG={
 
 const geoServerUrl='http://119.3.72.23:8085/';//geoserver服务地址
 const MAPURL={
+  //雪碧图
+  sprite:'http://localhost:8087/static/mapjs/sptite/sprite',
   //底图
   mapTile:ProxyServlet+"http://localhost:9192/mapboxLayer/{z}/{x}/{y}.pbf",
   //字体
