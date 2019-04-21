@@ -46,19 +46,15 @@ public class AddressController {
 	/**
 	 * <em>根据地址编码查询坐标</em><br>
 	 * examples:<br>
-	 * http://localhost:8083/location/code/44030600960102T0117
+	 * http://localhost:8083/location/code/4403060090031200105
 	 * 
 	 * @param code      String 路径变量，指定查询的地址编码
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
-	 * @param tablename String 请求参数，指定查询的数据库表
-	 * @param orderby   String 请求参数，指定查询结果排序方式
-	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
 	 * @return String 返回JSON格式的查询结果
 	 */
-	@ApiOperation(value = "根据地址编码查询", notes = "根据地址编码查询，获取对应地址编码的所有地址信息。示例：/location/code/44030600960102T0117")
+	@ApiOperation(value = "根据地址编码查询", notes = "根据地址编码查询，获取对应地址编码的所有地址信息。示例：/location/code/4403060090031200105")
 	@GetMapping("/code/{code}")
 	public String selectByCode(
-			@ApiParam(value = "查询的地址编码，如44030600960102T0117") @PathVariable(value = IControllerConstant.ADDRESS_CODE, required = true) String code) {
+			@ApiParam(value = "查询的地址编码，如4403060090031200105") @PathVariable(value = IControllerConstant.ADDRESS_CODE, required = true) String code) {
 		map.put("code", code);
 		List<BuildingPositionRow> rows = mapper.findBuildingEquals(map);
 		return ControllerUtils.getResponseBody5(rows);
