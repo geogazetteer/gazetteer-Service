@@ -22,7 +22,6 @@ import top.geomatics.gazetteer.utilities.database.BuildingQuery;
 @RestController
 @RequestMapping("/building")
 public class BuildingController {
-	BuildingQuery bquery = new BuildingQuery();
 
 	/**
 	 * example: http://localhost:8083/building/codes?x=114.043736&y=22.649473
@@ -36,7 +35,7 @@ public class BuildingController {
 	public String queryCodes(
 			@ApiParam(value = "指定x坐标，如x=114.043736") @RequestParam(value = "x", required = true) Double x,
 			@ApiParam(value = "指定y坐标，如y=22.649473") @RequestParam(value = "y", required = true) Double y) {
-		return JSON.toJSONString(bquery.query(x, y));
+		return JSON.toJSONString(BuildingQuery.query(x, y));
 	}
 
 	/**
@@ -49,7 +48,7 @@ public class BuildingController {
 	@GetMapping("/point")
 	public String queryPoint(
 			@ApiParam(value = "指定筑物编码，如4403060070051200001") @RequestParam(value = "code", required = true) String code) {
-		return JSON.toJSONString(bquery.query(code));
+		return JSON.toJSONString(BuildingQuery.query(code));
 
 	}
 }

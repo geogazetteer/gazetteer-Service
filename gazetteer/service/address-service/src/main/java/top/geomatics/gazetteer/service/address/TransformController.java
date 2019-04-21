@@ -138,5 +138,22 @@ public class TransformController {
 		return JSON.toJSONString(AddressProcessor.exchangeWords(input));
 
 	}
+	
+	/**
+	 * <em>同义词转换，示例：粤=广东省</em><br>
+	 * examples:<br>
+	 * <!--http://localhost:8083/transform/exterchange/smean?chars=广东省深圳市龙华区龙华街道清湖社区清沙路8号力得威公司宿舍楼
+	 * -->
+	 * 
+	 * @param input
+	 * @return
+	 */
+	@ApiOperation(value = "同义词转换", notes = "同义词转换，示例：/transform/exterchange/smean?chars=粤深圳市龙华区龙华街道清湖社区清沙路8号力德威公司宿舍楼")
+	@GetMapping("/exterchange/smean")
+	public String exchangeSmeanWords(
+			@ApiParam(value = "同义词转换，示例：粤=广东省") @RequestParam(value = "chars", required = true) String input) {
+		return JSON.toJSONString(AddressProcessor.exchangeSmeanWords(input));
+
+	}
 
 }
