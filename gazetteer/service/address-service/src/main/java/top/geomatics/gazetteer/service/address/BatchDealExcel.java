@@ -10,80 +10,82 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
 
+import io.swagger.annotations.Api;
+
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import top.geomatics.gazetteer.model.BuildingPositionRow;
 
-//
-//import java.io.File;
-//import java.io.FileInputStream;
-//import java.io.InputStream;
-//
-//import org.apache.poi.xssf.usermodel.XSSFSheet;
-//import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-//
 public class BatchDealExcel {
 
-	public static Boolean batchDealExcel(String excelPath) {
+	public static Boolean batchDealExcel(String excelPath,String outpath) {
+		System.out.println("开始处理");
 		Boolean flag=false;
 		File file=new File(excelPath);
 		if(!file.exists()||!file.isFile()) {
-			return flag;
+			return flag;	
 		}else {
 			try {
 			InputStream in=new FileInputStream(file);
-			XSSFWorkbook xssfWorkbook = new XSSFWorkbook(in);
-			XSSFSheet xssfSheet=xssfWorkbook.getSheetAt(0);
-			if(xssfSheet!=null) {
+			HSSFWorkbook HSSFWorkbook = new HSSFWorkbook(in);
+			HSSFSheet HSSFSheet=HSSFWorkbook.getSheetAt(0);
+			if(HSSFSheet!=null) {
 				List<Map<String, String>> list=new ArrayList<>();
-				for (int rowNum = 1; rowNum <= xssfSheet.getLastRowNum(); rowNum++) {
+				for (int rowNum = 1; rowNum <= HSSFSheet.getLastRowNum(); rowNum++) {
 						Map<String, String> map=new HashMap<String, String>();
-					    XSSFRow xssfRow = xssfSheet.getRow(rowNum);
-					    if(xssfRow.getCell(0)==null) {
-					    	String longitude=xssfRow.getCell(1).toString();
-					    	String latitude=xssfRow.getCell(2).toString();
-					    	map.put("longtitude",longitude);
+					    HSSFRow HSSFRow = HSSFSheet.getRow(rowNum);
+					    if(HSSFRow.getCell(0)==null) {
+					    	String longitude=HSSFRow.getCell(1).toString();
+					    	String latitude=HSSFRow.getCell(2).toString();
+					    	map.put("longitude",longitude);
 					    	map.put("latitude", latitude);
-					    	String code=ControllerUtils.mapper.findAddressCodeBycoordinate(Double.valueOf(longitude), Double.valueOf(latitude));
+					    	String code=ControllerUtils.mapper.findAddressCodeBycoordinate(longitude, latitude);
 					    	String address=ControllerUtils.mapper.findAddressBycoordinate(code);
 					    	map.put("address", address);
-					    	list.add(map);
+					    	list.add(map);				  		
+					    	System.out.println(JSON.toJSONString(list));
 					    }else {
-					    	String address=xssfRow.getCell(0).toString();
+					    	String address=HSSFRow.getCell(0).toString();
 					    	map.put("address", address);
 					    	String code=ControllerUtils.mapper.findLonLatCodeByaddress(address);
 					    	BuildingPositionRow bp=ControllerUtils.mapper.findLonLatByCode(code);
 					    	map.put("longitude", String .valueOf(bp.getLongitude()));
 					    	map.put("latitude", String.valueOf(bp.getLatitude()));
 					    	list.add(map);
+					    	System.out.println(JSON.toJSONString(list));
 					    }
 				}
 				in.close();
-				OutputStream out=new FileOutputStream(file);
-				xssfWorkbook=new XSSFWorkbook();
-				xssfSheet=xssfWorkbook.createSheet("搜索完成的表格");
-				XSSFRow xssfRow=xssfWorkbook.getSheet("搜索完成的表格").createRow(0);
-				xssfRow.createCell(0).setCellValue("address");
-				xssfRow.createCell(1).setCellValue("longitude");
-				xssfRow.createCell(2).setCellValue("latitude");
+				HSSFWorkbook=new HSSFWorkbook();
+				HSSFSheet=HSSFWorkbook.createSheet("搜索完成的表格");
+				HSSFRow HSSFRow=HSSFWorkbook.getSheet("搜索完成的表格").createRow(0);
+				HSSFRow.createCell(0).setCellValue("address");
+				HSSFRow.createCell(1).setCellValue("longitude");
+				HSSFRow.createCell(2).setCellValue("latitude");
 				int i=1;
 				for(Map<String, String>map:list) {
-					xssfRow=xssfWorkbook.getSheet("搜索完成的表格").createRow(i);
-					xssfRow.createCell(0).setCellValue(map.get("address"));
-					xssfRow.createCell(1).setCellValue(map.get("longitude"));
-					xssfRow.createCell(2).setCellValue(map.get("latitude"));
+					HSSFRow=HSSFWorkbook.getSheet("搜索完成的表格").createRow(i);
+					HSSFRow.createCell(0).setCellValue(map.get("address"));
+					HSSFRow.createCell(1).setCellValue(map.get("longitude"));
+					HSSFRow.createCell(2).setCellValue(map.get("latitude"));
 					i++;
 				}
-				xssfWorkbook.write(out);
+				File file2=new File(outpath);
+				if(!file2.exists())file2.createNewFile();
+				OutputStream out=new FileOutputStream(file2);
+				HSSFWorkbook.write(out);
 				out.close();
 				flag=true;
 			}
 		}catch (Exception e) {
-			// TODO: handle exception
 		}
 		return flag;
 	}
-}}
+}
+}

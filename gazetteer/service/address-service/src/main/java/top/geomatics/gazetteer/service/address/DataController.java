@@ -29,6 +29,7 @@ import io.swagger.annotations.ApiParam;
 //数据导入导出
 @Api(value = "/data", tags = "地址数据上传下载")
 @Controller
+@RequestMapping("/data")
 public class DataController {
 	
 	/*获取file.html页面
@@ -45,6 +46,7 @@ public class DataController {
         if(file.isEmpty()){
             return "false";
         }
+        //获取文件名到保存到服务器
         String fileName = file.getOriginalFilename();
         int size = (int) file.getSize();
         System.out.println(fileName + "-->" + size);
@@ -54,9 +56,16 @@ public class DataController {
         if(!dest.getParentFile().exists()){ //判断文件父目录是否存在
             dest.getParentFile().mkdir();
         }
+       
+        
         try {
+        	
             file.transferTo(dest); //保存文件
+            String fileName2="test2.xls";
+            BatchDealExcel.batchDealExcel(path + "/" + fileName,path + "/" + fileName2);
             return "true";
+            
+            
         } catch (IllegalStateException e) {
             e.printStackTrace();
             return "false";
@@ -64,6 +73,7 @@ public class DataController {
             e.printStackTrace();
             return "false";
         }
+        
     }
     
     @ApiOperation(value = "下载地址数据", notes = "下载地址数据")
