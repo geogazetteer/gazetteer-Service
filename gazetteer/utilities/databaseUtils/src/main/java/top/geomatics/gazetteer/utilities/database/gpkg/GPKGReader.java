@@ -21,6 +21,7 @@ import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.geometry.Geometry;
 
 import top.geomatics.gazetteer.model.GeoPoint;
 
@@ -110,7 +111,7 @@ public class GPKGReader {
 		try {
 			Filter filter = ff.not(ff.isNull(ff.property(geoCol)));
 			Point point = geometryFactory.createPoint(new Coordinate(x, y));
-			ff.contains(geoCol, (org.opengis.geometry.Geometry) point);
+			ff.contains(ff.property(geoCol), ff.literal(point));
 			SimpleFeatureReader feaReader = geoPackage.reader(entry, filter, null);
 			while (feaReader.hasNext()) {
 				SimpleFeature feature = feaReader.next();

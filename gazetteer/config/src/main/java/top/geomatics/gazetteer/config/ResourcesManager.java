@@ -3,10 +3,12 @@
  */
 package top.geomatics.gazetteer.config;
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 /**
@@ -19,7 +21,7 @@ public class ResourcesManager {
 	private ResourcesManager() {
 		String pf = "D:\\gazetteer\\config\\gazetteer.properties";
 		try {
-			pro.load(new FileInputStream(new File(pf)));
+			pro.load(new BufferedReader(new InputStreamReader(new FileInputStream(pf), "UTF-8")));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -36,5 +38,6 @@ public class ResourcesManager {
 
 	public String getValue(String key) {
 		return pro.getProperty(key);
+
 	}
 }

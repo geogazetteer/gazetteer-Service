@@ -22,7 +22,7 @@ public class BuildingQuery {
 
 	public static GPKGReader gpkgReader = new GPKGReader(building_file);
 
-	public void close() {
+	public static void close() {
 		gpkgReader.close();
 	}
 
@@ -32,7 +32,7 @@ public class BuildingQuery {
 	 * @param czwCode
 	 * @return
 	 */
-	public GeoPoint query(String czwCode) {
+	public static GeoPoint query(String czwCode) {
 		gpkgReader.preQuery(table_name);
 		return gpkgReader.query(czwCode);
 	}
@@ -43,7 +43,7 @@ public class BuildingQuery {
 	 * @param czwCode
 	 * @return
 	 */
-	public List<String> query(double x, double y) {
+	public static List<String> query(double x, double y) {
 		gpkgReader.preQuery(table_name);
 		return gpkgReader.query(x, y);
 	}
@@ -52,7 +52,12 @@ public class BuildingQuery {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
+		GeoPoint point = query("4403060070051200001");
+		System.out.println(point.getX() + "\t" + point.getY());
+		List<String> codes = query(114.043736,22.649473);
+		for (String str:codes) {
+			System.out.println(str);
+		}
 	}
 
 }
