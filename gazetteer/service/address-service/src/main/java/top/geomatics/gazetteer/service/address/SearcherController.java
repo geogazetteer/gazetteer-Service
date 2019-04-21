@@ -517,6 +517,19 @@ public class SearcherController {
 		if (this.settings.isPOI()) {
 			return ControllerUtils.getResponseBody4(POISearcher.search(keywords, limit));
 		}
+		if (this.settings.isCoordinates()) {
+			// 根据输入的坐标搜索
+		}
+		if (this.settings.isBuildingCode()) {
+			// 根据建筑物编码搜索
+			String fields = "id.address";
+			String tablename = AddressProcessor.getCommunityFromBuildingCode(keywords);
+			AddressRow aRow = new AddressRow();
+			aRow.setCode(keywords);
+			Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, aRow, null, 0);
+			List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
+			return ControllerUtils.getResponseBody(rows);
+		}
 
 		return ControllerUtils.getResponseBody4(LuceneUtil.search(keywords, limit));
 	}
@@ -547,7 +560,7 @@ public class SearcherController {
 		}
 		return JSON.toJSONString(LuceneUtil.searchByPage(keywords, index, limit));
 	}
-	
+
 	/**
 	 * <em>根据关键词进行模糊查询分页展示(加上了同音字搜索功能)</em><br>
 	 * examples:<br>
@@ -565,8 +578,8 @@ public class SearcherController {
 			@ApiParam(value = "当前页面索引，从1开始") @PathVariable(value = "index", required = true) Integer index,
 			@ApiParam(value = "查询关键词，多个关键词以空格分隔，如：龙华") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
 			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = true, defaultValue = "10") Integer limit) {
-		String pinyin=AddressIndexer.ToPinyin(keywords);
-		
+		String pinyin = AddressIndexer.ToPinyin(keywords);
+
 		return JSON.toJSONString(LuceneUtil.searchByPinyin(pinyin, index, limit));
 	}
 
