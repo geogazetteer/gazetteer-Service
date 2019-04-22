@@ -134,17 +134,20 @@ public class AddressProcessor {
 
 	public static String transform(String address, SearcherSettings settings) {
 		String newAddress = address;
-		if (settings.isComplexChar()) {
+		if (settings.isComplexChar()) {// 繁体转换
 			newAddress = comToSimple(newAddress);
 		}
-		if (settings.isFullChar()) {
+		if (settings.isFullChar()) {// 全角转换
 			newAddress = fullToHalf(newAddress);
 		}
-		if (settings.isChineseNumber()) {
+		if (settings.isChineseNumber()) {// 数字转换
 			newAddress = chineseToNumber(newAddress).toString();
 		}
-		if (settings.isInterchangeable()) {
+		if (settings.isInterchangeable()) {// 通假字转换
 			newAddress = exchangeWords(newAddress).toString();
+		}
+		if (settings.isSynonym()) {// 同义词转换
+			newAddress = exchangeSmeanWords(newAddress).toString();
 		}
 		return newAddress;
 	}
@@ -175,6 +178,27 @@ public class AddressProcessor {
 			return flag;
 		}
 		if (y < IGazetteerConstant.LH_BBOX.getMiny() || y > IGazetteerConstant.LH_BBOX.getMaxy()) {
+			return flag;
+		}
+		flag = true;
+		return flag;
+	}
+
+	/**
+	 * <em>判断输入是否为440306 008001 48 00062形式的建筑物编码</em><br>
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static boolean isBuildingCode(String input) {
+		boolean flag = false;
+		if (19 != input.length()) {
+			return flag;
+		}
+		if (0 != input.substring(0, 6).compareTo("440306")) {
+			return flag;
+		}
+		if (!input.matches("440306[0-9]{8}[0-9a-zA-Z]{5}")) {
 			return flag;
 		}
 		flag = true;
@@ -213,7 +237,7 @@ public class AddressProcessor {
 		}
 		return newString;
 	}
-	
+
 	/**
 	 * <em>同义词转换</em><br>
 	 * 
@@ -225,6 +249,24 @@ public class AddressProcessor {
 		for (String key : SMeanExchangeableWords.WORDS_MAP.keySet()) {
 			if (input.contains(key)) {
 				newString = newString.replace(key, SMeanExchangeableWords.WORDS_MAP.get(key));
+			}
+		}
+		return newString;
+	}
+
+	/**
+	 * <em>根据建筑物编码获得社区名称</em><br>
+	 * 
+	 * @param code
+	 * @return
+	 */
+	public static String getCommunityFromBuildingCode(String code) {
+		String newString = "dmdz";
+		for (String key : IGazetteerConstant.COMMUNITY_MAP.keySet()) {
+			String value = IGazetteerConstant.COMMUNITY_MAP.get(key);
+			if (0 == value.compareTo(code)) {
+				newString = key;
+				break;
 			}
 		}
 		return newString;
@@ -249,6 +291,8 @@ public class AddressProcessor {
 
 		System.out.println(isCoordinatesExpression("113.9654368776450042,22.5895874795642015"));
 		System.out.println(isSensitiveWords("基地组织"));
+
+		System.out.println(isBuildingCode("4403060080014800062"));
 
 	}
 

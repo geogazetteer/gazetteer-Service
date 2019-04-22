@@ -12,7 +12,8 @@ public class SearcherSettings {
 	private boolean isFullChar = false;// 全角字
 	private boolean isChineseNumber = false;// 中文数字
 	private boolean isAddressAlias = false;// 地址别名，简称，曾用名
-	private boolean ishomophone = false;// 同音字
+	private boolean isHomophone = false;// 同音字
+	private boolean isSynonym = false;// 同义字
 	private boolean isInterchangeable = false;// 通假字
 	private boolean isCompleted = false;// 地址补全
 	private boolean isGeoName = false;// 地名
@@ -21,6 +22,7 @@ public class SearcherSettings {
 	private boolean isPOIAlias = false;// POI别名
 	private boolean isWithtin = false;// 地址范围识别
 	private boolean isCoordinates = false;// 坐标识别
+	private boolean isBuildingCode = false;// 建筑物编码
 
 	public boolean isComplexChar() {
 		return isComplexChar;
@@ -54,14 +56,7 @@ public class SearcherSettings {
 		this.isAddressAlias = isAddressAlias;
 	}
 
-	public boolean isIshomophone() {
-		return ishomophone;
-	}
-
-	public void setIshomophone(boolean ishomophone) {
-		this.ishomophone = ishomophone;
-	}
-
+	
 	public boolean isInterchangeable() {
 		return isInterchangeable;
 	}
@@ -124,6 +119,30 @@ public class SearcherSettings {
 
 	public void setCoordinates(boolean isCoordinates) {
 		this.isCoordinates = isCoordinates;
+	}
+
+	public boolean isHomophone() {
+		return isHomophone;
+	}
+
+	public void setHomophone(boolean isHomophone) {
+		this.isHomophone = isHomophone;
+	}
+
+	public boolean isSynonym() {
+		return isSynonym;
+	}
+
+	public void setSynonym(boolean isSynonym) {
+		this.isSynonym = isSynonym;
+	}
+
+	public boolean isBuildingCode() {
+		return isBuildingCode;
+	}
+
+	public void setBuildingCode(boolean isBuildingCode) {
+		this.isBuildingCode = isBuildingCode;
 	}
 
 }

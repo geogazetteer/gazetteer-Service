@@ -10,7 +10,6 @@ import org.ansj.domain.Result;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.DicAnalysis;
 
-
 import top.geomatics.gazetteer.model.IGazetteerConstant;
 
 /**
@@ -22,30 +21,34 @@ import top.geomatics.gazetteer.model.IGazetteerConstant;
 public class WordSegmenter {
 	/**
 	 * 判断地址中包含街道信息，并返回
+	 * 
 	 * @param address
 	 * @return
 	 */
 	public static final String getStreet(String address) {
-		for (String street:IGazetteerConstant.STREET_LIST) {
+		for (String street : IGazetteerConstant.STREET_LIST) {
 			if (address.contains(street)) {
 				return street;
 			}
 		}
 		return null;
 	}
+
 	/**
 	 * 判断地址中包含社区信息，并返回
+	 * 
 	 * @param address
 	 * @return
 	 */
 	public static final String getCommunity(String address) {
-		for (String community:IGazetteerConstant.COMMUNITY_LIST) {
+		for (String community : IGazetteerConstant.COMMUNITY_LIST) {
 			if (address.contains(community)) {
 				return community;
 			}
 		}
 		return null;
 	}
+
 	/**
 	 * @param word
 	 * @return
@@ -54,7 +57,7 @@ public class WordSegmenter {
 		List<String> wordResults = new ArrayList<String>();
 		// 分词结果的一个封装，主要是一个List<Term>的terms
 
-		Result result = DicAnalysis.parse(word); 
+		Result result = DicAnalysis.parse(word);
 		// 对不标准地址进行分词
 		AddressRecognition re = new AddressRecognition();
 		re.recognition(result);
@@ -62,19 +65,25 @@ public class WordSegmenter {
 		List<Term> terms = result.getTerms(); // 拿到terms
 		for (int i = 0; i < terms.size(); i++) {
 			String name = terms.get(i).getName(); // 拿到词
-			if (name.contains("座")||name.contains("室")||name.contains("楼")||name.contains("栋")||name.contains("单元")||name.contains("号")) {
-				
-				wordResults.add(name);
+			// if
+			// (name.contains("座")||name.contains("室")||name.contains("楼")||name.contains("栋")||name.contains("单元")||name.contains("号"))
+			// {
+			if (name.contains("号")) {
+				String str = name;
+				if (i > 0) {
+					str = terms.get(i - 1).getName() + name;
+				}
+				wordResults.add(str);
+			}
 		}
-		}
-	return wordResults;
+		return wordResults;
 	}
-	
+
 	public static List<String> segment(String word) {
 		List<String> wordResults = new ArrayList<String>();
 		// 分词结果的一个封装，主要是一个List<Term>的terms
 
-		Result result = DicAnalysis.parse(word); 
+		Result result = DicAnalysis.parse(word);
 		// 对不标准地址进行分词
 		AddressRecognition re = new AddressRecognition();
 		re.recognition(result);
@@ -82,13 +91,10 @@ public class WordSegmenter {
 		List<Term> terms = result.getTerms(); // 拿到terms
 		for (int i = 0; i < terms.size(); i++) {
 			String name = terms.get(i).getName(); // 拿到词
-				wordResults.add(name);
+			wordResults.add(name);
 		}
-		
-	return wordResults;
-	}
-	
 
-	
-	
+		return wordResults;
+	}
+
 }

@@ -87,6 +87,9 @@
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-epsg-hsql</artifactId>
 		</dependency>
+		<!-- 增加geotools依赖用于excel转shp -->
+		<!-- <dependency> <groupId>nl.cloudfarming.client</groupId> <artifactId>lib-geotools</artifactId> 
+			<version>2.7.7-NB72</version> </dependency> -->
 	</dependencies>
 	<build>
 		<plugins>

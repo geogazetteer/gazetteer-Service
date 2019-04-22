@@ -8,7 +8,7 @@
     <div style="position: absolute;bottom: 10px;left:55px;color:blue;font-size: 16px" id="coords"></div>
 
     <!--选中地图点的浮云-->
-    <div id="pointPopup" class="pointPopup ">
+    <div id="pointPopup" class="pointPopup">
       <div class="inner flex_col">
         <div class="close" @click.stop="closePop">
           <Icon type="md-close" size="20"/>
@@ -183,12 +183,6 @@
   #map {
     width: 100%;
     height: 100%;
-  }
-
-  .ol-scale-value {
-    top: 24px;
-    right: 8px;
-    position: absolute;
   }
   .pointPopup{
     background: #fff;
