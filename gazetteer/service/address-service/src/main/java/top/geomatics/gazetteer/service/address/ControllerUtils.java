@@ -20,6 +20,7 @@ import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.BuildingPositionRow;
 import top.geomatics.gazetteer.model.ComparableAddress;
 import top.geomatics.gazetteer.model.EnterpriseRow;
+import top.geomatics.gazetteer.model.MatcherResultRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 
 /**
@@ -231,6 +232,24 @@ public class ControllerUtils {
 		return responseString;
 
 	}
+	
+	/**
+	 * @param rows
+	 * @return
+	 */
+	public static String getResponseBody6(List<MatcherResultRow> rows) {
+		/*
+		 * { "total": 3, "rows": [ { "id": 0, "name": "Item 0", "price": "$0" }, { "id":
+		 * 1, "name": "Item 1", "price": "$1" } ] }
+		 */
+		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
+		// 使用阿里巴巴的fastjson
+		responseString += JSON.toJSONString(rows);
+		responseString += "}";
+		return responseString;
+
+	}
+	
 	
 	/**
 	 * @param updateRows

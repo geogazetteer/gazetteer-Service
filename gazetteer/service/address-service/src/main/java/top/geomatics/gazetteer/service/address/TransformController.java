@@ -75,16 +75,16 @@ public class TransformController {
 	/**
 	 * <em>识别地址中的门牌号，返回门牌号</em><br>
 	 * examples:<br>
-	 * <!--http://localhost:8083/transform/houseNumber?chars=深圳市龙华区大浪街道同胜社区石观工业区19栋3楼
+	 * <!--http://localhost:8083/transform/houseNumber?chars=广东省深圳市龙华区大浪街道浪口社区华霆路58号38栋
 	 * -->
 	 * 
 	 * @param input
 	 * @return
 	 */
-	@ApiOperation(value = "识别门牌号", notes = "识别门牌号，示例：/transform/houseNumber?chars=深圳市龙华区大浪街道同胜社区石观工业区19栋3楼")
+	@ApiOperation(value = "识别门牌号", notes = "识别门牌号，示例：/transform/houseNumber?chars=广东省深圳市龙华区大浪街道浪口社区华霆路58号38栋")
 	@GetMapping("/houseNumber")
 	public String recognizeHouse(
-			@ApiParam(value = "地址，如深圳市龙华区大浪街道同胜社区石观工业区19栋3楼") @RequestParam(value = "chars", required = true) String input) {
+			@ApiParam(value = "地址，如广东省深圳市龙华区大浪街道浪口社区华霆路58号38栋") @RequestParam(value = "chars", required = true) String input) {
 		return JSON.toJSONString(WordSegmenter.houseNumberSegment(input));
 
 	}
@@ -123,6 +123,23 @@ public class TransformController {
 	}
 
 	/**
+	 * <em>判断搜索输入是否为正确的建筑物编码</em><br>
+	 * examples:<br>
+	 * <!--http://localhost:8083/transform/buildingcode?chars=4403060080014800062
+	 * -->
+	 * 
+	 * @param input
+	 * @return
+	 */
+	@ApiOperation(value = "判断搜索输入是否为正确的建筑物编码", notes = "判断搜索输入是否为正确的建筑物编码，示例：/transform/buildingcode?chars=4403060080014800062")
+	@GetMapping("/buildingcode")
+	public String isBuildingcode(
+			@ApiParam(value = "建筑物编码，如4403060080014800062") @RequestParam(value = "chars", required = true) String input) {
+		return JSON.toJSONString(AddressProcessor.isBuildingCode(input));
+
+	}
+
+	/**
 	 * <em>通假字转换，示例：得=德</em><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/transform/exterchange?chars=广东省深圳市龙华区龙华街道清湖社区清沙路8号力得威公司宿舍楼
@@ -132,25 +149,25 @@ public class TransformController {
 	 * @return
 	 */
 	@ApiOperation(value = "通假字转换", notes = "通假字转换，示例：/exterchange?chars=广东省深圳市龙华区龙华街道清湖社区清沙路8号力得威公司宿舍楼")
-	@GetMapping("/exterchange")
+	@GetMapping("/exchange")
 	public String exchangeWords(
 			@ApiParam(value = "通假字转换，示例：得=德") @RequestParam(value = "chars", required = true) String input) {
 		return JSON.toJSONString(AddressProcessor.exchangeWords(input));
 
 	}
-	
+
 	/**
 	 * <em>同义词转换，示例：粤=广东省</em><br>
 	 * examples:<br>
-	 * <!--http://localhost:8083/transform/exterchange/smean?chars=广东省深圳市龙华区龙华街道清湖社区清沙路8号力得威公司宿舍楼
+	 * <!--http://localhost:8083/transform/synonym?chars=粤深圳市龙华区龙华街道清湖社区清沙路8号力得威公司宿舍楼
 	 * -->
 	 * 
 	 * @param input
 	 * @return
 	 */
-	@ApiOperation(value = "同义词转换", notes = "同义词转换，示例：/transform/exterchange/smean?chars=粤深圳市龙华区龙华街道清湖社区清沙路8号力德威公司宿舍楼")
-	@GetMapping("/exterchange/smean")
-	public String exchangeSmeanWords(
+	@ApiOperation(value = "同义词转换", notes = "同义词转换，示例：/transform/synonym?chars=粤深圳市龙华区龙华街道清湖社区清沙路8号力德威公司宿舍楼")
+	@GetMapping("/synonym")
+	public String synonymWords(
 			@ApiParam(value = "同义词转换，示例：粤=广东省") @RequestParam(value = "chars", required = true) String input) {
 		return JSON.toJSONString(AddressProcessor.exchangeSmeanWords(input));
 
