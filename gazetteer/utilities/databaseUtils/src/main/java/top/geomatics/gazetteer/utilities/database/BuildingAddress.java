@@ -42,6 +42,11 @@ public class BuildingAddress {
 			map.put("sql_tablename", tablename);
 			map.put("code", code);
 			List<AddressRow> temprows = mapper.findEquals(map);
+			
+			AddressRow tRow;
+			for (int i = 0; i < temprows.size(); i++) {
+				tRow = temprows.get(i);
+			}
 			rows.addAll(temprows);
 		}
 		return rows;
@@ -67,6 +72,9 @@ public class BuildingAddress {
 		for (AddressRow row : temprows) {
 			String code = row.getCode();
 			GeoPoint point = BuildingQuery.query(code);
+			if (null == point) {
+				continue;
+			}
 			BuildingPositionRow aRow = new BuildingPositionRow();
 			aRow.setCode(code);
 			aRow.setLongitude(point.getX());
