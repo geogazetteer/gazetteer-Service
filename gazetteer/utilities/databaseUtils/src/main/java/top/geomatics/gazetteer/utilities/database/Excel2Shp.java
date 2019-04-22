@@ -28,8 +28,6 @@ import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-
-
 public class Excel2Shp {
 	private static HSSFSheet sheet;
 	public static Boolean excel2Shp(String xlsfile,String shppath) {

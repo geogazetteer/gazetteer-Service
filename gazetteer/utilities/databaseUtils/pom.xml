@@ -12,11 +12,7 @@
 	<artifactId>gs-database-utilities</artifactId>
 	<name>gazetteer database utilities</name>
 	<packaging>jar</packaging>
-	
-	<properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <geotools.version>22-SNAPSHOT</geotools.version>
-    </properties>
+
     
 
 	<dependencies>
@@ -76,27 +72,27 @@
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-main</artifactId>
-			<version>${geotools.version}</version>
+		
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-shapefile</artifactId>
-			<version>${geotools.version}</version>
+			
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-geopkg</artifactId>
-			<version>${geotools.version}</version>
+			
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-swing</artifactId>
-			<version>${geotools.version}</version>
+			
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-epsg-hsql</artifactId>
-			<version>${geotools.version}</version>
+			
 		</dependency>
 		
 	</dependencies>
