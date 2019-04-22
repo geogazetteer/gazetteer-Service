@@ -1,11 +1,15 @@
 /**
  * 
  */
-package top.geomatics.gazetteer.utilities.database.csv;
+package top.geomatics.gazetteer.database.csv;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +31,12 @@ public class MYCSVReader {
 	public void openFile() {
 		// 准备CSV文件
 		try {
-			csvReader = new CSVReader(new FileReader(csvFName));// 打开CSV文件
+			csvReader = new CSVReader(
+					new BufferedReader(new InputStreamReader(new FileInputStream(csvFName), "UTF-8")));// 打开CSV文件
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
 		}
 	}
 

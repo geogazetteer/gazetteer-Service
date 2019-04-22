@@ -144,10 +144,13 @@ public class AddressProcessor {
 			newAddress = chineseToNumber(newAddress).toString();
 		}
 		if (settings.isInterchangeable()) {// 通假字转换
-			newAddress = exchangeWords(newAddress).toString();
+			newAddress = exchangeWords(newAddress);
 		}
 		if (settings.isAddressAlias() || settings.isGeoNameAlias() || settings.isPOIAlias()) {// 别名转换
-			newAddress = alias(newAddress).toString();
+			newAddress = alias(newAddress);
+		}
+		if (settings.isSynonym()) {// 同义词转换
+			newAddress = synonym(newAddress);
 		}
 		return newAddress;
 	}
@@ -249,6 +252,23 @@ public class AddressProcessor {
 		for (String key : Alias.WORDS_MAP.keySet()) {
 			if (input.contains(key)) {
 				newString = newString.replace(key, Alias.WORDS_MAP.get(key));
+			}
+		}
+		return newString;
+	}
+
+	/**
+	 * <em>同义词转换</em><br>
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String synonym(String input) {
+		String newString = input;
+		for (String key : SynonymDictionary.dictionary.keySet()) {
+			if (input.contains(key)) {
+				newString = newString.replace(key, SynonymDictionary.getSynonym(key));
+				break;//只替换一个
 			}
 		}
 		return newString;

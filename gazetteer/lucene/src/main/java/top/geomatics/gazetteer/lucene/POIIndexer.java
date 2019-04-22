@@ -20,7 +20,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import top.geomatics.gazetteer.config.ResourcesManager;
-import top.geomatics.gazetteer.utilities.database.csv.MYCSVReader;
+import top.geomatics.gazetteer.database.csv.MYCSVReader;
 
 /**
  * <em>建立POI的索引</em>
