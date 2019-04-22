@@ -22,9 +22,12 @@
         <div class="search">
           <Button type="primary" shape="circle" icon="ios-search" size="small" @click.stop='search'>搜索</Button>
         </div>
-        <div class="arrow"></div>
       </div>
+
+      <div class="arrow"></div>
+
     </div>
+
 
     <!--加载中-->
     <Spin fix size="large" v-if="showLoading" style="background-color: rgba(255,255,255,.35);"></Spin>
@@ -185,16 +188,18 @@
     height: 100%;
   }
   .pointPopup{
-    background: #fff;
+
+  }
+  .pointPopup .inner{
+    position: absolute;
+    top: -118px;
+    left: -100px;
     box-shadow: 1px 2px 1px rgba(0,0,0,.15);
     border-radius: 3px;
     width: 200px;
     height: 110px;
+    background: #fff;
     padding: 10px;
-  }
-  .pointPopup .inner{
-    width: 100%;
-    height: 100%;
   }
   .pointPopup .close{
     align-self: flex-end;
@@ -219,7 +224,7 @@
     border-width: 8px 6px 0;
     border-color: #fff transparent transparent;
     position: absolute;
-    bottom: -8px;
-    left: 100px;
+    bottom: 0;
+    left: 0;
   }
 </style>

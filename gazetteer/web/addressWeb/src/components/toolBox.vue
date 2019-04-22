@@ -10,7 +10,7 @@
       </div>
       <!--批量处理-->
       <div class="iconWrap flex_col hoverBlue">
-        <Icon type="ios-folder-open" color="#989898" size="24"  title="批量处理" @click="goToBatch"/>
+        <Icon type="ios-folder-open" color="#989898" size="24"  title="批量处理" @click="openBatch"/>
       </div>
       <div class="iconWrap flex_col">
         <Icon type="md-settings" size="24" title='设置搜索条件' color="#3385ff" v-if="isOpen" @click="toggleTool(0)"/>
@@ -60,49 +60,42 @@
     data() {
       return {
         isOpen:false,
-        settings_1:['繁体转换','全角转换','数字转换'],
-        settings_2:['别名识别','同音字识别','通假字识别'],
-        settings_3:['地址补全','地名','地名别名','POI','POI别名'],
-        settings_4:['地址范围识别','坐标识别'],
+        settings_1:SETLABELARR['settings_1'],
+        settings_2:SETLABELARR['settings_2'],
+        settings_3:SETLABELARR['settings_3'],
+        settings_4:SETLABELARR['settings_4'],
 
         setModal_1:[],//选中状态1
         setModal_2:[],//选中状态2
         setModal_3:[],//选中状态2
         setModal_4:[],//选中状态2,
+
         showLoading:false,
 
-        canSelPoint:false
+        canSelPoint:false,
+
       }
     },
     components: {},
     computed: {
       //...mapGetters(['isOpenCoordinate']) // 动态计算属性，相当于this.$store.getters.isOpenCoordinate
+      setObj_all_false(){
+        var setObj={};
+        for (var k in SETDICT){
+          setObj[SETDICT[k]]=false
+        }
+        return setObj;
+      }
     },
     props: {
 
     },
     created(){
-      //将所有搜索设置为false
-      var setObj={
-        "addressAlias": false,
-        "chineseNumber": false,
-        "completed": false,
-        "complexChar": false,
-        "coordinates": false,
-        "fullChar": false,
-        "geoName": false,
-        "geoNameAlias": false,
-        "interchangeable": false,
-        "ishomophone": false,
-        "poi": false,
-        "poialias": false,
-        "withtin": false
-      };
-      this.$api.setSettings(setObj);
       //关闭地图点选
       this.updateCanSelPoint(false)
     },
     mounted(){
+      this.$api.setSettings(this.setObj_all_false);
 
     },
     methods: {
@@ -119,27 +112,15 @@
         var $this = this;
         $this.showLoading=true;//loading
         var setArr=$this.setModal_1.concat($this.setModal_2).concat($this.setModal_3).concat($this.setModal_4)
-        var setObj={
-          "addressAlias": false,
-          "chineseNumber": false,
-          "completed": false,
-          "complexChar": false,
-          "coordinates": false,
-          "fullChar": false,
-          "geoName": false,
-          "geoNameAlias": false,
-          "interchangeable": false,
-          "ishomophone": false,
-          "poi": false,
-          "poialias": false,
-          "withtin": false
-        };
+        var setObj=JSON.parse(JSON.stringify($this.setObj_all_false));
+
         for (var i=0;i<setArr.length;i++){
           setObj[SETDICT[setArr[i]]]=true
         }
+
         $this.$api.setSettings(setObj).then(function (res) {
           $this.showLoading=false;//loading
-        })
+        });
 
         //vuex传值，存储是否开启了坐标识别
         if(setArr.indexOf('坐标识别')!=-1){
@@ -151,13 +132,14 @@
       },
 
       //跳转到批量处理
-      goToBatch(){
+      openBatch(){
         // this.$router.push('/batchHandle')
         //新窗口打开
-        let routeUrl = this.$router.resolve({
+        /*let routeUrl = this.$router.resolve({
           path: "/batchHandle",
         });
-        window.open(routeUrl .href, '_blank');
+        window.open(routeUrl .href, '_blank');*/
+        this.$emit('openBatch')
       },
       //打开地图选点
       openSelPoint(canSel){
