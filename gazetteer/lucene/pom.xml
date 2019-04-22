@@ -27,7 +27,6 @@
 		<dependency>
 			<groupId>com.belerweb</groupId>
 			<artifactId>pinyin4j</artifactId>
-			<version>2.5.0</version>
 		</dependency>
 		<!-- 增加database模块依赖 -->
 		<dependency>
@@ -68,8 +67,6 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<addClasspath>true</addClasspath>
-							<mainClass>top.geomatics.gazetteer.lucene.TestSearch</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

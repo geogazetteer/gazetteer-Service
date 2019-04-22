@@ -157,7 +157,7 @@ public class TransformController {
 	}
 
 	/**
-	 * <em>同义词转换，示例：粤=广东省</em><br>
+	 * <em>别名转换，示例：粤=广东省</em><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/transform/synonym?chars=粤深圳市龙华区龙华街道清湖社区清沙路8号力得威公司宿舍楼
 	 * -->
@@ -165,11 +165,11 @@ public class TransformController {
 	 * @param input
 	 * @return
 	 */
-	@ApiOperation(value = "同义词转换", notes = "同义词转换，示例：/transform/synonym?chars=粤深圳市龙华区龙华街道清湖社区清沙路8号力德威公司宿舍楼")
-	@GetMapping("/synonym")
+	@ApiOperation(value = "别名转换", notes = "别名转换，示例：/transform/alias?chars=粤深圳市龙华区龙华街道清湖社区清沙路8号力德威公司宿舍楼")
+	@GetMapping("/alias")
 	public String synonymWords(
-			@ApiParam(value = "同义词转换，示例：粤=广东省") @RequestParam(value = "chars", required = true) String input) {
-		return JSON.toJSONString(AddressProcessor.exchangeSmeanWords(input));
+			@ApiParam(value = "别名转换，示例：粤=广东省") @RequestParam(value = "chars", required = true) String input) {
+		return JSON.toJSONString(AddressProcessor.alias(input));
 
 	}
 

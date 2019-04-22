@@ -146,8 +146,8 @@ public class AddressProcessor {
 		if (settings.isInterchangeable()) {// 通假字转换
 			newAddress = exchangeWords(newAddress).toString();
 		}
-		if (settings.isSynonym()) {// 同义词转换
-			newAddress = exchangeSmeanWords(newAddress).toString();
+		if (settings.isAddressAlias() || settings.isGeoNameAlias() || settings.isPOIAlias()) {// 别名转换
+			newAddress = alias(newAddress).toString();
 		}
 		return newAddress;
 	}
@@ -239,16 +239,16 @@ public class AddressProcessor {
 	}
 
 	/**
-	 * <em>同义词转换</em><br>
+	 * <em>别名转换</em><br>
 	 * 
 	 * @param input
 	 * @return
 	 */
-	public static String exchangeSmeanWords(String input) {
+	public static String alias(String input) {
 		String newString = input;
-		for (String key : SMeanExchangeableWords.WORDS_MAP.keySet()) {
+		for (String key : Alias.WORDS_MAP.keySet()) {
 			if (input.contains(key)) {
-				newString = newString.replace(key, SMeanExchangeableWords.WORDS_MAP.get(key));
+				newString = newString.replace(key, Alias.WORDS_MAP.get(key));
 			}
 		}
 		return newString;

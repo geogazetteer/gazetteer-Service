@@ -86,53 +86,69 @@ public class AddressIndexer {
 
 		for (SimpleAddressRow row : rows) {
 			Document doc = new Document();
-			String address=row.getAddress();
-			String addressRep=address;
-			List<String> pinyinAddress=new ArrayList<String>();
-			if(address!=null&&!address.equals("")) {
-				if(addressRep.contains("、")) {
-					addressRep=addressRep.replaceAll("、", "");
-				}if(addressRep.contains("—")) {
-					addressRep=addressRep.replaceAll("—", "");
-				}if(addressRep.contains("〈")) {
-					addressRep=addressRep.replaceAll("〈", "");
-				}if(addressRep.contains("〉")) {
-					addressRep=addressRep.replaceAll("〉", "");
-				}if(addressRep.contains("-")) {
-					addressRep=addressRep.replaceAll("-", "");
-				}if(addressRep.contains("。")) {
-					addressRep=addressRep.replaceAll("。", "");
-				}if(addressRep.contains("“")) {
-					addressRep=addressRep.replaceAll("“", "");
-				}if(addressRep.contains("”")) {
-					addressRep=addressRep.replaceAll("”", "");
-				}if(addressRep.contains("\\(")) {
-					addressRep=addressRep.replaceAll("\\(", "");
-				}if(addressRep.contains("\\)")) {
-					addressRep=addressRep.replaceAll("\\)", "");
-				}if(addressRep.contains("①")) {
-					addressRep=addressRep.replaceAll("①", "");
-				}if(addressRep.contains("②")) {
-					addressRep=addressRep.replaceAll("②", "");
-				}if(addressRep.contains("·")) {
-					addressRep=addressRep.replaceAll("·", "");
-				}if(addressRep.contains("～")) {
-					addressRep=addressRep.replaceAll("～", "");
-				}if(addressRep.contains("Ⅰ")) {
-					addressRep=addressRep.replaceAll("Ⅰ", "1");
-				}if(addressRep.contains("ˉ")) {
-					addressRep=addressRep.replaceAll("ˉ", "");
-				}if(addressRep.contains("–")) {
-					addressRep=addressRep.replaceAll("–", "");
+			String address = row.getAddress();
+			String addressRep = address;
+			List<String> pinyinAddress = new ArrayList<String>();
+			if (address != null && !address.equals("")) {
+				if (addressRep.contains("、")) {
+					addressRep = addressRep.replaceAll("、", "");
 				}
-				List<String>list=WordSegmenter.segment(addressRep);
-				for(String s:list) {
+				if (addressRep.contains("—")) {
+					addressRep = addressRep.replaceAll("—", "");
+				}
+				if (addressRep.contains("〈")) {
+					addressRep = addressRep.replaceAll("〈", "");
+				}
+				if (addressRep.contains("〉")) {
+					addressRep = addressRep.replaceAll("〉", "");
+				}
+				if (addressRep.contains("-")) {
+					addressRep = addressRep.replaceAll("-", "");
+				}
+				if (addressRep.contains("。")) {
+					addressRep = addressRep.replaceAll("。", "");
+				}
+				if (addressRep.contains("“")) {
+					addressRep = addressRep.replaceAll("“", "");
+				}
+				if (addressRep.contains("”")) {
+					addressRep = addressRep.replaceAll("”", "");
+				}
+				if (addressRep.contains("\\(")) {
+					addressRep = addressRep.replaceAll("\\(", "");
+				}
+				if (addressRep.contains("\\)")) {
+					addressRep = addressRep.replaceAll("\\)", "");
+				}
+				if (addressRep.contains("①")) {
+					addressRep = addressRep.replaceAll("①", "");
+				}
+				if (addressRep.contains("②")) {
+					addressRep = addressRep.replaceAll("②", "");
+				}
+				if (addressRep.contains("·")) {
+					addressRep = addressRep.replaceAll("·", "");
+				}
+				if (addressRep.contains("～")) {
+					addressRep = addressRep.replaceAll("～", "");
+				}
+				if (addressRep.contains("Ⅰ")) {
+					addressRep = addressRep.replaceAll("Ⅰ", "1");
+				}
+				if (addressRep.contains("ˉ")) {
+					addressRep = addressRep.replaceAll("ˉ", "");
+				}
+				if (addressRep.contains("–")) {
+					addressRep = addressRep.replaceAll("–", "");
+				}
+				List<String> list = WordSegmenter.segment(addressRep);
+				for (String s : list) {
 					pinyinAddress.add(ToPinyin(s));
 				}
 			}
 			doc.add(new StringField(ADDRESS_ID, row.getId().toString(), Field.Store.YES));
-			doc.add(new TextField(ADDRESS,address, Field.Store.YES));
-			for(String str:pinyinAddress) {
+			doc.add(new TextField(ADDRESS, address, Field.Store.YES));
+			for (String str : pinyinAddress) {
 				doc.add(new StringField(ADDRESSPINYIN, str, Field.Store.YES));
 			}
 			writer.addDocument(doc);
@@ -141,41 +157,41 @@ public class AddressIndexer {
 	}
 
 	public static void main(String[] args) {
-	/*	try {
-			AddressIndexer.updateIndex();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
-		List<String>strings=WordSegmenter.segment("广东省深圳市龙华区大浪街道龙平社区龙军花园A1A2栋");
-		for(String s:strings) {
-			
+		/*
+		 * try { AddressIndexer.updateIndex(); } catch (Exception e) {
+		 * e.printStackTrace(); }
+		 */
+		List<String> strings = WordSegmenter.segment("广东省深圳市龙华区大浪街道龙平社区龙军花园A1A2栋");
+		for (String s : strings) {
+
 			System.out.println(ToPinyin(s));
 		}
 	}
-	
+
 	/**
-	      * 汉字转为拼音
-	      * @param chinese
-	      * @return
-	      */
-	     public static String ToPinyin(String chinese){          
-	         String pinyinStr = "";  
-	         char[] newChar = chinese.toCharArray();  
-	         HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();  
-	         defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);  
-	         defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);  
-	         for (int i = 0; i < newChar.length; i++) {  
-	             if (newChar[i] > 128) {  
-	                 try {  
-	                     pinyinStr += PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0];  
-	                 } catch (BadHanyuPinyinOutputFormatCombination e) {  
-	                     e.printStackTrace();  
-	                 }  
-	             }else{  
-	                 pinyinStr += newChar[i];  
-	             }  
-	         }  
-	         return pinyinStr;  
-	     }  
-	     
+	 * 汉字转为拼音
+	 * 
+	 * @param chinese
+	 * @return
+	 */
+	public static String ToPinyin(String chinese) {
+		String pinyinStr = "";
+		char[] newChar = chinese.toCharArray();
+		HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
+		defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+		defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+		for (int i = 0; i < newChar.length; i++) {
+			if (newChar[i] > 128) {
+				try {
+					pinyinStr += PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0];
+				} catch (BadHanyuPinyinOutputFormatCombination e) {
+					e.printStackTrace();
+				}
+			} else {
+				pinyinStr += newChar[i];
+			}
+		}
+		return pinyinStr;
+	}
+
 }

@@ -79,6 +79,8 @@
 		<hanlp.version>portable-1.7.2</hanlp.version>
 		<!-- 汉字处理 -->
 		<chineseUtils.version>1.0</chineseUtils.version>
+		<!-- 拼音处理 -->
+		<pinyin.version>2.5.0</pinyin.version>
 	</properties>
 	<!-- maven 远程仓库位置 -->
 	<repositories>
@@ -319,6 +321,12 @@
 				<groupId>com.luhuiguo</groupId>
 				<artifactId>chinese-utils</artifactId>
 				<version>${chineseUtils.version}</version>
+			</dependency>
+			<!-- 拼音处理 -->
+			<dependency>
+				<groupId>com.belerweb</groupId>
+				<artifactId>pinyin4j</artifactId>
+				<version>${pinyin.version}</version>
 			</dependency>
 			<!-- commons text -->
 			<dependency>
