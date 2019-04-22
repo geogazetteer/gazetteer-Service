@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -24,10 +23,6 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 public class Excel2Shp {
 	private static HSSFSheet sheet;
@@ -60,8 +55,8 @@ public class Excel2Shp {
 			      //定义图形信息和属性信息
 			      SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
 			      tb.setCRS(DefaultGeographicCRS.WGS84);
-			      tb.setName("shapefile");
-			      tb.add("the_geom", Point.class);
+//			      tb.setName("shapefile");
+//			      tb.add("the_geom", Point.class);
 			      for (int i = 0; i < list.size(); i++) {
 			        Map<String, Object> map = (Map<String, Object>) list.get(i);
 			        tb.add(map.get("name").toString(), (Class) map.get("type"));
@@ -87,7 +82,7 @@ public class Excel2Shp {
 			            mapLonLat.put(fieldName, cell.getRichStringCellValue().getString());
 			          }
 			        }
-			        feature.setAttribute("the_geom", new GeometryFactory().createPoint(new Coordinate((double) mapLonLat.get("longitude"), (double) mapLonLat.get("latitude"))));
+//			        feature.setAttribute("the_geom", new GeometryFactory().createPoint(new Coordinate((double) mapLonLat.get("longitude"), (double) mapLonLat.get("latitude"))));
 			      }
 			      writer.write();
 			      writer.close();

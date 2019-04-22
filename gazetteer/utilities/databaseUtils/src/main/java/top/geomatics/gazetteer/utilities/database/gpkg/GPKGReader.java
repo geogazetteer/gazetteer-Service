@@ -108,9 +108,10 @@ public class GPKGReader {
 	public List<String> query(double x, double y) {
 		List<String> czwcodes = new ArrayList<>();
 		try {
-			Filter filter = ff.not(ff.isNull(ff.property(geoCol)));
 			Point point = geometryFactory.createPoint(new Coordinate(x, y));
-			ff.contains(ff.property(geoCol), ff.literal(point));
+			Filter filter1 = ff.not(ff.isNull(ff.property(geoCol)));
+			Filter filter2 = ff.contains(ff.property(geoCol), ff.literal(point));
+			Filter filter = ff.and(filter1, filter2);
 			SimpleFeatureReader feaReader = geoPackage.reader(entry, filter, null);
 			while (feaReader.hasNext()) {
 				SimpleFeature feature = feaReader.next();

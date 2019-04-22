@@ -10,17 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.alibaba.fastjson.JSON;
-
-import io.swagger.annotations.Api;
-
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
-import top.geomatics.gazetteer.model.BuildingPositionRow;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 public class BatchDealExcel {
 
@@ -45,20 +37,20 @@ public class BatchDealExcel {
 					    	String latitude=HSSFRow.getCell(2).toString();
 					    	map.put("longitude",longitude);
 					    	map.put("latitude", latitude);
-					    	String code=ControllerUtils.mapper.findAddressCodeBycoordinate(longitude, latitude);
-					    	String address=ControllerUtils.mapper.findAddressBycoordinate(code);
-					    	map.put("address", address);
-					    	list.add(map);				  		
-					    	System.out.println(JSON.toJSONString(list));
+////					    	String code=ControllerUtils.mapper.findAddressCodeBycoordinate(longitude, latitude);
+////					    	String address=ControllerUtils.mapper.findAddressBycoordinate(code);
+//					    	map.put("address", address);
+//					    	list.add(map);				  		
+//					    	System.out.println(JSON.toJSONString(list));
 					    }else {
 					    	String address=HSSFRow.getCell(0).toString();
 					    	map.put("address", address);
-					    	String code=ControllerUtils.mapper.findLonLatCodeByaddress(address);
-					    	BuildingPositionRow bp=ControllerUtils.mapper.findLonLatByCode(code);
-					    	map.put("longitude", String .valueOf(bp.getLongitude()));
-					    	map.put("latitude", String.valueOf(bp.getLatitude()));
-					    	list.add(map);
-					    	System.out.println(JSON.toJSONString(list));
+//					    	String code=ControllerUtils.mapper.findLonLatCodeByaddress(address);
+//					    	BuildingPositionRow bp=ControllerUtils.mapper.findLonLatByCode(code);
+//					    	map.put("longitude", String .valueOf(bp.getLongitude()));
+//					    	map.put("latitude", String.valueOf(bp.getLatitude()));
+//					    	list.add(map);
+//					    	System.out.println(JSON.toJSONString(list));
 					    }
 				}
 				in.close();

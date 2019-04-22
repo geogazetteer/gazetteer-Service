@@ -28,12 +28,7 @@
 			<groupId>top.geomatics.gazetteer.model</groupId>
 			<artifactId>gs-model</artifactId>
 		</dependency>
-		<!-- 增加geotools依赖用于excel转shp -->
-		<dependency>
-			<groupId>nl.cloudfarming.client</groupId>
-			<artifactId>lib-geotools</artifactId>
-			<version>2.7.7-NB72</version>
-		</dependency>
+		
 		<!-- 增加database模块依赖 -->
 		<dependency>
 			<groupId>top.geomatics.gazetteer.database</groupId>

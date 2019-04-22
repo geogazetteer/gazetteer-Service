@@ -54,7 +54,7 @@ public class BuildingQuery {
 	public static void main(String[] args) {
 		GeoPoint point = query("4403060070051200001");
 		System.out.println(point.getX() + "\t" + point.getY());
-		List<String> codes = query(114.043736,22.649473);
+		List<String> codes = query(114.019777,22.672456);
 		for (String str:codes) {
 			System.out.println(str);
 		}
