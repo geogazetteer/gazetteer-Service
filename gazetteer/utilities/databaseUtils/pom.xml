@@ -27,6 +27,10 @@
 			<artifactId>gs-segment</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>top.geomatics.gazetteer.utilities</groupId>
+			<artifactId>gs-address-utilities</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 		</dependency>

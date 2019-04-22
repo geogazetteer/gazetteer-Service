@@ -1,4 +1,4 @@
-package top.geomatics.gazetteer.utilities.database;
+package top.geomatics.gazetteer.utilities.database.excel;
 
 import java.io.File;
 import java.io.FileInputStream;
