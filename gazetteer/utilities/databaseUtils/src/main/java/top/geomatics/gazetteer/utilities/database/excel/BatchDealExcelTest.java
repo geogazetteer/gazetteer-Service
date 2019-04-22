@@ -1,4 +1,4 @@
-package top.geomatics.gazetteer.utilities.database;
+package top.geomatics.gazetteer.utilities.database.excel;
 
 public class BatchDealExcelTest {
 	public static void main(String[] args) {

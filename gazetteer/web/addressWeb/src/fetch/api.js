@@ -101,5 +101,10 @@ export default {
   //根据code搜索
   searchByCode(code){
     return fetch('get',URLCFG['searchByCodeUrl']+'/'+code)
-  }
+  },
+  //根据点找标准地址
+  searchByPoint(x,y){
+      return fetch('get',URLCFG['searchByPointUrl']+'?x='+x+'&y='+y)
+  },
+
 };

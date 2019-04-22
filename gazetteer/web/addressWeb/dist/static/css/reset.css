@@ -189,11 +189,11 @@ body {
 }
 
 /*编辑 modal*/
-.editLine .select div{
+.editLine .select .ivu-select-dropdown,.editLine .ivu-select-selection>div,.editLine .ivu-select-selection{
   height: auto !important;
   width: 100% !important;
 }
-.editLine .select  span{
+.editLine .select .ivu-select-item>span,.editLine .ivu-select-selected-value{
   overflow: visible !important;
   white-space: pre-wrap !important;
   line-height: 1.5 !important;
@@ -216,6 +216,10 @@ body {
   text-overflow:ellipsis;
   white-space:nowrap
 }
-.ivu-icon:hover{
+.hoverBlue .ivu-icon:hover{
   color:#3385ff !important;
+}
+
+.autoHeight .similar{
+  height: 35px !important;
 }

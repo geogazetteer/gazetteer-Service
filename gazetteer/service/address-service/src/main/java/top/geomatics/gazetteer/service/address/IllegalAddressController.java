@@ -1,7 +1,5 @@
 package top.geomatics.gazetteer.service.address;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -16,10 +14,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import springfox.documentation.annotations.ApiIgnore;
 import top.geomatics.gazetteer.model.BoundingBox;
 import top.geomatics.gazetteer.segment.WordSegmenter;
 
 //非法地址判别
+@ApiIgnore
 @Api(value = "/illegal_address", tags = "非法地址判别")
 @Controller
 @RequestMapping("/illegal_address")
@@ -83,56 +83,54 @@ public class IllegalAddressController {
 		Address_word.add("龙平");
 		Address_word.add("龙胜");
 	}
+
 	/**
 	 * 返回值是true表示是严重错误数据，false在合理范围内
+	 * 
 	 * @param query
 	 * @return
 	 */
 	@ApiOperation(value = "判断输入地址是否是严重错误的地址", notes = "判断输入地址是否是严重错误的地址")
-    @GetMapping("/error")
-    @ResponseBody 
-    public String isErrorAddress(@RequestParam("query") String query){
-		String flag="true";
-		WordSegmenter ws=new WordSegmenter();
-		List<String>ls= ws.segment(query);
-		for(String s:ls) {
-			Iterator i=Address_word.iterator();
-			while(i.hasNext()) {
-				if(s.contains(i.next().toString())) {
-					flag="false";
+	@GetMapping("/error")
+	@ResponseBody
+	public String isErrorAddress(@RequestParam("query") String query) {
+		String flag = "true";
+		WordSegmenter ws = new WordSegmenter();
+		List<String> ls = ws.segment(query);
+		for (String s : ls) {
+			Iterator i = Address_word.iterator();
+			while (i.hasNext()) {
+				if (s.contains(i.next().toString())) {
+					flag = "false";
 					break;
 				}
 			}
-			
+
 		}
-       return flag;
-    }
-	
-	
+		return flag;
+	}
+
 	/**
 	 * 
 	 * @param query
 	 * @return
 	 */
 	@ApiOperation(value = "判断输入的坐标是否越界", notes = "判断输入的坐标是否越界")
-    @GetMapping("/out_of_boundary")
-    @ResponseBody 
-    public String isErrorAddress(
-    		@ApiParam(value = "指定x坐标，如x=503361.375")
-			@RequestParam(value = "x", required = true) Double x,
-			@ApiParam(value = "指定y坐标，如y=2506786.75")
-			@RequestParam(value = "y", required = true) Double y){
-		String flag="true";
-		BoundingBox bb=new BoundingBox();
-		Double maxx=bb.getMaxx();
-		Double maxy=bb.getMaxy();
-		Double minx=bb.getMinx();
-		Double miny=bb.getMiny();
-		if(x>=minx&&x<=maxx&&y>=miny&&y<=maxy) {
-			flag="fasle";
+	@GetMapping("/out_of_boundary")
+	@ResponseBody
+	public String isErrorAddress(
+			@ApiParam(value = "指定x坐标，如x=503361.375") @RequestParam(value = "x", required = true) Double x,
+			@ApiParam(value = "指定y坐标，如y=2506786.75") @RequestParam(value = "y", required = true) Double y) {
+		String flag = "true";
+		BoundingBox bb = new BoundingBox();
+		Double maxx = bb.getMaxx();
+		Double maxy = bb.getMaxy();
+		Double minx = bb.getMinx();
+		Double miny = bb.getMiny();
+		if (x >= minx && x <= maxx && y >= miny && y <= maxy) {
+			flag = "fasle";
 		}
-       return flag;
-    }	
-	
-}
+		return flag;
+	}
 
+}

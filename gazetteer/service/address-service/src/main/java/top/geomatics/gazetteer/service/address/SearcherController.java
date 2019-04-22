@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.support.jaxrs.FastJsonAutoDiscoverable;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,6 +25,7 @@ import top.geomatics.gazetteer.lucene.POISearcher;
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.address.SearcherSettings;
+import top.geomatics.gazetteer.utilities.database.BuildingQuery;
 
 /**
  * <em>搜索服务</em><br>
@@ -519,6 +519,25 @@ public class SearcherController {
 		}
 		if (this.settings.isCoordinates()) {
 			// 根据输入的坐标搜索
+			if (!AddressProcessor.isCoordinatesExpression(keywords)) {
+				return "";
+			}
+			String coordString[] = keywords.split(",");
+			double x = Double.parseDouble(coordString[0]);
+			double y = Double.parseDouble(coordString[1]);
+			List<String> codes = BuildingQuery.query(x, y);
+			List<AddressRow> rowsTotal = new ArrayList<>();
+			for (String code : codes) {
+				// 根据建筑物编码搜索
+				String fields = "id,address";
+				String tablename = AddressProcessor.getCommunityFromBuildingCode(code);
+				AddressRow aRow = new AddressRow();
+				aRow.setCode(code);
+				Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, aRow, null, 0);
+				List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
+				rowsTotal.addAll(rows);
+			}
+			return ControllerUtils.getResponseBody(rowsTotal);
 		}
 		if (this.settings.isBuildingCode()) {
 			// 根据建筑物编码搜索
