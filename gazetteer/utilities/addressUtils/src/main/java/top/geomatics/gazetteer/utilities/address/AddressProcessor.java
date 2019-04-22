@@ -261,7 +261,7 @@ public class AddressProcessor {
 	 * @return
 	 */
 	public static String getCommunityFromBuildingCode(String code) {
-		String newString = code;
+		String newString = "dmdz";
 		for (String key : IGazetteerConstant.COMMUNITY_MAP.keySet()) {
 			String value = IGazetteerConstant.COMMUNITY_MAP.get(key);
 			if (0 == value.compareTo(code)) {

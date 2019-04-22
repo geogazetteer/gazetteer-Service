@@ -522,7 +522,7 @@ public class SearcherController {
 		}
 		if (this.settings.isBuildingCode()) {
 			// 根据建筑物编码搜索
-			String fields = "id.address";
+			String fields = "id,address";
 			String tablename = AddressProcessor.getCommunityFromBuildingCode(keywords);
 			AddressRow aRow = new AddressRow();
 			aRow.setCode(keywords);
