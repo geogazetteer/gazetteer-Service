@@ -13,6 +13,8 @@
 	<name>gazetteer database utilities</name>
 	<packaging>jar</packaging>
 
+    
+
 	<dependencies>
 		<dependency>
 			<groupId>top.geomatics.gazetteer.database</groupId>
@@ -74,26 +76,29 @@
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-main</artifactId>
+		
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-shapefile</artifactId>
+			
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-geopkg</artifactId>
+			
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-swing</artifactId>
+			
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-epsg-hsql</artifactId>
+			
 		</dependency>
-		<!-- 增加geotools依赖用于excel转shp -->
-		<!-- <dependency> <groupId>nl.cloudfarming.client</groupId> <artifactId>lib-geotools</artifactId> 
-			<version>2.7.7-NB72</version> </dependency> -->
+		
 	</dependencies>
 	<build>
 		<plugins>

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -21,6 +22,9 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -55,8 +59,8 @@ public class Excel2Shp {
 			      //定义图形信息和属性信息
 			      SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
 			      tb.setCRS(DefaultGeographicCRS.WGS84);
-//			      tb.setName("shapefile");
-//			      tb.add("the_geom", Point.class);
+			      tb.setName("shapefile");
+			      tb.add("the_geom", Point.class);
 			      for (int i = 0; i < list.size(); i++) {
 			        Map<String, Object> map = (Map<String, Object>) list.get(i);
 			        tb.add(map.get("name").toString(), (Class) map.get("type"));
@@ -69,7 +73,7 @@ public class Excel2Shp {
 			      FeatureWriter<SimpleFeatureType, SimpleFeature> writer = ds.getFeatureWriter(ds.getTypeNames()[0], Transaction.AUTO_COMMIT);
 			      //写下一条
 			      SimpleFeature feature = null;
-			      for (int i = 1; i < rowNum; i++) {
+			      for (int i = 1; i <= rowNum; i++) {
 			        row = sheet.getRow(i);
 			        feature = writer.next();
 			        Map mapLonLat = new HashMap();
@@ -82,11 +86,18 @@ public class Excel2Shp {
 			            mapLonLat.put(fieldName, cell.getRichStringCellValue().getString());
 			          }
 			        }
-//			        feature.setAttribute("the_geom", new GeometryFactory().createPoint(new Coordinate((double) mapLonLat.get("longitude"), (double) mapLonLat.get("latitude"))));
+			        String lon=(String) mapLonLat.get("longitude");
+			        String lat=(String) mapLonLat.get("latitude");
+			     
+			        System.out.println(mapLonLat.get("longitude"));
+			        System.out.println(mapLonLat.get("latitude"));
+			        feature.setAttribute("the_geom", new GeometryFactory().createPoint
+			        		(new Coordinate(Double.valueOf(lon), Double.valueOf(lat))));
 			      }
 			      writer.write();
 			      writer.close();
 			      ds.dispose();
+			      System.out.println("生成成功");
 			 
 			    } catch (Exception e) {
 			      e.printStackTrace();
