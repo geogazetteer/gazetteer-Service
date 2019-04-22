@@ -29,8 +29,12 @@ const URLCFG={
   isCoordinateUrl:serverUrl+'transform/coordinate',//(param:chars=chars)
   //根据坐标查code
   getCodeByPointUrl:serverUrl+'building/codes',//(param:x=114.017776720804&y=22.6390350934369)
-  //根据code搜索
+  //根据code搜索标准地址
   searchByCodeUrl:serverUrl+'address/code',//(param:code)
+  //根据坐标查标准地址
+  searchByPointUrl:serverUrl+'building/address',//(param:x=114.019777&y=22.672456)
+  //根据地址获取门楼号
+  getHouseNumberByAddrUrl:serverUrl+'transform/houseNumber',//(params,chars=chars)
 };
 
 const geoServerUrl='http://119.3.72.23:8085/';//geoserver服务地址
@@ -62,10 +66,17 @@ const SETDICT={
   "地名": 'geoName',
   "地名别名": 'geoNameAlias',
   "通假字识别": 'interchangeable',
-  "同音字识别": 'ishomophone',
+  "同音字识别": 'homophone',
   "POI": 'poi',
   "POI别名": 'poialias',
-  "地址范围识别": 'withtin'
+  "地址范围识别": 'withtin',
+  '楼栋编码':'buildingCode'
+};
+const SETLABELARR={
+  settings_1:['繁体转换','全角转换','数字转换'],
+  settings_2:['别名识别','同音字识别','通假字识别'],
+  settings_3:['地址补全','地名','地名别名','POI','POI别名'],
+  settings_4:['地址范围识别','坐标识别','楼栋编码'],
 };
 
 const BATCHSERVICE={

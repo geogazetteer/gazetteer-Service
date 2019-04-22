@@ -233,6 +233,8 @@
           $this.showResult = false;//隐藏结果
           $this.showHis = false;//隐藏历史记录
           $this.showCard = false;//隐藏联想
+          $this.hideDetail=true;//隐藏详情
+          $this.showDetail=false;//隐藏详情
           //判断是否含有敏感词
           $this.testChar(null,str,function (res) {
             if(res){
@@ -316,11 +318,22 @@
                 {label: '社区网格员ID', value: ''},
               ]
             };
-            $this.detail = detail;
+            //查询楼栋号
+            $this.$api.getMsg(URLCFG['getHouseNumberByAddrUrl'],{chars:listData['address']}).then(function (res) {
+              if(res.length>0){
+                detail['detailList'][2].value=res[0]
+              }else{
+                //没有匹配到门楼号
+                //detail['detailList'][2].value='没有匹配到门牌号'
+              }
 
-            $this.showDetail = true;//显示详情
-            $this.hideDetail  = false;
-            //this.$emit('setMarkCoord', [114.30,30.52]);//地图定位
+              $this.detail = detail;
+
+              $this.showDetail = true;//显示详情
+              $this.hideDetail  = false;
+            }).catch(function () {
+
+            })
           })
 
         }
@@ -374,9 +387,26 @@
             $this.showResult = false;//隐藏结果
             $this.showHis = false;//隐藏历史记录
             $this.showCard = false;//隐藏联想
+            $this.hideDetail=true;//隐藏详情
+            $this.showDetail=false;//隐藏详情
 
+            $this.$api.searchByPoint(val[0],val[1]).then(function (res) {
+              if(res['rows'].length>0){
+                $this.resultCount = res.total;
+                $this.resultList = res.rows;
+                $this.showResult = true;//显示搜索结果
+                $this.needSpin = false;//隐藏spin
+              }else{
+                $this.$Message.warning('没有匹配到建筑物！');
+                //搜索结果为空
+                $this.resultCount =0;
+                $this.resultList = [];
+                $this.showResult = true;//显示搜索结果
+                $this.needSpin = false;//隐藏spin
+              }
+            });
             //根据坐标查找code
-            $this.$api.getCodeByPoint(val[0],val[1]).then(function (res) {
+           /* $this.$api.getCodeByPoint(val[0],val[1]).then(function (res) {
               if(res.length>0){
                 var code=res[0];
 
@@ -403,19 +433,8 @@
                 $this.needSpin = false;//隐藏spin
               }
 
-            })
-           /* var url = URLCFG['searchCtxUrl'];
-            $this.$api.getSearchCtx(url, str).then(function (res) {
-              $this.resultCount = res.total;
-              $this.resultList = res.rows;
-              $this.showResult = true;//显示搜索结果
-              $this.needSpin = false;//隐藏spin
-
-              //记录历史记录到localStorage
-              if(res.total>0){
-                $this.hisList = SetRecord(str)
-              }
             })*/
+
 
 
           }

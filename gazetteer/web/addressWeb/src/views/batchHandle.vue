@@ -1,7 +1,7 @@
 
 <!--批量处理页-->
 <template>
-  <div class="wrapper">
+  <div class="Wrapper">
     <h1 class="title">批量地址匹配服务</h1>
     <div class="topTool flex_row">
       <div class="btnBox flex_row">
@@ -83,35 +83,27 @@ export default {
           align:'center'
         },
         {
-          title: '输入地址',
+          title: '地址',
           key: 'address',
 		  className:'header'
         },
         {
-          title: '输入坐标',
-          key: 'coordinates',
+          title: '经度',
+          key: 'lng',
           className:'header'
         },
         {
-          title: '匹配结果',
-          key: 'result',
+          title: '纬度',
+          key: 'lat',
 		  className:'header'
-        },
-        {
-          title: '相似度',
-          key: 'fuzzy',
-          width: 150,
-          slot: 'fuzzy',
-        },
+        }
       ],
       data: [
         {
           uid:1,
-          encode:'utf-8',
           address: '深圳市龙华区地名地址服务',
-          coordinates:'114.30,30.52',
-          result: '深圳市龙华区观澜街道a栋1806',
-          fuzzy: 98,
+          lng:'114.30',
+          lat:'30.52',
         },
       ],
 
@@ -162,21 +154,21 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.wrapper{
-  width: 90%;
+.Wrapper{
+  width: 100%;
   height: 100%;
-  margin: 0 auto;
   position: relative;
+  border: 2px solid #3385ff;
+  background: #F6EBDD;
+  padding: 0 4%;
+
 }
   .title{
     margin-bottom: 20px;
     text-align: center;
     margin-top: 50px;
   }
-.wrapper .header{
-	font-weight: bold;
-    font-size: 16px;
-  }
+
 .topTool{
   margin-bottom: 20px;
 }
