@@ -1,4 +1,4 @@
-package top.geomatics.gazetteer.service.address;
+package top.geomatics.gazetteer.utilities.database;
 
 public class Excel2ShpTest {
 	public static void main(String[] args) {

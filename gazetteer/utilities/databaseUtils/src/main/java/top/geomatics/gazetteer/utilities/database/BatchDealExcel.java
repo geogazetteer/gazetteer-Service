@@ -1,4 +1,4 @@
-package top.geomatics.gazetteer.service.address;
+package top.geomatics.gazetteer.utilities.database;
 
 import java.io.File;
 import java.io.FileInputStream;
