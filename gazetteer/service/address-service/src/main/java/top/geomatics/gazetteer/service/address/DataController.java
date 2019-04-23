@@ -28,6 +28,8 @@ import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 import top.geomatics.gazetteer.model.MatcherResultRow;
 import top.geomatics.gazetteer.utilities.database.excel.BatchDealExcel;
+import top.geomatics.gazetteer.utilities.database.excel.Excel2Shp;
+import top.geomatics.gazetteer.utilities.database.excel.ShpZip;
 
 //数据导入导出
 @Api(value = "/data", tags = "地址数据上传下载")
@@ -78,6 +80,7 @@ public class DataController {
 
 	}
 
+	//http://localhost:8083/data/download/id
 	@ApiOperation(value = "上传批量匹配处理数据", notes = "上传批量匹配处理数据")
 	@PostMapping("/upload/matcher")
 	@ResponseBody
@@ -118,12 +121,12 @@ public class DataController {
 		// 文件地址
 		String folder = "D:/data/upload";
 		try (
-				// jdk7新特性，可以直接写到try()括号里面，java会自动关闭
-				InputStream inputStream = new FileInputStream(new File(folder, id + ".csv"));
-				OutputStream outputStream = response.getOutputStream()) {
+			// jdk7新特性，可以直接写到try()括号里面，java会自动关闭
+			InputStream inputStream = new FileInputStream(new File(folder, id + ".xlsx"));
+			OutputStream outputStream = response.getOutputStream()) {
 			// 指明为下载
 			response.setContentType("application/x-download");
-			String fileName = "test.csv";
+			String fileName = id + ".xlsx";
 			response.addHeader("Content-Disposition", "attachment;fileName=" + fileName); // 设置文件名
 
 			// 把输入流copy到输出流
@@ -135,7 +138,51 @@ public class DataController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		long start=System.currentTimeMillis();
+		String path="D:/data/upload/"+id;
+		File file=new File(path);
+		file.mkdir();
+		
+		String xlsfile="D:/data/upload/"+id+".xlsx";
+		System.out.println(xlsfile);
+		String shppath=path+"/shp_"+id+".shp";
+        System.out.println(shppath);
+        //excel转shp
+        Excel2Shp.excel2Shp(xlsfile, shppath);
+		
+        //将生成的shp文件压缩
+		String sourcePath ="D:/data/upload/"+id;
+		String zipName="shp_"+id;
+		ShpZip.createCardImgZip(sourcePath, zipName);
+		long end=System.currentTimeMillis();
+		System.out.println(end-start);
 
 	}
+	
+//	@ApiIgnore
+//	@ApiOperation(value = "生成shp数据", notes = "生成shp数据")
+//	@GetMapping("/shp/{id}") // id为文件名
+//	public void Shp(@PathVariable("id") String id) {
+//		long start=System.currentTimeMillis();
+//		String path="D:/data/upload/"+id;
+//		File file=new File(path);
+//		file.mkdir();
+//		
+//		String xlsfile="D:/data/upload/"+id+".xlsx";
+//		System.out.println(xlsfile);
+//		String shppath=path+"/shp_"+id+".shp";
+//        System.out.println(shppath);
+//        //excel转shp
+//        Excel2Shp.excel2Shp(xlsfile, shppath);
+//		
+//        //将生成的shp文件压缩
+//		String sourcePath ="D:/data/upload/"+id;
+//		String zipName="shp_"+id;
+//		ShpZip.createCardImgZip(sourcePath, zipName);
+//		long end=System.currentTimeMillis();
+//		System.out.println(end-start);
+//		
+//	}
 
 }
