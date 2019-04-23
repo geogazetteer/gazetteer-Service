@@ -41,8 +41,8 @@ public class SynonymDictionary {
 						if (keyString.isEmpty() || valueString.isEmpty()) {
 							continue;
 						}
-						dictionary.put(row[j], row[j2]);
-						dictionary.put(row[j2], row[j]);
+						dictionary.put(keyString, valueString);
+						dictionary.put(valueString, keyString);
 					}
 				}
 			}

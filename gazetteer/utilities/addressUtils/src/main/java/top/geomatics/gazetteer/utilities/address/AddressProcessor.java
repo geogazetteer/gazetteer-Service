@@ -152,6 +152,9 @@ public class AddressProcessor {
 		if (settings.isSynonym()) {// 同义词转换
 			newAddress = synonym(newAddress);
 		}
+		if (settings.isHomophone()) {// 同音字转换
+			newAddress = homophone(newAddress);
+		}
 		return newAddress;
 	}
 
@@ -268,7 +271,24 @@ public class AddressProcessor {
 		for (String key : SynonymDictionary.dictionary.keySet()) {
 			if (input.contains(key)) {
 				newString = newString.replace(key, SynonymDictionary.getSynonym(key));
-				break;//只替换一个
+				break;// 只替换一个
+			}
+		}
+		return newString;
+	}
+
+	/**
+	 * <em>同音字转换</em><br>
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String homophone(String input) {
+		String newString = input;
+		for (String key : HomophoneDictionary.dictionary.keySet()) {
+			if (input.contains(key)) {
+				newString = newString.replace(key, HomophoneDictionary.getHomophone(key).get(0));
+				break;// 只替换一个
 			}
 		}
 		return newString;

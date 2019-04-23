@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import top.geomatics.gazetteer.segment.WordSegmenter;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
+import top.geomatics.gazetteer.utilities.address.HomophoneDictionary;
 
 /**
  * @author chenfa
@@ -186,6 +187,22 @@ public class TransformController {
 	public String synonymWords(
 			@ApiParam(value = "同义词转换，示例：中原=华夏") @RequestParam(value = "chars", required = true) String input) {
 		return JSON.toJSONString(AddressProcessor.synonym(input));
+
+	}
+
+	/**
+	 * <em>同音字转换，示例：啊=阿</em><br>
+	 * examples:<br>
+	 * <!--http://localhost:8083/transform/synonym?chars=啊 -->
+	 * 
+	 * @param input
+	 * @return
+	 */
+	@ApiOperation(value = "同音字转换", notes = "同音字转换，示例：/transform/synonym?chars=啊")
+	@GetMapping("/homophone")
+	public String homophoneWords(
+			@ApiParam(value = "同音字转换，示例：啊=阿") @RequestParam(value = "chars", required = true) String input) {
+		return JSON.toJSONString(HomophoneDictionary.getHomophone(input));
 
 	}
 
