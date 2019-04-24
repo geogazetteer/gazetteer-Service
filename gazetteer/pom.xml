@@ -39,7 +39,7 @@
 	<!-- 自定义变量 -->
 	<properties>
 		<!-- 打包输出文件的路径 -->
-		<outputDirectory>D:\\gazetteer\\bin</outputDirectory>
+		<outputDirectory>D:\\gazetteer\\application\\lib</outputDirectory>
 		<!-- 编码 -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- JDK版本 -->
