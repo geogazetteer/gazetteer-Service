@@ -1,2 +1,2 @@
-cd E:\gazetteer\bin
-java -jar gs-address-service-0.0.4-SNAPSHOT.jar
+cd D:\gazetteer\application\lib
+java -jar gs-address-service-0.0.5-SNAPSHOT.jar
