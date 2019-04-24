@@ -61,3 +61,5 @@ gazetteer/model/.project
 gazetteer/model/.project
 gazetteer/database/.project
 gazetteer/web/addressWeb/package-lock.json
+gazetteer/web/addressWeb/package-lock.json
+gazetteer/web/addressWeb/package.json
