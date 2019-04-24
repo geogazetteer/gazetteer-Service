@@ -14,7 +14,7 @@
 	<!-- 本项目顶级POM -->
 	<groupId>top.geomatics.gazetteer</groupId>
 	<artifactId>gs-gazetteer</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>gazetteer</name>
 	<description>gazetteer service for smart Longhhua</description>
