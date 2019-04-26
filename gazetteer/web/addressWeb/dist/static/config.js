@@ -1,8 +1,8 @@
 /**
  * Created by lixiaochao on 2019/3/21.
  */
-
-const serverUrl = 'http://119.3.72.23:8083/';//服务器地址
+const IP = 'http://119.3.72.23';
+const serverUrl = IP+':8083/';//服务器地址
 var ProxyServlet = 'http://localhost:9192/ProxyServlet/proxyHandler?url=';//代理服务器地址
 const URLCFG={
   searchCtxUrl:serverUrl+'address/hint',//搜索联想，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
@@ -37,8 +37,8 @@ const URLCFG={
   getHouseNumberByAddrUrl:serverUrl+'transform/houseNumber',//(params,chars=chars)
 };
 
-const geoServerUrl='http://119.3.72.23:8085/';//geoserver服务地址
-const webUrl=ProxyServlet+'http://localhost:9192/';
+const geoServerUrl=IP + ':8085/';//geoserver服务地址
+const webUrl=IP + ':8087/';
 const MAPURL={
   //雪碧图
   sprite:webUrl+'sprite/sprite',
@@ -82,6 +82,6 @@ const SETLABELARR={
 };
 
 const BATCHSERVICE={
-  modelUrl:'http://119.3.72.23:8087/files/downloads/批量处理模版.xls',//模板地址
+  modelUrl:webUrl+'files/downloads/批量处理模版.xls',//模板地址
   uploadUrl:serverUrl+'data/upload/matcher',//文件上传
 };
