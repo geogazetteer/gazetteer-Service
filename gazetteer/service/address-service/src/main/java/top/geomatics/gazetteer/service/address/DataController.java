@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,106 +31,146 @@ import springfox.documentation.annotations.ApiIgnore;
 import top.geomatics.gazetteer.config.ResourcesManager;
 import top.geomatics.gazetteer.model.MatcherResultRow;
 import top.geomatics.gazetteer.utilities.database.excel.BatchDealExcel;
-import top.geomatics.gazetteer.utilities.database.excel.Excel2Shp;
-import top.geomatics.gazetteer.utilities.database.excel.ShpZip;
 
-//数据导入导出
+/**
+ * <b>地址数据上传下载服务类</b><br>
+ * 
+ * @author whudyj
+ */
 @Api(value = "/data", tags = "地址数据上传下载")
 @Controller
 @RequestMapping("/data")
 public class DataController {
 	// 文件上传路径
-	private String upload_file_path = ResourcesManager.getInstance().getValue("upload_file_path");
+	private String upload_file_path = ResourcesManager.getInstance().getValue(Messages.getString("DataController.0")); //$NON-NLS-1$
 
-	/*
-	 * 获取file.html页面
+	// 添加slf4j日志实例对象
+	private final static Logger logger = LoggerFactory.getLogger(DataController.class);
+
+	/**
+	 * <b>上传数据文件</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>数据文件格式为excel格式</i><br>
+	 * 
+	 * examples:<br>
+	 * http://localhost:8083/data/upload?fileName=
+	 * 
+	 * @param file MultipartFile 请求参数，前台上传的文件
+	 * @return String 返回JSON格式的上传结果
 	 */
-//    @RequestMapping("/file")
-//    public String file(){
-//        return "file";
-//    }
-	@ApiIgnore
 	@ApiOperation(value = "上传地址数据", notes = "上传地址数据")
-	@PostMapping("/fileUpload")
+	@PostMapping("/upload")
 	@ResponseBody
-	public String fileUpload(@RequestParam("fileName") MultipartFile file) {
-		if (file.isEmpty()) {
-			return "false";
-		}
-		// 获取文件名到保存到服务器
-		String fileName = file.getOriginalFilename();
-		int size = (int) file.getSize();
-		System.out.println(fileName + "-->" + size);
-		// 文件上传路径
-		File dest = new File(upload_file_path + "/" + fileName);
-		if (!dest.getParentFile().exists()) { // 判断文件父目录是否存在
-			dest.getParentFile().mkdir();
-		}
-
-		try {
-
-			file.transferTo(dest); // 保存文件
-			String fileName2 = "test2.xls";
-			BatchDealExcel.batchDealExcel(upload_file_path + "/" + fileName, upload_file_path + "/" + fileName2);
-			return "true";
-
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-			return "false";
-		} catch (IOException e) {
-			e.printStackTrace();
-			return "false";
-		}
-
-	}
-
-	// http://localhost:8083/data/download/id
-	@ApiOperation(value = "上传批量匹配处理数据", notes = "上传批量匹配处理数据")
-	@PostMapping("/upload/matcher")
-	@ResponseBody
-	public String uploadMatcherFile(@RequestParam("fileName") MultipartFile file) {
+	public String fileUpload(@ApiParam(value = "前台上传的文件") @RequestParam("fileName") MultipartFile file) {
 		if (file.isEmpty()) {
 			// 日志
+			String logMsgString = Messages.getString("DataController.1"); //$NON-NLS-1$
+			logger.error(logMsgString);
+			return ""; //$NON-NLS-1$
 		}
 		// 服务器上存储的文件名
 		UUID uuid = UUID.randomUUID();
-		String fileName = uuid + ".xlsx";
+		String fileName = uuid + Messages.getString("DataController.3"); //$NON-NLS-1$
 
 		String sourceFilePath = upload_file_path + File.separator + fileName;
+		// 判断文件父目录是否存在，如果不存在，则创建目录
 		File dest = new File(sourceFilePath);
-		if (!dest.getParentFile().exists()) { // 判断文件父目录是否存在
+		if (!dest.getParentFile().exists()) {
 			dest.getParentFile().mkdir();
 		}
 
 		try {
 			// 保存文件
 			file.transferTo(dest);
+			String logMsgString = Messages.getString("DataController.4"); //$NON-NLS-1$
+			logger.info(logMsgString);
+			return logMsgString;
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
+			logger.error(e.getMessage());
+			return ""; //$NON-NLS-1$
 		} catch (IOException e) {
 			e.printStackTrace();
+			logger.error(e.getMessage());
+			return ""; //$NON-NLS-1$
 		}
-		String fileName2 = uuid + "_result.xlsx";
+
+	}
+
+	/**
+	 * <b>上传批量匹配处理数据文件</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>数据文件格式为excel格式</i><br>
+	 * 
+	 * examples:<br>
+	 * http://localhost:8083/data/upload/matcher
+	 * 
+	 * @param file MultipartFile 请求参数，前台上传的文件
+	 * @return String 返回JSON格式的批量匹配处理结果
+	 */
+	@ApiOperation(value = "上传批量匹配处理数据", notes = "上传批量匹配处理数据")
+	@PostMapping("/upload/matcher")
+	@ResponseBody
+	public String uploadMatcherFile(@ApiParam(value = "前台上传的文件") @RequestParam("fileName") MultipartFile file) {
+		if (file.isEmpty()) {
+			// 日志
+			String logMsgString = Messages.getString("DataController.7"); //$NON-NLS-1$
+			logger.error(logMsgString);
+			return ""; //$NON-NLS-1$
+		}
+		// 服务器上存储的文件名
+		UUID uuid = UUID.randomUUID();
+		String fileName = uuid + Messages.getString("DataController.9"); //$NON-NLS-1$
+
+		String sourceFilePath = upload_file_path + File.separator + fileName;
+		File dest = new File(sourceFilePath);
+		// 判断文件父目录是否存在，如果不存在，则创建目录
+		if (!dest.getParentFile().exists()) {
+			dest.getParentFile().mkdir();
+		}
+
+		try {
+			// 保存文件
+			file.transferTo(dest);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// 日志
+			String logMsgString = Messages.getString("DataController.10"); //$NON-NLS-1$
+			logger.error(logMsgString);
+			return ""; //$NON-NLS-1$
+		}
+		// 批量匹配处理数据
+		String fileName2 = uuid + Messages.getString("DataController.12"); //$NON-NLS-1$
 		String destFilePath = upload_file_path + File.separator + fileName2;
 		List<MatcherResultRow> allRows = BatchDealExcel.batchDealExcel(sourceFilePath, destFilePath);
 
 		return ControllerUtils.getResponseBody6(allRows);
 	}
 
-	@ApiOperation(value = "下载地址数据", notes = "下载地址数据")
-	@GetMapping("/download/{id}") // id为文件名
-	public void download(@ApiParam(value = "测试，文件名输入test") @PathVariable("id") String id, HttpServletRequest request,
+	/**
+	 * <b>下载数据文件</b><br>
+	 * 
+	 * examples:<br>
+	 * http://localhost:8083/data/download/
+	 * 
+	 * @param id String 路径变量，服务器上下载文件名
+	 */
+	@ApiIgnore
+	@ApiOperation(value = "下载数据", notes = "下载数据")
+	@GetMapping("/download/{id}")
+	public void download(@ApiParam(value = "下载文件名") @PathVariable("id") String id, HttpServletRequest request,
 			HttpServletResponse response) {
 		// 文件地址
 		String folder = upload_file_path;
 		try (
 				// jdk7新特性，可以直接写到try()括号里面，java会自动关闭
-				InputStream inputStream = new FileInputStream(new File(folder, id + ".xlsx"));
+				InputStream inputStream = new FileInputStream(new File(folder, id));
 				OutputStream outputStream = response.getOutputStream()) {
 			// 指明为下载
-			response.setContentType("application/x-download");
-			String fileName = id + ".xlsx";
-			response.addHeader("Content-Disposition", "attachment;fileName=" + fileName); // 设置文件名
+			response.setContentType(Messages.getString("DataController.13")); //$NON-NLS-1$
+			response.addHeader(Messages.getString("DataController.14"), Messages.getString("DataController.15") + id); // 设置文件名 //$NON-NLS-1$ //$NON-NLS-2$
 
 			// 把输入流copy到输出流
 			IOUtils.copy(inputStream, outputStream);
@@ -140,50 +182,20 @@ public class DataController {
 			e.printStackTrace();
 		}
 
-		long start = System.currentTimeMillis();
-		String path = upload_file_path + File.separator + id;
-		File file = new File(path);
-		file.mkdir();
-
-		String xlsfile = upload_file_path + File.separator + id + ".xlsx";
-		System.out.println(xlsfile);
-		String shppath = path + "/shp_" + id + ".shp";
-		System.out.println(shppath);
-		// excel转shp
-		Excel2Shp.excel2Shp(xlsfile, shppath);
-
-		// 将生成的shp文件压缩
-		String sourcePath = upload_file_path + File.separator + id;
-		String zipName = "shp_" + id;
-		ShpZip.createCardImgZip(sourcePath, zipName);
-		long end = System.currentTimeMillis();
-		System.out.println(end - start);
+		/*
+		 * long start = System.currentTimeMillis(); String path = upload_file_path +
+		 * File.separator + id; File file = new File(path); file.mkdir();
+		 * 
+		 * String xlsfile = upload_file_path + File.separator + id + ".xlsx";
+		 * System.out.println(xlsfile); String shppath = path + "/shp_" + id + ".shp";
+		 * System.out.println(shppath); // excel转shp Excel2Shp.excel2Shp(xlsfile,
+		 * shppath);
+		 * 
+		 * // 将生成的shp文件压缩 String sourcePath = upload_file_path + File.separator + id;
+		 * String zipName = "shp_" + id; ShpZip.createCardImgZip(sourcePath, zipName);
+		 * long end = System.currentTimeMillis(); System.out.println(end - start);
+		 */
 
 	}
-
-//	@ApiIgnore
-//	@ApiOperation(value = "生成shp数据", notes = "生成shp数据")
-//	@GetMapping("/shp/{id}") // id为文件名
-//	public void Shp(@PathVariable("id") String id) {
-//		long start=System.currentTimeMillis();
-//		String path="D:/data/upload/"+id;
-//		File file=new File(path);
-//		file.mkdir();
-//		
-//		String xlsfile="D:/data/upload/"+id+".xlsx";
-//		System.out.println(xlsfile);
-//		String shppath=path+"/shp_"+id+".shp";
-//        System.out.println(shppath);
-//        //excel转shp
-//        Excel2Shp.excel2Shp(xlsfile, shppath);
-//		
-//        //将生成的shp文件压缩
-//		String sourcePath ="D:/data/upload/"+id;
-//		String zipName="shp_"+id;
-//		ShpZip.createCardImgZip(sourcePath, zipName);
-//		long end=System.currentTimeMillis();
-//		System.out.println(end-start);
-//		
-//	}
 
 }

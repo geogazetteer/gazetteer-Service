@@ -18,17 +18,12 @@
 
 
 	<dependencies>
-		<!-- 增加thymeleaf依赖 -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
 		<!-- 增加model模块依赖 -->
 		<dependency>
 			<groupId>top.geomatics.gazetteer.model</groupId>
 			<artifactId>gs-model</artifactId>
 		</dependency>
-		
+
 		<!-- 增加database模块依赖 -->
 		<dependency>
 			<groupId>top.geomatics.gazetteer.database</groupId>
@@ -57,20 +52,28 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-starter-logging</artifactId>
 				</exclusion>
 			</exclusions>
-
+		</dependency>
+		<!-- 增加thymeleaf依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- 增加POI依赖 -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>4.0.0</version>
 		</dependency>
 		<!-- 增加spring-boot-starter-test依赖 -->
 		<dependency>
@@ -104,6 +107,12 @@
 			</plugin>
 		</plugins>
 		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**//*.properties</include>
+				</includes>
+			</resource>
 			<resource>
 				<directory>src/resources</directory>
 				<includes>

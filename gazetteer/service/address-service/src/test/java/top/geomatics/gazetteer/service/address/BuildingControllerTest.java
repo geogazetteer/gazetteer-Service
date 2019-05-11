@@ -15,7 +15,7 @@ import org.springframework.util.MultiValueMap;
 
 //@RunWith(SpringRunner.class)
 //@SpringBootTest
-public class BuildingControllerTest extends AddressServiceApplicationTests{
+public class BuildingControllerTest extends ControllerTests{
 	
 //	private MockMvc mvc;
 //	@Before 

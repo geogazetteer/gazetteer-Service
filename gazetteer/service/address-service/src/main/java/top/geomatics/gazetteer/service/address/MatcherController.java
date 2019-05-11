@@ -21,7 +21,7 @@ import top.geomatics.gazetteer.model.IGazetteerConstant;
 import top.geomatics.gazetteer.utilities.address.AddressSimilarity;
 
 /**
- * <em>地址匹配服务</em><br>
+ * <b>地址匹配服务</b><br>
  * <i>说明</i><br>
  * <i>目前地址匹配服务还不完善</i>
  * 
@@ -33,7 +33,7 @@ import top.geomatics.gazetteer.utilities.address.AddressSimilarity;
 public class MatcherController {
 
 	/**
-	 * <em>查询与指定关键词匹配的地址</em><br>
+	 * <b>查询与指定关键词匹配的地址</b><br>
 	 * examples: <br>
 	 * <!--http://localhost:8083/matcher/address?keywords=东环一路天汇大厦&min_sim=0.1 -->
 	 * 
@@ -99,7 +99,7 @@ public class MatcherController {
 	}
 
 	/**
-	 * <em>度量两个地址的相似度</em><br>
+	 * <b>度量两个地址的相似度</b><br>
 	 * examples: <br>
 	 * <!--http://localhost:8083/matcher/fuzzy?address1=广东省深圳市龙华区民治街道白石龙社区逸秀新村17栋&address2=深圳市龙华区民治街道白石龙社区白石龙一区58栋58-2
 	 * -->
