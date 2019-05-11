@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import top.geomatics.gazetteer.config.ResourcesManager;
-import top.geomatics.gazetteer.database.csv.MYCSVReader;
+import top.geomatics.gazetteer.utilities.csv.MYCSVReader;
 
 /**
  * <em>同音字</em>
