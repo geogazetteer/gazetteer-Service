@@ -6,91 +6,191 @@ package top.geomatics.gazetteer.database;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Select;
-
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.BuildingPositionRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 
 /**
+ * <b>标准地址数据库操作的mybatis映射接口</b><br>
+ * 
  * @author whudyj
  *
  */
 public interface AddressMapper {
 
-	// 搜索所有地址
-	public List<AddressRow> selectAllAddress();
-
-	// 搜索所有地址，返回limit个结果
-	public List<AddressRow> selectAllAddressWithLimit(int limit);
-
-	// 根据详细地址查询
-	public List<AddressRow> selectByAddress(String address);
-
-	// 根据地理编码查询
-	public List<AddressRow> selectByCode(String code);
-
-	// 模糊查询
-	public List<AddressRow> selectByAddressLike(String keyword);
-
-	// lucene
-	public List<AddressRow> selectAddressBylucene(String keyword);
-
-	// 关键字
-	public List<AddressRow> selectByKeyword(String keyword);
-
-	public List<AddressRow> selectstreets();
-
-	public List<AddressRow> selectcommunities();
-
-	public List<AddressRow> selectbuildings();
-
-	public List<AddressRow> selecthouses();
-
-	public List<AddressRow> selectAddressForDictionary() throws Exception;
-
-	public List<AddressRow> findEquals(Map<String, Object> map);
-
-	public List<AddressRow> findLike(Map<String, Object> map);
-
-	public List<BuildingPositionRow> findBuildingEquals(Map<String, Object> map);
-	
-	public List<BuildingPositionRow> findBuildingByPoint(Map<String, Object> map);
-
-	@Select("select code from building_position where longitude=#{arg0} and latitude=#{arg1}")
-	public String findAddressCodeBycoordinate(String longitutde,String latitude);
-
-	@Select("select address from dmdz where code=#{arg0}")
-	public String findAddressBycoordinate(String code);
-	
-	@Select("select code from dmdz where address=#{arg0}")
-	public String findLonLatCodeByaddress(String address);
-	
-	@Select("select longitude,latitude from building_position where code=#{arg0}")
-	public  BuildingPositionRow findLonLatByCode(String code);
-	// 创建更新数据库表
-	public void dropTable(String tableName);
-
-	public void createAddressTable(String tableName);
-
-	public void insertAddress(Map<String, Object> map);
-	
-	public void createBuildingPositionTable(String tableName);
-
-	public void insertBuildingPosition(Map<String, Object> map);
-
-	public void createDistrictTable(String tableName);
-
-	public void insertDistrict(Map<String, Object> map);
-
-	public void createStreetTable(String tableName);
-
-	public void insertStreet(Map<String, Object> map);
-
-	// 通过id查询所有
+	/**
+	 * <b>在dmdz表中根据id查询</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>表名固定为：dmdz</i><br>
+	 * 
+	 * @param id 数据库中记录的序号（标识号）
+	 * @return 搜索结果集
+	 */
 	public List<AddressRow> selectById(Integer id);
+
+	/**
+	 * <b>在dmdz表中根据一组id查询</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>表名固定为：dmdz</i><br>
+	 * 
+	 * @param ids 数据库中的一组记录序号（标识号）
+	 * @return 搜索结果集
+	 */
 	public List<AddressRow> selectByIds(List<Integer> ids);
 
+	/**
+	 * <b>选择dmdz表中有关词汇用于建立分词词典</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>表名固定为：dmdz</i><br>
+	 * 
+	 * @return 搜索结果集
+	 * @throws Exception 异常
+	 */
+	public List<AddressRow> selectAddressForDictionary() throws Exception;
+
+	/**
+	 * <b>任意精确查询</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中任意的select语句</i><br>
+	 * 
+	 * @param map select语句中的所有参数
+	 * @return 搜索结果集
+	 */
+	public List<AddressRow> findEquals(Map<String, Object> map);
+
+	/**
+	 * <b>任意精确查询</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中任意的select语句，返回结果中只有id，address。主要用于lucene搜索</i><br>
+	 * 
+	 * @param map select语句中的所有参数
+	 * @return 搜索结果集
+	 */
 	public List<SimpleAddressRow> findSimpleEquals(Map<String, Object> map);
+
+	/**
+	 * <b>任意精确查询</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中任意的select语句，返回结果中只有与建筑物相关的信息。主要用于建筑物地址关联搜索</i><br>
+	 * 
+	 * @param map select语句中的所有参数
+	 * @return 搜索结果集
+	 */
+	public List<BuildingPositionRow> findBuildingEquals(Map<String, Object> map);
+
+	/**
+	 * <b>任意模糊查询</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中任意的select语句</i><br>
+	 * 
+	 * @param map select语句中的所有参数
+	 * @return 搜索结果集
+	 */
+	public List<AddressRow> findLike(Map<String, Object> map);
+
+	/**
+	 * <b>根据位置坐标查询</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中任意的select语句</i><br>
+	 * 
+	 * @param map select语句中的所有参数，必须包含有位置坐标（经纬度）信息。
+	 * @return 搜索结果集
+	 */
+	public List<BuildingPositionRow> findBuildingByPoint(Map<String, Object> map);
+
+	/**
+	 * <b>删除表</b><br>
+	 * 
+	 * @param tableName 表名
+	 */
+	public void dropTable(String tableName);
+
+	/**
+	 * <b>创建标准地址表</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>标准地址表有19个字段</i><br>
+	 * 
+	 * @param tableName 表名
+	 */
+	public void createAddressTable(String tableName);
+
+	/**
+	 * <b>标准地址表中添加记录</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中的insert into语句</i><br>
+	 * 
+	 * @param map insert into语句中的参数
+	 */
+	public void insertAddress(Map<String, Object> map);
+
+	/**
+	 * <b>创建建筑物位置表</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>建筑物位置表有4个字段</i><br>
+	 * 
+	 * @param tableName 表名
+	 */
+	public void createBuildingPositionTable(String tableName);
+
+	/**
+	 * <b>建筑物位置表中添加记录</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中的insert into语句</i><br>
+	 * 
+	 * @param map insert into语句中的参数
+	 */
+	public void insertBuildingPosition(Map<String, Object> map);
+
+	/**
+	 * <b>创建龙华区表</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>龙华区表有2个字段</i><br>
+	 * 
+	 * @param tableName 表名
+	 */
+	public void createDistrictTable(String tableName);
+
+	/**
+	 * <b>龙华区表中添加记录</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中的insert into语句</i><br>
+	 * 
+	 * @param map insert into语句中的参数
+	 */
+	public void insertDistrict(Map<String, Object> map);
+
+	/**
+	 * <b>创建街道表</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>街道表有2个字段</i><br>
+	 * 
+	 * @param tableName 表名
+	 */
+	public void createStreetTable(String tableName);
+
+	/**
+	 * <b>街道表中添加记录</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中的insert into语句</i><br>
+	 * 
+	 * @param map insert into语句中的参数
+	 */
+	public void insertStreet(Map<String, Object> map);
 
 }
