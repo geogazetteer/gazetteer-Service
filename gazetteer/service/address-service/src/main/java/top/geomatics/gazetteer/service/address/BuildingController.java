@@ -31,12 +31,17 @@ import top.geomatics.gazetteer.utilities.database.building.BuildingQuery;
 @RequestMapping("/building")
 public class BuildingController {
 
-	BuildingQuery buildingQuery = new BuildingQuery();
+	private static BuildingQuery buildingQuery = new BuildingQuery();
+	static {
+		buildingQuery.open();
+	}
+	
+	
 
 	/**
 	 * <b>根据坐标查询建筑物编码</b><br>
 	 * 
-	 * example: http://localhost:8083/building/codes?x=114.019777&y=22.672456
+	 * example: http://localhost:8083/building/codes?x=114.019777%26y=22.672456
 	 * 
 	 * @param x 指定x坐标，如x=114.019777
 	 * @param y 指定y坐标，如y=22.672456
@@ -69,7 +74,7 @@ public class BuildingController {
 	/**
 	 * <b>根据坐标查询标准地址</b><br>
 	 * 
-	 * example: http://localhost:8083/building/address?x=114.019777&y=22.672456
+	 * example: http://localhost:8083/building/address?x=114.019777%26y=22.672456
 	 * 
 	 * @param x 指定x坐标，如x=114.019777
 	 * @param y 指定y坐标，如y=22.672456
