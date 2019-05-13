@@ -7,9 +7,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
-//用户模块
-@Api(value="/user",tags="系统用户管理服务")
+/**
+ * <b>系统用户管理服务类</b><br>
+ * 
+ * @author whudyj
+ */
+@ApiIgnore
+@Api(value = "/user", tags = "系统用户管理服务")
 @RestController
 @RequestMapping("/user")
 public class UserController {
