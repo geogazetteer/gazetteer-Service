@@ -16,6 +16,8 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
@@ -29,6 +31,8 @@ import top.geomatics.gazetteer.utilities.csv.MYCSVReader;
  *
  */
 public class POIIndexer {
+	// 添加slf4j日志实例对象
+	final static Logger logger = LoggerFactory.getLogger(POIIndexer.class);
 
 	private static ResourcesManager manager = ResourcesManager.getInstance();
 	private static final String LUCENE_INDEX_PATH = "poi_index_path";
@@ -42,27 +46,38 @@ public class POIIndexer {
 	public static MYCSVReader csv = new MYCSVReader(poi_file_name);
 
 	/**
-	 * @return IndexWriter
-	 * @throws Exception 异常 注释
+	 * <b>准备建立索引</b><br>
+	 * 
+	 * @return IndexWriter 索引输出
 	 */
-	private static IndexWriter getWriter() throws Exception {
+	private static IndexWriter getWriter() {
 		Analyzer analyzer = new IKAnalyzer(true);
 		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_47, analyzer);
 		iwc.setRAMBufferSizeMB(16);
-		IndexWriter writer = new IndexWriter(dir, iwc);
+		IndexWriter writer = null;
+		try {
+			dir = FSDirectory.open(new File(INDEX_PATH));
+			writer = new IndexWriter(dir, iwc);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return writer;
 	}
 
 	/**
 	 * <em>更新索引</em>
 	 * 
-	 * @throws Exception 异常
 	 */
 	@Scheduled(cron = "0 0 8 1 * ? ")
-	public static void updateIndex() throws Exception {
-		dir = FSDirectory.open(new File(INDEX_PATH));
+	public static void updateIndex() {
 		IndexWriter writer = getWriter();
-		writer.deleteAll();
+		try {
+			writer.deleteAll();
+		} catch (IOException e) {
+			e.printStackTrace();
+			String logMsgString = String.format("删除索引目录：%s 失败", dir.toString());
+			logger.error(logMsgString);
+		}
 
 		List<String[]> dataList = null;
 		csv.openFile();
@@ -81,20 +96,21 @@ public class POIIndexer {
 			Document doc = new Document();
 			doc.add(new TextField(GEONAME, temp[1], Field.Store.YES));
 			doc.add(new StringField(ADDRESS, addressString, Field.Store.YES));
-			writer.addDocument(doc);
+			try {
+				writer.addDocument(doc);
+			} catch (IOException e) {
+				e.printStackTrace();
+				logger.error(e.getMessage());
+			}
 		}
 
 		csv.closeFile();
 
-		writer.close();
-	}
-
-	public static void main(String[] args) {
 		try {
-			POIIndexer.updateIndex();
-		} catch (Exception e) {
+			writer.close();
+		} catch (IOException e) {
 			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
-
 	}
 }

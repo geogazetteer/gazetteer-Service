@@ -60,6 +60,20 @@
 		</dependency>
 	</dependencies>
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -67,6 +81,7 @@
 				<configuration>
 					<archive>
 						<manifest>
+							<mainClass>top.geomatics.gazetteer.lucene.AddressIndexer</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
