@@ -597,7 +597,7 @@ public class SearcherController {
 			@ApiParam(value = "当前页面索引，从1开始") @PathVariable(value = "index", required = true) Integer index,
 			@ApiParam(value = "查询关键词，多个关键词以空格分隔，如：龙华") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
 			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = true, defaultValue = "10") Integer limit) {
-		String pinyin = AddressIndexer.ToPinyin(keywords);
+		String pinyin = AddressIndexer.toPinyin(keywords);
 
 		return JSON.toJSONString(LuceneUtil.searchByPinyin(pinyin, index, limit));
 	}
