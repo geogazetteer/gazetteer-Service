@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.opencsv.CSVWriter;
 import com.opencsv.CSVWriterBuilder;
 
+import top.geomatics.gazetteer.config.ResourcesManager;
 import top.geomatics.gazetteer.database.AddressMapper;
 import top.geomatics.gazetteer.database.DatabaseHelper;
 import top.geomatics.gazetteer.model.AddressRow;
@@ -30,6 +31,9 @@ import top.geomatics.gazetteer.model.AddressRow;
 public class DictionaryCreator {
 	// 添加slf4j日志实例对象
 	private final static Logger logger = LoggerFactory.getLogger(DictionaryCreator.class);
+	// 分词词典文件路径
+	private static ResourcesManager manager = ResourcesManager.getInstance();
+	private static final String SEGMENT_DICTIONARY_PATH = "segment_dictionary_path";
 
 	// 保存词典及词频，不重复
 	private static Map<String, Long> wordMap = null;
@@ -64,12 +68,12 @@ public class DictionaryCreator {
 	 */
 	private static void createDictionary() {
 		// 输出词典文件
-		fileNString = DictionaryCreator.class.getResource("/").getPath();
-		fileNString += "userLibrary.dic";
+		fileNString = manager.getValue(SEGMENT_DICTIONARY_PATH);
+		fileNString = fileNString + File.separator + "userLibrary.dic";
 		file = new File(fileNString);
 
 		try {
-			csvWriter = (CSVWriter) new CSVWriterBuilder(new FileWriter(file)).withSeparator('\t').withLineEnd("\r\t")
+			csvWriter = (CSVWriter) new CSVWriterBuilder(new FileWriter(file)).withSeparator('\t').withLineEnd("\r\n")
 					.build();
 		} catch (IOException e) {
 			e.printStackTrace();

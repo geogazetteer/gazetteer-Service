@@ -3,22 +3,81 @@
  */
 package top.geomatics.gazetteer.segment;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.ansj.domain.Result;
 import org.ansj.domain.Term;
+import org.ansj.splitWord.analysis.BaseAnalysis;
 import org.ansj.splitWord.analysis.DicAnalysis;
+import org.ansj.splitWord.analysis.IndexAnalysis;
+import org.ansj.splitWord.analysis.NlpAnalysis;
+import org.ansj.splitWord.analysis.ToAnalysis;
+import org.nlpcn.commons.lang.tire.domain.Forest;
+import org.nlpcn.commons.lang.tire.library.Library;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import top.geomatics.gazetteer.config.ResourcesManager;
 import top.geomatics.gazetteer.model.IGazetteerConstant;
 
 /**
- * <!--提供分词功能-->
+ * <b>提供分词功能</b>
  * 
  * @author whudyj
  *
  */
 public class WordSegmenter {
+	// 添加slf4j日志实例对象
+	private final static Logger logger = LoggerFactory.getLogger(WordSegmenter.class);
+	// 分词词典文件路径
+	private static ResourcesManager manager = ResourcesManager.getInstance();
+	private static final String SEGMENT_DICTIONARY_PATH = "segment_dictionary_path";
+	private static Forest forest = null;
+	static {
+		// 加载分词词典文件
+		String userLibrary = manager.getValue(SEGMENT_DICTIONARY_PATH);
+		userLibrary = userLibrary + File.separator + "userLibrary.dic";
+		
+		try {
+			forest = Library.makeForest(userLibrary);
+		} catch (Exception e) {
+			e.printStackTrace();
+			String longMsgString = String.format("加载分词词典文件：%s 失败！", userLibrary);
+			logger.error(longMsgString);
+		}
+	}
+
+	/**
+	 * <b>分词</b><br>
+	 * 
+	 * @param text 待分词的文本
+	 * @param type 分词类型
+	 * @return 分词结果
+	 */
+	public static final Result segment(String text, int type) {
+		Result terms = null;
+		switch (type) {
+		case 0:
+			terms = BaseAnalysis.parse(text);
+			break;
+		case 1:
+			terms = ToAnalysis.parse(text);
+			break;
+		case 2:
+			terms = NlpAnalysis.parse(text,forest);
+			break;
+		case 3:
+			terms = IndexAnalysis.parse(text);
+			break;
+		default:
+			terms = ToAnalysis.parse(text);
+			break;
+		}
+		return terms;
+	}
+
 	/**
 	 * 判断地址中包含街道信息，并返回
 	 * 

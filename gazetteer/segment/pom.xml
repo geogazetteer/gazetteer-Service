@@ -20,6 +20,11 @@
 			<groupId>top.geomatics.gazetteer.model</groupId>
 			<artifactId>gs-model</artifactId>
 		</dependency>
+		<!-- 增加config模块依赖 -->
+		<dependency>
+			<groupId>top.geomatics.gazetteer.config</groupId>
+			<artifactId>gs-config</artifactId>
+		</dependency>
 		<!-- 增加database模块依赖 -->
 		<dependency>
 			<groupId>top.geomatics.gazetteer.database</groupId>
