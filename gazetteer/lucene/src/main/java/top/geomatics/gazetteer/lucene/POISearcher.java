@@ -1,7 +1,7 @@
 package top.geomatics.gazetteer.lucene;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +14,6 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import top.geomatics.gazetteer.config.ResourcesManager;
@@ -43,13 +42,13 @@ public class POISearcher {
 			e.printStackTrace();
 		}
 	}
-	private static QueryParser queryParser = new QueryParser(Version.LUCENE_47, GEONAME, new IKAnalyzer(true));
+	private static QueryParser queryParser = new QueryParser(GEONAME, new IKAnalyzer(true));
 
 	private static IndexSearcher init() throws IOException {
 		IndexSearcher indexSearcher = null;
 		if (indexSearcher == null) {
 
-			Directory directory = FSDirectory.open(new File(INDEX_PATH));
+			Directory directory = FSDirectory.open(Path.of(INDEX_PATH));
 			DirectoryReader directoryReader = DirectoryReader.open(directory);
 			indexSearcher = new IndexSearcher(directoryReader);
 		}

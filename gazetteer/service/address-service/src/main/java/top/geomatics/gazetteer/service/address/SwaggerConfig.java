@@ -11,8 +11,9 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
- * Swagger2配置类 在与spring boot集成时，放在与Application.java同级的目录下。
- * 通过@Configuration注解，让Spring来加载该类配置。 再通过@EnableSwagger2注解来启用Swagger2。
+ * <b>Swagger2配置类</b><br>
+ * 
+ * @author whudyj
  */
 @Configuration
 @EnableSwagger2
@@ -21,12 +22,12 @@ public class SwaggerConfig {
 	@Bean
 	public Docket config() {
 		return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
-				.apis(RequestHandlerSelectors.basePackage("top.geomatics.gazetteer.service.address")).build();
+				.apis(RequestHandlerSelectors.basePackage(Messages.getString("SwaggerConfig.0"))).build(); //$NON-NLS-1$
 	}
 
 	private ApiInfo apiInfo() {
-		return new ApiInfoBuilder().title("深圳市龙华区地名地址服务").termsOfServiceUrl("http://localhost:8083")
-				.version("1.0.0").build();
+		return new ApiInfoBuilder().title(Messages.getString("SwaggerConfig.1")).termsOfServiceUrl(Messages.getString("SwaggerConfig.2")) //$NON-NLS-1$ //$NON-NLS-2$
+				.version(Messages.getString("SwaggerConfig.3")).build(); //$NON-NLS-1$
 	}
 
 }

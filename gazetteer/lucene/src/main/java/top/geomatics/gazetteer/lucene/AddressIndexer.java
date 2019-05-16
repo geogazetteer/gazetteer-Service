@@ -1,11 +1,14 @@
 package top.geomatics.gazetteer.lucene;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ansj.lucene7.AnsjAnalyzer;
+import org.ansj.lucene7.AnsjAnalyzer.TYPE;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
@@ -16,7 +19,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.wltea.analyzer.lucene.IKAnalyzer;
@@ -33,12 +37,18 @@ import top.geomatics.gazetteer.model.SimpleAddressRow;
 import top.geomatics.gazetteer.segment.WordSegmenter;
 
 /**
- * <em>建立地址索引</em>
+ * <b>建立地址索引</b>
  * 
  * @author whudyj
  *
  */
+/**
+ * @author whudyj
+ *
+ */
 public class AddressIndexer {
+	// 添加slf4j日志实例对象
+	final static Logger logger = LoggerFactory.getLogger(AddressIndexer.class);
 
 	private static ResourcesManager manager = ResourcesManager.getInstance();
 	private static final String LUCENE_INDEX_PATH = "lucene_index_path";
@@ -57,124 +67,81 @@ public class AddressIndexer {
 	private static Map<String, Object> map = new HashMap<String, Object>();
 
 	/**
-	 * @return IndexWriter
-	 * @throws Exception 异常 注释
+	 * <b>准备建立索引</b><br>
+	 * 
+	 * @return IndexWriter 索引输出
 	 */
-	private static IndexWriter getWriter() throws Exception {
-		Analyzer analyzer = new IKAnalyzer(true);
-		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_47, analyzer);
+	private static IndexWriter getWriter() {
+		Analyzer analyzer = new AnsjAnalyzer(TYPE.query_ansj);
+		IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 		iwc.setRAMBufferSizeMB(16);
-		IndexWriter writer = new IndexWriter(dir, iwc);
+		IndexWriter writer = null;
+		try {
+			dir = FSDirectory.open(Path.of(INDEX_PATH));
+			writer = new IndexWriter(dir, iwc);
+		} catch (IOException e) {
+			e.printStackTrace();
+			String logMsgString = String.format("无法创建索引目录：%s", dir.toString());
+			logger.error(logMsgString);
+		}
 		return writer;
 	}
 
 	/**
-	 * <em>更新索引</em>
+	 * <b>更新索引</b>
 	 * 
-	 * @throws Exception 异常
 	 */
 	@Scheduled(cron = "0 0 8 1 * ? ")
-	public static void updateIndex() throws Exception {
-		dir = FSDirectory.open(new File(INDEX_PATH));
-		IndexWriter writer = getWriter();
-		writer.deleteAll();
+	public static void updateIndex() {
 
+		IndexWriter writer = getWriter();
+		try {
+			writer.deleteAll();
+		} catch (IOException e) {
+			e.printStackTrace();
+			String logMsgString = String.format("删除索引目录：%s 失败", dir.toString());
+			logger.error(logMsgString);
+		}
+
+		// 从数据库中查询
 		map.put("sql_fields", SELECT_FIELDS);
 		map.put("sql_tablename", TABLE_NAME);
-
 		List<SimpleAddressRow> rows = mapper.findSimpleEquals(map);
 
 		for (SimpleAddressRow row : rows) {
 			Document doc = new Document();
 			String address = row.getAddress();
-			String addressRep = address;
-			List<String> pinyinAddress = new ArrayList<String>();
-			if (address != null && !address.equals("")) {
-				if (addressRep.contains("、")) {
-					addressRep = addressRep.replaceAll("、", "");
-				}
-				if (addressRep.contains("—")) {
-					addressRep = addressRep.replaceAll("—", "");
-				}
-				if (addressRep.contains("〈")) {
-					addressRep = addressRep.replaceAll("〈", "");
-				}
-				if (addressRep.contains("〉")) {
-					addressRep = addressRep.replaceAll("〉", "");
-				}
-				if (addressRep.contains("-")) {
-					addressRep = addressRep.replaceAll("-", "");
-				}
-				if (addressRep.contains("。")) {
-					addressRep = addressRep.replaceAll("。", "");
-				}
-				if (addressRep.contains("“")) {
-					addressRep = addressRep.replaceAll("“", "");
-				}
-				if (addressRep.contains("”")) {
-					addressRep = addressRep.replaceAll("”", "");
-				}
-				if (addressRep.contains("\\(")) {
-					addressRep = addressRep.replaceAll("\\(", "");
-				}
-				if (addressRep.contains("\\)")) {
-					addressRep = addressRep.replaceAll("\\)", "");
-				}
-				if (addressRep.contains("①")) {
-					addressRep = addressRep.replaceAll("①", "");
-				}
-				if (addressRep.contains("②")) {
-					addressRep = addressRep.replaceAll("②", "");
-				}
-				if (addressRep.contains("·")) {
-					addressRep = addressRep.replaceAll("·", "");
-				}
-				if (addressRep.contains("～")) {
-					addressRep = addressRep.replaceAll("～", "");
-				}
-				if (addressRep.contains("Ⅰ")) {
-					addressRep = addressRep.replaceAll("Ⅰ", "1");
-				}
-				if (addressRep.contains("ˉ")) {
-					addressRep = addressRep.replaceAll("ˉ", "");
-				}
-				if (addressRep.contains("–")) {
-					addressRep = addressRep.replaceAll("–", "");
-				}
-				List<String> list = WordSegmenter.segment(addressRep);
-				for (String s : list) {
-					pinyinAddress.add(ToPinyin(s));
-				}
-			}
+			// 拼音处理
+			//List<String> pinyinAddress = addressPinyin(address);
+
 			doc.add(new StringField(ADDRESS_ID, row.getId().toString(), Field.Store.YES));
 			doc.add(new TextField(ADDRESS, address, Field.Store.YES));
-			for (String str : pinyinAddress) {
-				doc.add(new StringField(ADDRESSPINYIN, str, Field.Store.YES));
+
+//			for (String str : pinyinAddress) {
+//				doc.add(new StringField(ADDRESSPINYIN, str, Field.Store.YES));
+//			}
+			try {
+				writer.addDocument(doc);
+			} catch (IOException e) {
+				e.printStackTrace();
+				logger.error(e.getMessage());
 			}
-			writer.addDocument(doc);
 		}
-		writer.close();
-	}
-
-	public static void main(String[] args) {
-		/*
-		 * try { AddressIndexer.updateIndex(); } catch (Exception e) {
-		 * e.printStackTrace(); }
-		 */
-		List<String> strings = WordSegmenter.segment("广东省深圳市龙华区大浪街道龙平社区龙军花园A1A2栋");
-		for (String s : strings) {
-
-			System.out.println(ToPinyin(s));
+		try {
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 	}
 
 	/**
-	 * 汉字转为拼音
+	 * <b>汉字转为拼音</b><br>
 	 * 
-	 * @param chinese
-	 * @return
+	 * @param chinese 汉字
+	 * @return 转换后的拼音
 	 */
-	public static String ToPinyin(String chinese) {
+	public static String toPinyin(String chinese) {
 		String pinyinStr = "";
 		char[] newChar = chinese.toCharArray();
 		HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
@@ -186,12 +153,57 @@ public class AddressIndexer {
 					pinyinStr += PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0];
 				} catch (BadHanyuPinyinOutputFormatCombination e) {
 					e.printStackTrace();
+					logger.error(e.getMessage());
 				}
 			} else {
 				pinyinStr += newChar[i];
 			}
 		}
 		return pinyinStr;
+	}
+
+	/**
+	 * <b>地址分词，并转拼音</b><br>
+	 * 
+	 * @param address 地址
+	 * @return 分词后的地址拼音
+	 */
+	private static List<String> addressPinyin(String address) {
+		List<String> list = WordSegmenter.segment(address);
+		List<String> pinyinAddress = new ArrayList<String>();
+		for (String s : list) {
+			String regularString = handleSpecialChar(s);
+			pinyinAddress.add(toPinyin(regularString));
+		}
+		return pinyinAddress;
+	}
+
+	/**
+	 * <b>去掉非汉字字符</b><br>
+	 * 
+	 * @param specialChar 含有特殊字符的汉字文本
+	 * @return 规则化后的汉字
+	 */
+	public static String handleSpecialChar(String specialChar) {
+		String regularChar = specialChar;
+		regularChar = regularChar.replaceAll("[^\u4e00-\u9fa5]", "");
+		return regularChar;
+
+	}
+
+	/**
+	 * <b>主方法，创建（更新）索引</b><br>
+	 * 
+	 * @param args 命令行参数
+	 */
+	public static void main(String[] args) {
+		logger.info("更新lucne索引......");
+		AddressIndexer.updateIndex();
+		logger.info("更新地名索引......");
+		GeoNameIndexer.updateIndex();
+		logger.info("更新POI索引......");
+		POIIndexer.updateIndex();
+
 	}
 
 }

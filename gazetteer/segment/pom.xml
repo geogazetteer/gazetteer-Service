@@ -20,6 +20,11 @@
 			<groupId>top.geomatics.gazetteer.model</groupId>
 			<artifactId>gs-model</artifactId>
 		</dependency>
+		<!-- 增加config模块依赖 -->
+		<dependency>
+			<groupId>top.geomatics.gazetteer.config</groupId>
+			<artifactId>gs-config</artifactId>
+		</dependency>
 		<!-- 增加database模块依赖 -->
 		<dependency>
 			<groupId>top.geomatics.gazetteer.database</groupId>
@@ -48,6 +53,27 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources/library</directory>
+				<includes>
+					<include>**/*.dic</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -56,7 +82,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>top.geomatics.gazetteer.segment.Main</mainClass>
+							<mainClass>top.geomatics.gazetteer.segment.DictionaryCreator</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

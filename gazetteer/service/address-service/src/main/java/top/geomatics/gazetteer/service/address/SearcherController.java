@@ -28,7 +28,7 @@ import top.geomatics.gazetteer.utilities.address.SearcherSettings;
 import top.geomatics.gazetteer.utilities.database.BuildingQuery;
 
 /**
- * <em>搜索服务</em><br>
+ * <b>搜索服务</b><br>
  * <i>说明</i><br>
  * <i>目前只针对标准地名地址数据库中的地名地址进行查询</i>
  * 
@@ -41,10 +41,10 @@ public class SearcherController {
 	private SearcherSettings settings = new SearcherSettings();
 
 	/**
-	 * <em>搜索设置</em><br>
+	 * <b>搜索设置</b><br>
 	 * 
-	 * @param seetings
-	 * @return
+	 * @param settings 搜索选项
+	 * @return 设置结果
 	 */
 	@ApiOperation(value = "搜索设置", notes = "设置搜索选项。示例：/address/searcher/settings")
 	@PutMapping("/searcher/settings")
@@ -54,10 +54,10 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>查询所有地址</em><br>
+	 * <b>查询所有地址</b><br>
 	 * examples:<br>
-	 * <!--http://localhost:8083/address/all?fields=id,address&tablename=民治社区&limit=10
-	 * -->
+	 * http://localhost:8083/address/all?fields=id,address%26tablename=民治社区%26limit=10
+	 * 
 	 * 
 	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,address
 	 * @param tablename String 请求参数，指定查询的数据库表，如：油松社区
@@ -80,7 +80,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>查询一个街道的所有社区</em><br>
+	 * <b>查询一个街道的所有社区</b><br>
 	 * examples:<br>
 	 * http://localhost:8083/address/龙华区/民治街道?limit=10
 	 * 
@@ -105,7 +105,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>查询一个社区的所有地址</em><br>
+	 * <b>查询一个社区的所有地址</b><br>
 	 * examples:<br>
 	 * http://localhost:8083/address/龙华区/民治街道/民治社区?limit=5
 	 * 
@@ -132,7 +132,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据条件查询地址</em><br>
+	 * <b>根据条件查询地址</b><br>
 	 * examples:<br>
 	 * <!--
 	 * http://localhost:8083/address/searcher/?fields=id,address&tablename=民治社区&address=广东省深圳市龙华区民治街道民治社区沙吓村六巷7栋
@@ -214,7 +214,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据条件模糊查询地址</em><br>
+	 * <b>根据条件模糊查询地址</b><br>
 	 * examples:<br>
 	 * <!--
 	 * http://localhost:8083/address/fuzzysearcher/?fields=id,address&tablename=民治社区&address=沙吓村六巷7栋
@@ -296,7 +296,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据地址ID查询</em><br>
+	 * <b>根据地址ID查询</b><br>
 	 * examples:<br>
 	 * http://localhost:8083/address/address_id/63EEDE6B9E9D6A3AE0538CC0C0C07BB0
 	 * 
@@ -322,7 +322,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据地址编码查询</em><br>
+	 * <b>根据地址编码查询</b><br>
 	 * examples:<br>
 	 * http://localhost:8083/address/code/44030600960102T0117?limit=5
 	 * 
@@ -347,7 +347,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据街道名称查询</em><br>
+	 * <b>根据街道名称查询</b><br>
 	 * examples:<br>
 	 * http://localhost:8083/address/street/民治街道?limit=5
 	 * 
@@ -372,7 +372,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据社区名称查询</em><br>
+	 * <b>根据社区名称查询</b><br>
 	 * examples:<br>
 	 * http://localhost:8083/address/community/龙塘社区?limit=5
 	 * 
@@ -397,7 +397,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据建筑物ID查询</em><br>
+	 * <b>根据建筑物ID查询</b><br>
 	 * examples:<br>
 	 * http://localhost:8083/address/buildingID/44030600960102T0117?limit=5
 	 * 
@@ -422,7 +422,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据建筑物名称查询</em><br>
+	 * <b>根据建筑物名称查询</b><br>
 	 * examples:<br>
 	 * http://localhost:8083/address/building/L25号铁皮房?limit=5
 	 * 
@@ -447,7 +447,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据村名称查询</em><br>
+	 * <b>根据村名称查询</b><br>
 	 * examples:<br>
 	 * http://localhost:8083/address/village/上塘农贸建材市场?limit=5
 	 * 
@@ -472,7 +472,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据道路名称查询</em><br>
+	 * <b>根据道路名称查询</b><br>
 	 * examples:<br>
 	 * http://localhost:8083/address/road/下围工业二路?limit=5
 	 * 
@@ -497,7 +497,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据关键词进行模糊查询</em><br>
+	 * <b>根据关键词进行模糊查询</b><br>
 	 * examples:<br>
 	 * <!-- http://localhost:8083/address/hint?keywords=龙华&limit=10 -->
 	 * 
@@ -554,7 +554,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据关键词进行模糊查询分页展示</em><br>
+	 * <b>根据关键词进行模糊查询分页展示</b><br>
 	 * examples:<br>
 	 * <!-- http://localhost:8083/address/hint/1?keywords=民治街道&pageNo=10&pageSize=10
 	 * -->
@@ -581,7 +581,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据关键词进行模糊查询分页展示(加上了同音字搜索功能)</em><br>
+	 * <b>根据关键词进行模糊查询分页展示(加上了同音字搜索功能)</b><br>
 	 * examples:<br>
 	 * <!-- http://localhost:8083/address/hint/page/pinyin/2?keywords=神针是&limit=10
 	 * -->
@@ -597,13 +597,13 @@ public class SearcherController {
 			@ApiParam(value = "当前页面索引，从1开始") @PathVariable(value = "index", required = true) Integer index,
 			@ApiParam(value = "查询关键词，多个关键词以空格分隔，如：龙华") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
 			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = true, defaultValue = "10") Integer limit) {
-		String pinyin = AddressIndexer.ToPinyin(keywords);
+		String pinyin = AddressIndexer.toPinyin(keywords);
 
 		return JSON.toJSONString(LuceneUtil.searchByPinyin(pinyin, index, limit));
 	}
 
 	/**
-	 * <em>根据数据库id进行查询</em><br>
+	 * <b>根据数据库id进行查询</b><br>
 	 * examples:<br>
 	 * http://localhost:8083/address/id/1
 	 * 
@@ -622,7 +622,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <em>根据一组数据库id进行查询</em><br>
+	 * <b>根据一组数据库id进行查询</b><br>
 	 * examples:<br>
 	 * http://localhost:8083/address/ids?in=1,2,3
 	 * 

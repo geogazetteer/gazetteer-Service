@@ -15,16 +15,17 @@ import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.address.HomophoneDictionary;
 
 /**
- * @author chenfa
+ * <b>特殊地址转换服务类</b><br>
+ * 
+ * @author whudyj
  */
-
 @Api(value = "/transform", tags = "特殊地址转换处理")
 @RestController
 @RequestMapping("/transform")
 public class TransformController {
 
 	/**
-	 * <em>全角字符转换为半角字符，示例：１2３</em><br>
+	 * <b>全角字符转换为半角字符，示例：１2３</b><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/transform/full?chars=１2３ -->
 	 * 
@@ -40,7 +41,7 @@ public class TransformController {
 	}
 
 	/**
-	 * <em>繁体汉字转换为简体汉字，示例：龍華</em><br>
+	 * <b>繁体汉字转换为简体汉字，示例：龍華</b><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/transform/complex?chars=龍華 -->
 	 * 
@@ -58,7 +59,7 @@ public class TransformController {
 	}
 
 	/**
-	 * <em>汉字数字转换为阿拉伯数字，示例：一,二,三</em><br>
+	 * <b>汉字数字转换为阿拉伯数字，示例：一,二,三</b><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/transform/digital?chars=百-->
 	 * 
@@ -74,7 +75,7 @@ public class TransformController {
 	}
 
 	/**
-	 * <em>识别地址中的门牌号，返回门牌号</em><br>
+	 * <b>识别地址中的门牌号，返回门牌号</b><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/transform/houseNumber?chars=广东省深圳市龙华区大浪街道浪口社区华霆路58号38栋
 	 * -->
@@ -91,7 +92,7 @@ public class TransformController {
 	}
 
 	/**
-	 * <em>判断搜索输入是否含有敏感词</em><br>
+	 * <b>判断搜索输入是否含有敏感词</b><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/transform/sensitive?chars=基地组织 -->
 	 * 
@@ -107,7 +108,7 @@ public class TransformController {
 	}
 
 	/**
-	 * <em>判断搜索输入是否为正确的坐标</em><br>
+	 * <b>判断搜索输入是否为正确的坐标</b><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/transform/coordinate?chars=113.975436877645,22.5995874795642
 	 * -->
@@ -124,7 +125,7 @@ public class TransformController {
 	}
 
 	/**
-	 * <em>判断搜索输入是否为正确的建筑物编码</em><br>
+	 * <b>判断搜索输入是否为正确的建筑物编码</b><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/transform/buildingcode?chars=4403060080014800062
 	 * -->
@@ -141,7 +142,7 @@ public class TransformController {
 	}
 
 	/**
-	 * <em>通假字转换，示例：得=德</em><br>
+	 * <b>通假字转换，示例：得=德</b><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/transform/exterchange?chars=广东省深圳市龙华区龙华街道清湖社区清沙路8号力得威公司宿舍楼
 	 * -->
@@ -158,7 +159,7 @@ public class TransformController {
 	}
 
 	/**
-	 * <em>别名转换，示例：粤=广东省</em><br>
+	 * <b>别名转换，示例：粤=广东省</b><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/transform/alias?chars=粤深圳市龙华区龙华街道清湖社区清沙路8号力得威公司宿舍楼
 	 * -->
@@ -175,7 +176,7 @@ public class TransformController {
 	}
 
 	/**
-	 * <em>同义词转换，示例：中原=华夏</em><br>
+	 * <b>同义词转换，示例：中原=华夏</b><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/transform/synonym?chars=中原 -->
 	 * 
@@ -191,7 +192,7 @@ public class TransformController {
 	}
 
 	/**
-	 * <em>同音字转换，示例：啊=阿</em><br>
+	 * <b>同音字转换，示例：啊=阿</b><br>
 	 * examples:<br>
 	 * <!--http://localhost:8083/transform/synonym?chars=啊 -->
 	 * 
