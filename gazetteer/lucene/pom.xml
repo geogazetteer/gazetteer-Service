@@ -58,6 +58,10 @@
 			<groupId>com.janeluo</groupId>
 			<artifactId>ikanalyzer</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.ansj</groupId>
+			<artifactId>ansj_lucene7_plug</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<resources>

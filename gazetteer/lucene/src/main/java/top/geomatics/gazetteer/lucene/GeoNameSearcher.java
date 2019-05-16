@@ -1,7 +1,7 @@
 package top.geomatics.gazetteer.lucene;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +15,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.TotalHits;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -47,9 +48,8 @@ public class GeoNameSearcher {
 	private static IndexSearcher indexSearcher = null;
 	private static final String GEONAME = "name";
 	private static final String ADDRESS = "address";
-	private static final Version VERSION =Version.LUCENE_47;
 	private static TopDocs topDocs = null;
-	private static int totalHits = 0;
+	private static TotalHits totalHits = null;
 
 	static {
 		init();
@@ -66,7 +66,7 @@ public class GeoNameSearcher {
 			Directory directory = null;
 			DirectoryReader directoryReader = null;
 			try {
-				directory = FSDirectory.open(new File(INDEX_PATH));
+				directory = FSDirectory.open(Path.of(INDEX_PATH));
 				directoryReader = DirectoryReader.open(directory);
 				indexSearcher = new IndexSearcher(directoryReader);
 			} catch (IOException e) {
@@ -108,7 +108,7 @@ public class GeoNameSearcher {
 		QueryParser queryParser = null;
 		switch (queryType) {
 		case 0:
-			queryParser = new QueryParser(VERSION, GEONAME, new IKAnalyzer(true));
+			queryParser = new QueryParser(GEONAME, new IKAnalyzer(true));
 			try {
 				query = queryParser.parse(keyword);
 			} catch (ParseException e) {
@@ -125,7 +125,7 @@ public class GeoNameSearcher {
 			query = new WildcardQuery(new Term(GEONAME, keyword));
 			break;
 		default:
-			queryParser = new QueryParser(VERSION, GEONAME, new IKAnalyzer(true));
+			queryParser = new QueryParser(GEONAME, new IKAnalyzer(true));
 			try {
 				query = queryParser.parse(keyword);
 			} catch (ParseException e) {
@@ -141,15 +141,15 @@ public class GeoNameSearcher {
 	/**
 	 * <b>获得查询结果个数</b><br>
 	 * 
-	 *@param queryType 查询类型，0--QueryParse, 解析器查询 1--TermQuery 词根查询 2--
+	 * @param queryType 查询类型，0--QueryParse, 解析器查询 1--TermQuery 词根查询 2--
 	 *                  WildcardQuery 通配符查询
 	 * @param keyword   查询关键词
 	 * 
 	 * @return 查询结果个数
 	 */
-	public static int getCount(int queryType, String keyword) {
+	public static long getCount(int queryType, String keyword) {
 		buildSearch(buildQuery(queryType, keyword));
-		return totalHits;
+		return totalHits.value;
 	}
 
 	/**

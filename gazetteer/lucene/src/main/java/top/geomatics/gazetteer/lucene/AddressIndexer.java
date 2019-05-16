@@ -1,24 +1,24 @@
 package top.geomatics.gazetteer.lucene;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ansj.lucene7.AnsjAnalyzer;
+import org.ansj.lucene7.AnsjAnalyzer.TYPE;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -72,12 +72,12 @@ public class AddressIndexer {
 	 * @return IndexWriter 索引输出
 	 */
 	private static IndexWriter getWriter() {
-		Analyzer analyzer = new IKAnalyzer(true);
-		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_47, analyzer);
+		Analyzer analyzer = new AnsjAnalyzer(TYPE.query_ansj);
+		IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 		iwc.setRAMBufferSizeMB(16);
 		IndexWriter writer = null;
 		try {
-			dir = FSDirectory.open(new File(INDEX_PATH));
+			dir = FSDirectory.open(Path.of(INDEX_PATH));
 			writer = new IndexWriter(dir, iwc);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -112,14 +112,14 @@ public class AddressIndexer {
 			Document doc = new Document();
 			String address = row.getAddress();
 			// 拼音处理
-			List<String> pinyinAddress = addressPinyin(address);
+			//List<String> pinyinAddress = addressPinyin(address);
 
-			doc.add(new LongField(ADDRESS_ID, row.getId(), Field.Store.YES));
+			doc.add(new StringField(ADDRESS_ID, row.getId().toString(), Field.Store.YES));
 			doc.add(new TextField(ADDRESS, address, Field.Store.YES));
 
-			for (String str : pinyinAddress) {
-				doc.add(new StringField(ADDRESSPINYIN, str, Field.Store.YES));
-			}
+//			for (String str : pinyinAddress) {
+//				doc.add(new StringField(ADDRESSPINYIN, str, Field.Store.YES));
+//			}
 			try {
 				writer.addDocument(doc);
 			} catch (IOException e) {

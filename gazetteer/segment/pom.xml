@@ -53,6 +53,27 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources/library</directory>
+				<includes>
+					<include>**/*.dic</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -61,7 +82,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>top.geomatics.gazetteer.segment.Main</mainClass>
+							<mainClass>top.geomatics.gazetteer.segment.DictionaryCreator</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

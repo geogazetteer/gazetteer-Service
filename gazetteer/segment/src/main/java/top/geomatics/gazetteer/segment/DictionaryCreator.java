@@ -33,16 +33,16 @@ public class DictionaryCreator {
 	private final static Logger logger = LoggerFactory.getLogger(DictionaryCreator.class);
 	// 分词词典文件路径
 	private static ResourcesManager manager = ResourcesManager.getInstance();
-	private static final String SEGMENT_DICTIONARY_PATH = "segment_dictionary_path";
+	private static final String SEGMENT_DICTIONARY_PATH = Messages.getString("DictionaryCreator.0"); //$NON-NLS-1$
 
 	// 保存词典及词频，不重复
-	private static Map<String, Long> wordMap = null;
+	private static Map<String, String[]> wordMap = null;
 	// 数据库连接
 	private static DatabaseHelper helper = null;
 	private static SqlSession session = null;
 	private static AddressMapper mapper = null;
 	// 输出词典文件
-	private static String fileNString = "";
+	private static String fileNString = Messages.getString("DictionaryCreator.1"); //$NON-NLS-1$
 	private static File file = null;
 	private static CSVWriter csvWriter = null;
 	// 数据库中记录数
@@ -53,7 +53,7 @@ public class DictionaryCreator {
 	 * 
 	 */
 	private static void openDatabase() {
-		wordMap = new HashMap<String, Long>();
+		wordMap = new HashMap<String, String[]>();
 		// 连接数据库
 		helper = new DatabaseHelper();
 		session = helper.getSession();
@@ -69,55 +69,43 @@ public class DictionaryCreator {
 	private static void createDictionary() {
 		// 输出词典文件
 		fileNString = manager.getValue(SEGMENT_DICTIONARY_PATH);
-		fileNString = fileNString + File.separator + "userLibrary.dic";
+		fileNString = fileNString + File.separator + Messages.getString("DictionaryCreator.2"); //$NON-NLS-1$
 		file = new File(fileNString);
 
 		try {
-			csvWriter = (CSVWriter) new CSVWriterBuilder(new FileWriter(file)).withSeparator('\t').withLineEnd("\r\n")
+			csvWriter = (CSVWriter) new CSVWriterBuilder(new FileWriter(file)).withSeparator('\t').withLineEnd(Messages.getString("DictionaryCreator.3")) //$NON-NLS-1$
 					.build();
 		} catch (IOException e) {
 			e.printStackTrace();
-			String logMsgString = String.format("打开词典文件： %s 失败！", fileNString);
+			String logMsgString = String.format(Messages.getString("DictionaryCreator.4"), fileNString); //$NON-NLS-1$
 			logger.error(logMsgString);
 		}
 		// 加一些固定的词
 		String nextLine[] = new String[3];
-		nextLine[0] = "广东省";
-		nextLine[1] = "pron";// 自定义的词性，表示省
-		nextLine[2] = String.format("%d", count);
+		nextLine[0] = Messages.getString("DictionaryCreator.5"); //$NON-NLS-1$
+		nextLine[1] = Messages.getString("DictionaryCreator.6");// 自定义的词性，表示省 //$NON-NLS-1$
+		nextLine[2] = String.format(Messages.getString("DictionaryCreator.7"), count); //$NON-NLS-1$
 		csvWriter.writeNext(nextLine, false);
 
-		nextLine[0] = "深圳市";
-		nextLine[1] = "city";// 自定义的词性，表示市
-		nextLine[2] = String.format("%d", count);
+		nextLine[0] = Messages.getString("DictionaryCreator.8"); //$NON-NLS-1$
+		nextLine[1] = Messages.getString("DictionaryCreator.9");// 自定义的词性，表示市 //$NON-NLS-1$
+		nextLine[2] = String.format(Messages.getString("DictionaryCreator.10"), count); //$NON-NLS-1$
 		csvWriter.writeNext(nextLine, false);
 
-		nextLine[0] = "龙华区";
-		nextLine[1] = "dict";// 自定义的词性，表示区
-		nextLine[2] = String.format("%d", count);
+		nextLine[0] = Messages.getString("DictionaryCreator.11"); //$NON-NLS-1$
+		nextLine[1] = Messages.getString("DictionaryCreator.12");// 自定义的词性，表示区 //$NON-NLS-1$
+		nextLine[2] = String.format(Messages.getString("DictionaryCreator.13"), count); //$NON-NLS-1$
 		csvWriter.writeNext(nextLine, false);
 
-		// 缺省词性为
-		String wordproperty = "n";
 		for (String keyString : wordMap.keySet()) {
-			// 数字、字母、下划线不管
-			if (keyString.matches("/[0-9()]")) {
-				continue;
-			}
+			// 非汉字不管
+//			if (keyString.matches("[^\\u4e00-\\u9fa5]")) {
+//				continue;
+//			}
+			String[] word = wordMap.get(keyString);
 			nextLine[0] = keyString;
-			if (-1 != keyString.lastIndexOf("社区")) {
-				wordproperty = "comm";
-			} else if (-1 != keyString.lastIndexOf("街道")) {
-				wordproperty = "street";
-			} else if (-1 != keyString.lastIndexOf("路") || -1 != keyString.lastIndexOf("道")) {
-				wordproperty = "road";
-			} else if (-1 != keyString.lastIndexOf("村") || -1 != keyString.lastIndexOf("小区")) {
-				wordproperty = "vill";
-			} else if (-1 != keyString.lastIndexOf("楼") || -1 != keyString.lastIndexOf("大厦")) {
-				wordproperty = "build";
-			}
-			nextLine[1] = wordproperty;
-			nextLine[2] = wordMap.get(keyString).toString();
+			nextLine[1] = word[0];
+			nextLine[2] = word[1];
 			csvWriter.writeNext(nextLine, false);
 		}
 		try {
@@ -142,11 +130,12 @@ public class DictionaryCreator {
 		}
 		count = rows.size();
 		for (AddressRow row : rows) {
-			addWord(row.getStreet());
-			addWord(row.getCommunity());
-			addWord(row.getRoad());
-			addWord(row.getRoad_num());
-			addWord(row.getVillage());
+			addWord(row.getStreet(), Messages.getString("DictionaryCreator.14")); //$NON-NLS-1$
+			addWord(row.getCommunity(), Messages.getString("DictionaryCreator.15")); //$NON-NLS-1$
+			addWord(row.getRoad(), Messages.getString("DictionaryCreator.16")); //$NON-NLS-1$
+			addWord(row.getRoad_num(), Messages.getString("DictionaryCreator.17")); //$NON-NLS-1$
+			addWord(row.getVillage(), Messages.getString("DictionaryCreator.18")); //$NON-NLS-1$
+			addWord(row.getBuilding(), Messages.getString("DictionaryCreator.19")); //$NON-NLS-1$
 		}
 
 	}
@@ -156,14 +145,21 @@ public class DictionaryCreator {
 	 * 
 	 * @param wordString 词根
 	 */
-	private static void addWord(String wordString) {
+	private static void addWord(String wordString, String wordNature) {
 		if (wordString.trim().isEmpty())
 			return;
+		String wordProperty[] = wordMap.get(wordString);
+		String wordNew[] = null;
 		Long count = 1L;
-		if (wordMap.containsKey(wordString)) {
-			count = wordMap.get(wordString) + 1L;
+		if (!wordMap.containsKey(wordString) || null == wordProperty) {
+			wordNew = new String[2];
+			wordNew[0] = wordNature;
+			wordNew[1] = String.format(Messages.getString("DictionaryCreator.20"), count); //$NON-NLS-1$
+		} else {
+			wordNew = wordProperty;
+			wordNew[1] = String.format(Messages.getString("DictionaryCreator.21"), Integer.parseInt(wordNew[1]) + 1); //$NON-NLS-1$
 		}
-		wordMap.put(wordString, count);
+		wordMap.put(wordString, wordNew);
 	}
 
 	/**
@@ -172,7 +168,7 @@ public class DictionaryCreator {
 	public static void main(String[] args) {
 		openDatabase();
 		createDictionary();
-		String logMsgString = String.format("创建词典文件： %s 完成！", fileNString);
+		String logMsgString = String.format(Messages.getString("DictionaryCreator.22"), fileNString); //$NON-NLS-1$
 		logger.info(logMsgString);
 	}
 
