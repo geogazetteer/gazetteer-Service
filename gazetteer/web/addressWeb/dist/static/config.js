@@ -35,7 +35,7 @@ const URLCFG={
   //根据地址获取门楼号
   getHouseNumberByAddrUrl:serverUrl+'transform/houseNumber',//(params,chars=chars)
   
-  //根据楼栋编号查询坐标
+   //根据楼栋编号查询坐标
   getCoordinatesByCodeUrl:serverUrl+'building/point',//(param:code='')
 };
 
