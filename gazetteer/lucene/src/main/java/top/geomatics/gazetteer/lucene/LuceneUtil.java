@@ -1,23 +1,25 @@
 package top.geomatics.gazetteer.lucene;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ansj.lucene7.AnsjAnalyzer;
+import org.ansj.lucene7.AnsjAnalyzer.TYPE;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.simple.SimpleQueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.springframework.beans.factory.annotation.Value;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
@@ -41,8 +43,9 @@ public class LuceneUtil {
 	private static final String ADDRESS_ID = "id";
 	private static final String ADDRESS = "address";
 	private static final String ADDRESSPINYIN = "address_pinyin";
+	private static final int MAX_HITS = 100000000;
 	private static Map<String, String> mapQuery;
-	private static Integer total;
+	private static long total = 0;
 	static {
 		try {
 			mapQuery = new HashMap<String, String>();
@@ -51,19 +54,45 @@ public class LuceneUtil {
 			e.printStackTrace();
 		}
 	}
-	private static QueryParser queryParser = new QueryParser(Version.LUCENE_47, ADDRESS, new IKAnalyzer(true));
-	
-	private static QueryParser queryParserPinyin = new QueryParser(Version.LUCENE_47, ADDRESSPINYIN, new IKAnalyzer(true));
+	private static QueryParser queryParser = new QueryParser(ADDRESS, new AnsjAnalyzer(TYPE.query_ansj));
+
+	private static QueryParser queryParserPinyin = new QueryParser(ADDRESSPINYIN, new AnsjAnalyzer(TYPE.query_ansj));
 
 	private static IndexSearcher init() throws IOException {
 		IndexSearcher indexSearcher = null;
 		if (indexSearcher == null) {
 
-			Directory directory = FSDirectory.open(new File(INDEX_PATH));
+			Directory directory = FSDirectory.open(Path.of(INDEX_PATH));
 			DirectoryReader directoryReader = DirectoryReader.open(directory);
 			indexSearcher = new IndexSearcher(directoryReader);
 		}
 		return indexSearcher;
+	}
+
+	/**
+	 * <em> 根据关键词进行搜索，支持多个关键词模糊搜索</em>
+	 * 
+	 * @param keywords String 搜索关键词，多个关键词以空格分隔
+	 * @param maxHits  int 搜索词的最大个数
+	 * @return List 返回一个简单地址数组
+	 */
+	public static List<SimpleAddressRow> search(String keywords) {
+		List<SimpleAddressRow> list = new ArrayList<SimpleAddressRow>();
+		try {
+			Query query = queryParser.parse(keywords);
+			TopDocs topDocs = indexSearcher.search(query, MAX_HITS);
+
+			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+				Document doc = indexSearcher.doc(scoreDoc.doc);
+				SimpleAddressRow row = new SimpleAddressRow();
+				row.setId(Integer.parseInt(doc.get(ADDRESS_ID)));
+				row.setAddress(doc.get(ADDRESS));
+				list.add(row);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
 	}
 
 	/**
@@ -120,18 +149,18 @@ public class LuceneUtil {
 				mapQuery.put(keywords, "true");
 				Query query = queryParser.parse(keywords);
 				TopDocs topDocs1 = indexSearcher.search(query, 100000000);
-				total = topDocs1.totalHits;
+				total = topDocs1.totalHits.value;
 			}
 			List<SimpleAddressRow> list = new ArrayList<SimpleAddressRow>();
-			TopDocs topDocs =null;
-			
+			TopDocs topDocs = null;
+
 			int start = (pageNow - 1) * pageSize;
 			// 查询数据， 结束页面自前的数据都会查询到，但是只取本页的数据
 			Query query = queryParser.parse(keywords);
 			map.put("total", total);
-			if(pageNow==1) {
+			if (pageNow == 1) {
 				topDocs = indexSearcher.search(query, pageSize);
-			}else {
+			} else {
 				TopDocs topDocs1 = indexSearcher.search(query, start);
 				// 获取到上一页最后一条
 				ScoreDoc preScore = topDocs1.scoreDocs[start - 1];
@@ -167,8 +196,7 @@ public class LuceneUtil {
 		 * e.printStackTrace(); } finally { coloseReader(reader); }
 		 */
 	}
-	
-	
+
 	/**
 	 * 分页搜索(同音字)
 	 * 
@@ -186,18 +214,18 @@ public class LuceneUtil {
 				mapQuery.put(keywords, "true");
 				Query query = queryParserPinyin.parse(keywords);
 				TopDocs topDocs1 = indexSearcher.search(query, 100000000);
-				total = topDocs1.totalHits;
+				total = topDocs1.totalHits.value;
 			}
 			List<SimpleAddressRow> list = new ArrayList<SimpleAddressRow>();
-			TopDocs topDocs =null;
-			
+			TopDocs topDocs = null;
+
 			int start = (pageNow - 1) * pageSize;
 			// 查询数据， 结束页面自前的数据都会查询到，但是只取本页的数据
 			Query query = queryParserPinyin.parse(keywords);
 			map.put("total", total);
-			if(pageNow==1) {
+			if (pageNow == 1) {
 				topDocs = indexSearcher.search(query, pageSize);
-			}else {
+			} else {
 				TopDocs topDocs1 = indexSearcher.search(query, start);
 				// 获取到上一页最后一条
 				ScoreDoc preScore = topDocs1.scoreDocs[start - 1];
@@ -234,7 +262,6 @@ public class LuceneUtil {
 		 */
 	}
 
-	
 	public static void main(String[] args) {
 		Map<String, Object> map = searchByPage("民治街道", 10, 10);
 		List<SimpleAddressRow> s = (List<SimpleAddressRow>) map.get("datalist");
