@@ -40,14 +40,14 @@ public class GeoNameIndexer {
 	final static Logger logger = LoggerFactory.getLogger(GeoNameIndexer.class);
 
 	private static ResourcesManager manager = ResourcesManager.getInstance();
-	private static final String LUCENE_INDEX_PATH = "geoname_index_path";
+	private static final String LUCENE_INDEX_PATH = Messages.getString("GeoNameIndexer.0"); //$NON-NLS-1$
 
 	@Value("${index.path}")
 	public static String INDEX_PATH = manager.getValue(LUCENE_INDEX_PATH);
 	private static Directory dir;
-	private static final String GEONAME = "name";
-	private static final String ADDRESS = "address";
-	private static final String SELECT_FIELDS = "name,address";
+	private static final String GEONAME = Messages.getString("GeoNameIndexer.1"); //$NON-NLS-1$
+	private static final String ADDRESS = Messages.getString("GeoNameIndexer.2"); //$NON-NLS-1$
+	private static final String SELECT_FIELDS = Messages.getString("GeoNameIndexer.3"); //$NON-NLS-1$
 	private static EnterpriseDatabaseHelper helper = new EnterpriseDatabaseHelper();
 	private static SqlSession session = helper.getSession();
 	private static EnterpriseAddressMapper mapper = session.getMapper(EnterpriseAddressMapper.class);
@@ -84,14 +84,14 @@ public class GeoNameIndexer {
 			writer.deleteAll();
 		} catch (IOException e) {
 			e.printStackTrace();
-			String logMsgString = String.format("删除索引目录：%s 失败", dir.toString());
+			String logMsgString = String.format(Messages.getString("GeoNameIndexer.4"), dir.toString()); //$NON-NLS-1$
 			logger.error(logMsgString);
 		}
 
-		map.put("sql_fields", SELECT_FIELDS);
+		map.put(Messages.getString("GeoNameIndexer.5"), SELECT_FIELDS); //$NON-NLS-1$
 		for (int i = 1; i < 5; i++) {
-			String tableNameString = "enterprise" + i;
-			map.put("sql_tablename", tableNameString);
+			String tableNameString = Messages.getString("GeoNameIndexer.6") + i; //$NON-NLS-1$
+			map.put(Messages.getString("GeoNameIndexer.7"), tableNameString); //$NON-NLS-1$
 
 			List<EnterpriseRow> rows = mapper.findEquals(map);
 
