@@ -10,6 +10,10 @@ public class AddressIndexerTest {
 	public void testUpdateIndex() {
 		// AddressIndexer.updateIndex();
 	}
+	@Test
+	public void testUpdateIndexPinyin() {
+		AddressIndexer.updateIndexPinyin();
+	}
 
 	@Test
 	public void testToPinyin() {

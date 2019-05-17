@@ -6,7 +6,7 @@ public class GeoNameIndexerTest {
 
 	@Test
 	public void testUpdateIndex() {
-		// GeoNameIndexer.updateIndex();
+		//GeoNameIndexer.updateIndex();
 	}
 
 }

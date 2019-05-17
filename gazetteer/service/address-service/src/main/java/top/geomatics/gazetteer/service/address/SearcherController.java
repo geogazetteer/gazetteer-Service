@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 import top.geomatics.gazetteer.lucene.AddressIndexer;
+import top.geomatics.gazetteer.lucene.AddressSearcherPinyin;
 import top.geomatics.gazetteer.lucene.GeoNameSearcher;
 import top.geomatics.gazetteer.lucene.LuceneUtil;
 import top.geomatics.gazetteer.lucene.POISearcher;
@@ -599,7 +600,7 @@ public class SearcherController {
 			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = true, defaultValue = "10") Integer limit) {
 		String pinyin = AddressIndexer.toPinyin(keywords);
 
-		return JSON.toJSONString(LuceneUtil.searchByPinyin(pinyin, index, limit));
+		return JSON.toJSONString(AddressSearcherPinyin.searchPage(pinyin, index, limit));
 	}
 
 	/**

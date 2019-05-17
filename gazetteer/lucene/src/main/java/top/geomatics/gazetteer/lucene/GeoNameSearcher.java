@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ansj.lucene7.AnsjAnalyzer;
+import org.ansj.lucene7.AnsjAnalyzer.TYPE;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.Term;
@@ -19,11 +21,9 @@ import org.apache.lucene.search.TotalHits;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import top.geomatics.gazetteer.config.ResourcesManager;
 import top.geomatics.gazetteer.model.EnterpriseRow;
@@ -40,27 +40,22 @@ public class GeoNameSearcher {
 	final static Logger logger = LoggerFactory.getLogger(GeoNameSearcher.class);
 
 	private static ResourcesManager manager = ResourcesManager.getInstance();
-	private static final String LUCENE_INDEX_PATH = "geoname_index_path";
+	private static final String LUCENE_INDEX_PATH = Messages.getString("GeoNameSearcher.0"); //$NON-NLS-1$
 	private static final int MAX_HITS = 100000000;
 
 	@Value("${index.path}")
 	public static String INDEX_PATH = manager.getValue(LUCENE_INDEX_PATH);
 	private static IndexSearcher indexSearcher = null;
-	private static final String GEONAME = "name";
-	private static final String ADDRESS = "address";
+	private static final String GEONAME = Messages.getString("GeoNameSearcher.1"); //$NON-NLS-1$
+	private static final String ADDRESS = Messages.getString("GeoNameSearcher.2"); //$NON-NLS-1$
 	private static TopDocs topDocs = null;
 	private static TotalHits totalHits = null;
-
-	static {
-		init();
-	}
 
 	/**
 	 * <b>初始化索引搜索对象</b><br>
 	 * 
-	 * @return 索引搜索对象
 	 */
-	public static void init() {
+	static {
 		if (indexSearcher == null) {
 
 			Directory directory = null;
@@ -71,7 +66,7 @@ public class GeoNameSearcher {
 				indexSearcher = new IndexSearcher(directoryReader);
 			} catch (IOException e) {
 				e.printStackTrace();
-				String logMsgString = String.format("打开索引目录：%s 失败！", directory.toString());
+				String logMsgString = String.format(Messages.getString("GeoNameSearcher.3"), directory.toString()); //$NON-NLS-1$
 				logger.error(logMsgString);
 			}
 
@@ -89,7 +84,7 @@ public class GeoNameSearcher {
 			totalHits = topDocs.totalHits;
 		} catch (IOException e) {
 			e.printStackTrace();
-			String logMsgString = String.format("查询错误：%s ", query.toString());
+			String logMsgString = String.format(Messages.getString("GeoNameSearcher.4"), query.toString()); //$NON-NLS-1$
 			logger.error(logMsgString);
 		}
 	}
@@ -107,16 +102,6 @@ public class GeoNameSearcher {
 		Query query = null;
 		QueryParser queryParser = null;
 		switch (queryType) {
-		case 0:
-			queryParser = new QueryParser(GEONAME, new IKAnalyzer(true));
-			try {
-				query = queryParser.parse(keyword);
-			} catch (ParseException e) {
-				e.printStackTrace();
-				String logMsgString = String.format("查询关键词：%s 异常", keyword);
-				logger.error(logMsgString);
-			}
-			break;
 		case 1:
 			query = new TermQuery(new Term(GEONAME, keyword));
 			break;
@@ -124,13 +109,14 @@ public class GeoNameSearcher {
 		case 2:
 			query = new WildcardQuery(new Term(GEONAME, keyword));
 			break;
+		case 0:
 		default:
-			queryParser = new QueryParser(GEONAME, new IKAnalyzer(true));
+			queryParser = new QueryParser(GEONAME, new AnsjAnalyzer(TYPE.query_ansj));
 			try {
 				query = queryParser.parse(keyword);
 			} catch (ParseException e) {
 				e.printStackTrace();
-				String logMsgString = String.format("查询关键词：%s 异常", keyword);
+				String logMsgString = String.format(Messages.getString("GeoNameSearcher.5"), keyword); //$NON-NLS-1$
 				logger.error(logMsgString);
 			}
 			break;
@@ -141,14 +127,26 @@ public class GeoNameSearcher {
 	/**
 	 * <b>获得查询结果个数</b><br>
 	 * 
+	 * @param keyword   查询关键词
 	 * @param queryType 查询类型，0--QueryParse, 解析器查询 1--TermQuery 词根查询 2--
 	 *                  WildcardQuery 通配符查询
-	 * @param keyword   查询关键词
 	 * 
 	 * @return 查询结果个数
 	 */
-	public static long getCount(int queryType, String keyword) {
+	public static long getCount(String keyword, int queryType) {
 		buildSearch(buildQuery(queryType, keyword));
+		return totalHits.value;
+	}
+
+	/**
+	 * <b>获得查询结果个数</b><br>
+	 * 
+	 * @param keyword 查询关键词 <i> 查询类型缺省为：0--QueryParse, 解析器查询 </i>
+	 * 
+	 * @return 查询结果个数
+	 */
+	public static long getCount(String keyword) {
+		buildSearch(buildQuery(0, keyword));
 		return totalHits.value;
 	}
 
@@ -168,6 +166,7 @@ public class GeoNameSearcher {
 
 			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 				Document doc = indexSearcher.doc(scoreDoc.doc);
+
 				EnterpriseRow row = new EnterpriseRow();
 				row.setName(doc.get(GEONAME));
 				row.setAddress(doc.get(ADDRESS));
@@ -175,7 +174,7 @@ public class GeoNameSearcher {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			String logMsgString = String.format("查询关键词：%s 出现异常", keywords);
+			String logMsgString = String.format(Messages.getString("GeoNameSearcher.6"), keywords); //$NON-NLS-1$
 			logger.error(logMsgString);
 		}
 		return list;
@@ -195,6 +194,9 @@ public class GeoNameSearcher {
 
 			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 				Document doc = indexSearcher.doc(scoreDoc.doc);
+				// System.out.println(keywords + "\t" + scoreDoc.score + "\t" + doc.get(GEONAME)
+				// + "\t" + doc.get(ADDRESS));
+
 				EnterpriseRow row = new EnterpriseRow();
 				row.setName(doc.get(GEONAME));
 				row.setAddress(doc.get(ADDRESS));
@@ -202,9 +204,46 @@ public class GeoNameSearcher {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			String logMsgString = String.format("查询关键词：%s 出现异常", keywords);
+			String logMsgString = String.format(Messages.getString("GeoNameSearcher.7"), keywords); //$NON-NLS-1$
 			logger.error(logMsgString);
 		}
+		return list;
+	}
+
+	/**
+	 * <b> 根据关键词进行分页搜索</b>
+	 * 
+	 * @param keywords  String 搜索关键词
+	 * @param pageIndex 当前页索引，从1开始
+	 * @param pageSize  页大小
+	 * 
+	 * @return List 返回一个企业法人地址数组
+	 */
+	public static List<EnterpriseRow> queryPage(String keywords, int pageIndex, int pageSize) {
+		List<EnterpriseRow> list = new ArrayList<EnterpriseRow>();
+		buildSearch(buildQuery(0, keywords));
+		int start = (pageIndex - 1) * pageSize;
+		int end = (start + pageSize) < topDocs.scoreDocs.length ? (start + pageSize) : topDocs.scoreDocs.length;
+
+		for (int i = start; i < end; i++) {
+			ScoreDoc scoreDoc = topDocs.scoreDocs[i];
+			Document doc = null;
+			try {
+				doc = indexSearcher.doc(scoreDoc.doc);
+			} catch (IOException e) {
+				e.printStackTrace();
+				String logMsgString = String.format(Messages.getString("GeoNameSearcher.8"), keywords); //$NON-NLS-1$
+				logger.error(logMsgString);
+			}
+			// System.out.println(keywords + "\t" + scoreDoc.score + "\t" + doc.get(GEONAME)
+			// + "\t" + doc.get(ADDRESS));
+
+			EnterpriseRow row = new EnterpriseRow();
+			row.setName(doc.get(GEONAME));
+			row.setAddress(doc.get(ADDRESS));
+			list.add(row);
+		}
+
 		return list;
 	}
 
@@ -243,17 +282,13 @@ public class GeoNameSearcher {
 			List<SimpleAddressRow> srows = LuceneUtil.search(row.getAddress(), 10);
 			for (SimpleAddressRow aRow : srows) {
 				simpleAddressRows.add(aRow);
+				System.out.println(keywords + Messages.getString("GeoNameSearcher.9") + row.getAddress() + Messages.getString("GeoNameSearcher.10") + aRow.getAddress()); //$NON-NLS-1$ //$NON-NLS-2$
+				break;
 			}
+			// 只搜搜第一个（分数最高的）
+			break;
 		}
 		return simpleAddressRows;
 	}
 
-	public static void main(String[] args) {
-		List<EnterpriseRow> rows = GeoNameSearcher.query("深圳市明亮伟业机械附件销售部");
-		for (EnterpriseRow sp : rows) {
-			System.out.println(sp.getAddress());
-			System.out.println(sp.getName());
-		}
-
-	}
 }
