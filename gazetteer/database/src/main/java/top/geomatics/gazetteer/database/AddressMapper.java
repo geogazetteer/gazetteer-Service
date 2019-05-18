@@ -50,6 +50,28 @@ public interface AddressMapper {
 	 * @throws Exception 异常
 	 */
 	public List<AddressRow> selectAddressForDictionary() throws Exception;
+	
+	/**
+	 * <b>获得记录个数</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中任意的select count(*)语句</i><br>
+	 * 
+	 * @param map select语句中的所有参数
+	 * @return 记录个数
+	 */
+	public Integer getCount(Map<String, Object> map);
+	
+	/**
+	 * <b>获得查询结果个数</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL语句： select count(*) from dmdz where address like 工商银行 </i><br>
+	 * 
+	 * @param map select语句中的所有参数
+	 * @return 记录个数
+	 */
+	public Integer getTotalLike(Map<String, Object> map);
 
 	/**
 	 * <b>任意精确查询</b><br>
@@ -94,6 +116,28 @@ public interface AddressMapper {
 	 * @return 搜索结果集
 	 */
 	public List<AddressRow> findLike(Map<String, Object> map);
+	
+	/**
+	 * <b>任意模糊、分页查询</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中任意的select语句</i><br>
+	 * 
+	 * @param map select语句中的所有参数
+	 * @return 搜索结果集
+	 */
+	public List<SimpleAddressRow> findSimpleLikePage(Map<String, Object> map);
+	
+	/**
+	 * <b>任意模糊查询</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中任意的select语句</i><br>
+	 * 
+	 * @param map select语句中的所有参数
+	 * @return 搜索结果集
+	 */
+	public List<SimpleAddressRow> findSimpleLike(Map<String, Object> map);
 
 	/**
 	 * <b>根据位置坐标查询</b><br>
