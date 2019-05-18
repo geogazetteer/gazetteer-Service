@@ -22,7 +22,12 @@
 	<!--选择dmdz表中有关词汇用于建立分词词典 -->
 	<select id="selectAddressForDictionary" resultType="AddressRow"> 
 		SELECT street,community,road,road_num,village,building,address FROM dmdz 
-	</select> 
+	</select>
+	
+	<select id="getCount" resultType="int">
+		SELECT count(*)
+		FROM ${sql_tablename}
+    </select> 
 	
 	<!--动态SQL -->
 	<select id="findEquals" resultType="AddressRow">
@@ -134,6 +139,53 @@
 			LIMIT #{sql_limit}
 		</if>
 	</select>
+	
+	<select id="getTotalLike" resultType="int">
+		SELECT count(*)
+		FROM ${sql_tablename}
+		<where>
+			<if test="province != null">
+				province LIKE #{province}
+			</if>
+			<if test="city != null">
+				AND city LIKE #{city}
+			</if>
+			<if test="district != null">
+				AND district LIKE #{district}
+			</if>
+			<if test="street != null">
+				AND street LIKE #{street}
+			</if>
+			<if test="community != null">
+				AND community LIKE #{community}
+			</if>
+			<if test="address != null">
+				AND address LIKE #{address}
+			</if>
+			<if test="address_id != null">
+				AND address_id LIKE #{address_id}
+			</if>
+			<if test="building != null">
+				AND building LIKE #{building}
+			</if>
+			<if test="building_id != null">
+				AND building_id LIKE #{building_id}
+			</if>
+			<if test="code != null">
+				AND code LIKE #{code}
+			</if>
+			<if test="road != null">
+				AND road LIKE #{road}
+			</if>
+			<if test="road_num != null">
+				AND road_num LIKE #{road_num}
+			</if>
+			<if test="village != null">
+				AND village LIKE #{village}
+			</if>
+		</where>
+	</select>
+	
 	<select id="findLike" resultType="AddressRow">
 		SELECT ${sql_fields}
 		FROM ${sql_tablename}
@@ -185,6 +237,125 @@
 			LIMIT #{sql_limit}
 		</if>
 	</select>
+	
+	<select id="findSimpleLike" resultType="SimpleAddressRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="province != null">
+				province LIKE #{province}
+			</if>
+			<if test="city != null">
+				AND city LIKE #{city}
+			</if>
+			<if test="district != null">
+				AND district LIKE #{district}
+			</if>
+			<if test="street != null">
+				AND street LIKE #{street}
+			</if>
+			<if test="community != null">
+				AND community LIKE #{community}
+			</if>
+			<if test="address != null">
+				AND address LIKE #{address}
+			</if>
+			<if test="address_id != null">
+				AND address_id LIKE #{address_id}
+			</if>
+			<if test="building != null">
+				AND building LIKE #{building}
+			</if>
+			<if test="building_id != null">
+				AND building_id LIKE #{building_id}
+			</if>
+			<if test="code != null">
+				AND code LIKE #{code}
+			</if>
+			<if test="road != null">
+				AND road LIKE #{road}
+			</if>
+			<if test="road_num != null">
+				AND road_num LIKE #{road_num}
+			</if>
+			<if test="village != null">
+				AND village LIKE #{village}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<if test="sql_limit != null">
+			LIMIT #{sql_limit}
+		</if>
+	</select>
+	
+	<select id="findSimpleLikePage" resultType="SimpleAddressRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="province != null">
+				province LIKE #{province}
+			</if>
+			<if test="city != null">
+				AND city LIKE #{city}
+			</if>
+			<if test="district != null">
+				AND district LIKE #{district}
+			</if>
+			<if test="street != null">
+				AND street LIKE #{street}
+			</if>
+			<if test="community != null">
+				AND community LIKE #{community}
+			</if>
+			<if test="address != null">
+				AND address LIKE #{address}
+			</if>
+			<if test="address_id != null">
+				AND address_id LIKE #{address_id}
+			</if>
+			<if test="building != null">
+				AND building LIKE #{building}
+			</if>
+			<if test="building_id != null">
+				AND building_id LIKE #{building_id}
+			</if>
+			<if test="code != null">
+				AND code LIKE #{code}
+			</if>
+			<if test="road != null">
+				AND road LIKE #{road}
+			</if>
+			<if test="road_num != null">
+				AND road_num LIKE #{road_num}
+			</if>
+			<if test="village != null">
+				AND village LIKE #{village}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<choose>
+            <when test="page_start != null">
+                <choose>
+                    <when test="sql_limit != null">
+                        LIMIT #{page_start},#{sql_limit}
+                    </when>
+                    <otherwise>
+                        LIMIT #{page_start},10
+                    </otherwise>
+                </choose>
+	        </when>
+            <otherwise>
+		        <if test="sql_limit != null">
+			        LIMIT #{sql_limit}
+		        </if>
+            </otherwise>
+        </choose>
+	</select>
+	
 	<!--动态SQL -->
 	<select id="findBuildingEquals" resultType="BuildingPositionRow">
 		SELECT ${sql_fields}
