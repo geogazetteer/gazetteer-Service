@@ -769,7 +769,7 @@ public class SearcherController {
 	@GetMapping("/page/{index}")
 	public String selectAddressPage(
 			@ApiParam(value = "当前页面索引，从1开始") @PathVariable(value = "index", required = true) Integer index,
-			@ApiParam(value = "查询关键词，如：中华工业园") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
+			@ApiParam(value = "查询关键词，如：工商银行") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
 			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = true, defaultValue = "10") Integer limit) {
 		// 关键词转换处理
 		keywords = AddressProcessor.transform(keywords, this.settings);

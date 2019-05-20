@@ -16,13 +16,13 @@ public class SearcherSettings {
 	private boolean isSynonym = false;// 同义字转换
 	private boolean isInterchangeable = false;// 通假字转换
 	
-	private boolean isAddress = false;// 地址
+	private boolean isAddress = true;// 地址
 	private boolean isGeoName = false;// 地名
 	private boolean isPOI = false;// POI
 	private boolean isCoordinates = false;// 坐标
 	private boolean isBuildingCode = false;// 建筑物编码
 	
-	private boolean isDatabaseSearch = false;// 普通搜索
+	private boolean isDatabaseSearch = true;// 普通搜索
 	private boolean isLuceneSearch = false;// 普通搜索
 
 	public boolean isComplexChar() {
