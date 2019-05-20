@@ -25,6 +25,7 @@ import top.geomatics.gazetteer.lucene.LuceneUtil;
 import top.geomatics.gazetteer.lucene.POISearcher;
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.IGazetteerConstant;
+import top.geomatics.gazetteer.model.SimpleAddressRow;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.address.SearcherSettings;
 import top.geomatics.gazetteer.utilities.database.BuildingQuery;
@@ -664,7 +665,7 @@ public class SearcherController {
 		// 返回查询结果
 		return ControllerUtils.getResponseBody4(ControllerUtils.mapper.findSimpleLike(map));
 	}
-	
+
 	/**
 	 * <b>根据地址关键词进行模糊、分页查询</b><br>
 	 * 
@@ -673,7 +674,7 @@ public class SearcherController {
 	 * http://localhost:8083/address/address/page/1?keywords=工商银行
 	 * </p>
 	 * 
-	 * @param index     Integer 路径变量，当前页，从1开始
+	 * @param index    Integer 路径变量，当前页，从1开始
 	 * @param keywords String 请求参数，查询关键词
 	 * @param limit    Integer 请求参数，页大小
 	 * @return String 返回JSON格式的查询结果
@@ -705,10 +706,113 @@ public class SearcherController {
 	}
 
 	/**
+	 * <b>获取查询结果个数</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/sum?keywords=工商银行
+	 * </p>
+	 * 
+	 * @param keywords String 请求参数，查询关键词，如：工商银行
+	 * @return String 返回记录总数
+	 */
+	@ApiOperation(value = "获取查询结果个数", notes = "获取查询结果个数")
+	@GetMapping("/sum")
+	public String getSum(
+			@ApiParam(value = "查询关键词，如工商银行") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS, required = true) String keywords) {
+		// 关键词转换处理
+		keywords = AddressProcessor.transform(keywords, this.settings);
+		// 如果是数据库查询
+		if (true == this.settings.isDatabaseSearch()) {
+			return getTotalLike(keywords);
+		}
+		long sum = 0L;
+		// 其他为lucene搜索
+		// 如果是地名
+		if (this.settings.isGeoName()) {
+			sum = GeoNameSearcher.getCount(keywords);
+		}
+		// 如果是POI
+		else if (this.settings.isPOI()) {
+			sum = POISearcher.getCount(keywords);
+		}
+		// 如果是建筑物编码
+		else if (this.settings.isBuildingCode()) {
+			sum = ControllerUtils.getCodeQuerys(keywords);
+		}
+		// 如果是坐标
+		else if (this.settings.isCoordinates()) {
+			sum = ControllerUtils.getCoordQuerys(keywords);
+		}
+		// 如果是地址
+		else {
+			sum = LuceneUtil.getCount(keywords);
+		}
+		// 返回结果
+		return "{ \"total\": " + sum + "}";
+	}
+
+	/**
+	 * <b>根据关键词进分页查询</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/page/1?keywords=工商银行%26limit=10
+	 * </p>
+	 * 
+	 * @param index    Integer 页面索引
+	 * @param keywords String 请求参数，查询关键词
+	 * @param limit    Integer 页面的大小
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据关键词进行分页查询", notes = "根据关键词进行分页查询，示例：/address/page/1?keywords=工商银行&limit=10")
+	@GetMapping("/page/{index}")
+	public String selectAddressPage(
+			@ApiParam(value = "当前页面索引，从1开始") @PathVariable(value = "index", required = true) Integer index,
+			@ApiParam(value = "查询关键词，如：中华工业园") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
+			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = true, defaultValue = "10") Integer limit) {
+		// 关键词转换处理
+		keywords = AddressProcessor.transform(keywords, this.settings);
+		// 如果是数据库查询
+		if (true == this.settings.isDatabaseSearch()) {
+			return selectByAddressLikePage(index,keywords,limit);
+		}
+		List<SimpleAddressRow> rows = null;
+		// 其他为lucene搜索
+		// 如果是地名
+		if (this.settings.isGeoName()) {
+			//暂时用这个
+			rows = LuceneUtil.searchByPage(keywords, index, limit);
+		}
+		// 如果是POI
+		else if (this.settings.isPOI()) {
+			//暂时用这个
+			rows = LuceneUtil.searchByPage(keywords, index, limit);
+		}
+		// 如果是建筑物编码
+		else if (this.settings.isBuildingCode()) {
+			rows = ControllerUtils.getCodeQuerysPage(keywords, index,limit);
+		}
+		// 如果是坐标
+		else if (this.settings.isCoordinates()) {
+			rows = ControllerUtils.getCoordQuerysPage(keywords, index,limit);
+		}
+		// 如果是地址
+		else {
+			rows = LuceneUtil.searchByPage(keywords, index, limit);
+		}
+		// 返回结果
+		return ControllerUtils.getResponseBody4(rows);
+	}
+	
+
+	/**
 	 * <b>根据关键词进行快速模糊查询</b><br>
 	 * 
-	 * <p>examples:<br>
-	 * http://localhost:8083/address/hint?keywords=龙华%26limit=10 </p>
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/hint?keywords=龙华%26limit=10
+	 * </p>
 	 * 
 	 * @param keywords String 请求参数，查询关键词，多个关键词以空格分隔
 	 * @param limit    Integer 请求参数，最多查询记录个数

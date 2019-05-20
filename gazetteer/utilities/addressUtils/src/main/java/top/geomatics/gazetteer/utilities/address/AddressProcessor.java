@@ -146,7 +146,7 @@ public class AddressProcessor {
 		if (settings.isInterchangeable()) {// 通假字转换
 			newAddress = exchangeWords(newAddress);
 		}
-		if (settings.isAddressAlias() || settings.isGeoNameAlias() || settings.isPOIAlias()) {// 别名转换
+		if (settings.isAlias()) {// 别名转换
 			newAddress = alias(newAddress);
 		}
 		if (settings.isSynonym()) {// 同义词转换
