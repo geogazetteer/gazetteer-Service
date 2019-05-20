@@ -12,7 +12,7 @@ public class AddressIndexerTest {
 	}
 	@Test
 	public void testUpdateIndexPinyin() {
-		AddressIndexer.updateIndexPinyin();
+		//AddressIndexer.updateIndexPinyin();
 	}
 
 	@Test
