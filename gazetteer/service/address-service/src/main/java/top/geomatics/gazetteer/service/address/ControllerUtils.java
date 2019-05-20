@@ -3,6 +3,7 @@
  */
 package top.geomatics.gazetteer.service.address;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,8 @@ import top.geomatics.gazetteer.model.ComparableAddress;
 import top.geomatics.gazetteer.model.EnterpriseRow;
 import top.geomatics.gazetteer.model.MatcherResultRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
+import top.geomatics.gazetteer.utilities.address.AddressProcessor;
+import top.geomatics.gazetteer.utilities.database.BuildingQuery;
 
 /**
  * @author whudyj
@@ -194,6 +197,7 @@ public class ControllerUtils {
 		return responseString;
 
 	}
+
 	/**
 	 * @param rows
 	 * @return
@@ -205,6 +209,7 @@ public class ControllerUtils {
 		return responseString;
 
 	}
+
 	/**
 	 * @param rows
 	 * @return
@@ -216,6 +221,7 @@ public class ControllerUtils {
 		return responseString;
 
 	}
+
 	/**
 	 * @param rows
 	 * @return
@@ -232,7 +238,7 @@ public class ControllerUtils {
 		return responseString;
 
 	}
-	
+
 	/**
 	 * @param rows
 	 * @return
@@ -249,16 +255,98 @@ public class ControllerUtils {
 		return responseString;
 
 	}
-	
-	
+
 	/**
 	 * @param updateRows
 	 * @return
 	 */
 	public static String getUpdateResponseBody(Integer updateRows) {
-		//{"update": "ok","total": 10}
-		return "{\"update\": \"ok\",\"total\":" +  updateRows + "}";
+		// {"update": "ok","total": 10}
+		return "{\"update\": \"ok\",\"total\":" + updateRows + "}";
 	}
-	
 
+	/**
+	 * <b>根据输入的坐标搜索,获得搜索结果</b><br>
+	 * 
+	 * @param keywords 输入的坐标
+	 * @return 搜索结果
+	 */
+	public static List<SimpleAddressRow> getCoordQueryResults(String keywords) {
+		List<SimpleAddressRow> rowsTotal = new ArrayList<>();
+		if (!AddressProcessor.isCoordinatesExpression(keywords)) {
+			return rowsTotal;
+		}
+		String coordString[] = keywords.split(",");
+		double x = Double.parseDouble(coordString[0]);
+		double y = Double.parseDouble(coordString[1]);
+		List<String> codes = BuildingQuery.query(x, y);
+
+		for (String code : codes) {
+			// 根据建筑物编码搜索
+			List<SimpleAddressRow> rows = getBuildingCodeQueryResults(code);
+			rowsTotal.addAll(rows);
+		}
+		return rowsTotal;
+	}
+
+	/**
+	 * <b>根据输入的建筑物编码,获得搜索结果</b><br>
+	 * 
+	 * @param keywords 建筑物编码
+	 * @return 搜索结果
+	 */
+	public static List<SimpleAddressRow> getBuildingCodeQueryResults(String keywords) {
+		List<SimpleAddressRow> rows = null;
+		if (!AddressProcessor.isBuildingCode(keywords)) {
+			return rows;
+		}
+		String fields = "id,address";
+		String tablename = AddressProcessor.getCommunityFromBuildingCode(keywords);
+		AddressRow aRow = new AddressRow();
+		aRow.setCode(keywords);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, aRow, null, 0);
+		rows = mapper.findSimpleEquals(map);
+
+		return rows;
+	}
+
+	private static List<SimpleAddressRow> buildingCodeQueryResults;
+	private static List<SimpleAddressRow> coordQueryResults;
+
+	public static int getCoordQuerys(String keywords) {
+		coordQueryResults = getCoordQueryResults(keywords);
+		return coordQueryResults.size();
+	}
+
+	public static int getCodeQuerys(String keywords) {
+		buildingCodeQueryResults = getBuildingCodeQueryResults(keywords);
+		return buildingCodeQueryResults.size();
+	}
+
+	public static List<SimpleAddressRow> getCoordQuerysPage(String keywords, int pageIndex, int pageSize) {
+		if (null == coordQueryResults || 0 > coordQueryResults.size()) {
+			return null;
+		}
+		List<SimpleAddressRow> rows = new ArrayList<SimpleAddressRow>();
+		int start = (pageIndex - 1) * pageSize;
+		int end = (start + pageSize) < coordQueryResults.size() ? (start + pageSize) : coordQueryResults.size();
+		for (int i = start; i < end; i++) {
+			rows.add(coordQueryResults.get(i));
+		}
+		return rows;
+	}
+
+	public static List<SimpleAddressRow> getCodeQuerysPage(String keywords, int pageIndex, int pageSize) {
+		if (null == buildingCodeQueryResults || 0 > buildingCodeQueryResults.size()) {
+			return null;
+		}
+		List<SimpleAddressRow> rows = new ArrayList<SimpleAddressRow>();
+		int start = (pageIndex - 1) * pageSize;
+		int end = (start + pageSize) < buildingCodeQueryResults.size() ? (start + pageSize)
+				: buildingCodeQueryResults.size();
+		for (int i = start; i < end; i++) {
+			rows.add(buildingCodeQueryResults.get(i));
+		}
+		return rows;
+	}
 }

@@ -175,7 +175,6 @@ public class LuceneUtil {
 	/**
 	 * <b> 根据关键词进行搜索</b>
 	 * 
-	 * @deprecated
 	 * @param keywords String 搜索关键词
 	 * @param maxHits  int 搜索词的最大个数
 	 * @return List 返回一个简单地址数组
