@@ -19,16 +19,20 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 import top.geomatics.gazetteer.lucene.AddressIndexer;
+import top.geomatics.gazetteer.lucene.AddressSearcherPinyin;
 import top.geomatics.gazetteer.lucene.GeoNameSearcher;
 import top.geomatics.gazetteer.lucene.LuceneUtil;
 import top.geomatics.gazetteer.lucene.POISearcher;
 import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.model.IGazetteerConstant;
+import top.geomatics.gazetteer.model.SimpleAddressRow;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.address.SearcherSettings;
 import top.geomatics.gazetteer.utilities.database.BuildingQuery;
 
 /**
  * <b>搜索服务</b><br>
+ * 
  * <i>说明</i><br>
  * <i>目前只针对标准地名地址数据库中的地名地址进行查询</i>
  * 
@@ -55,9 +59,11 @@ public class SearcherController {
 
 	/**
 	 * <b>查询所有地址</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
 	 * http://localhost:8083/address/all?fields=id,address%26tablename=民治社区%26limit=10
-	 * 
+	 * </p>
 	 * 
 	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,address
 	 * @param tablename String 请求参数，指定查询的数据库表，如：油松社区
@@ -81,33 +87,39 @@ public class SearcherController {
 
 	/**
 	 * <b>查询一个街道的所有社区</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
 	 * http://localhost:8083/address/龙华区/民治街道?limit=10
+	 * </p>
 	 * 
-	 * @param path_district String 路径变量，固定为“龙华区”
-	 * @param path_street   String 路径变量，表示所在的街道，如：民治街道
-	 * @param fields        String 请求参数，需要选择的字段，多个字段以,分隔，如：id,community
-	 * @param orderby       String 请求参数，指定查询结果排序方式
-	 * @param limit         int 请求参数，限定查询的记录个数，如：limit=10
+	 * @param district String 路径变量，固定为“龙华区”
+	 * @param street   String 路径变量，表示所在的街道，如：民治街道
+	 * @param fields   String 请求参数，需要选择的字段，多个字段以,分隔，如：id,community
+	 * @param orderby  String 请求参数，指定查询结果排序方式
+	 * @param limit    int 请求参数，限定查询的记录个数，如：limit=10
 	 * @return String 返回JSON格式的查询结果
 	 */
 	@ApiOperation(value = "查询一个街道的所有社区", notes = "按街道查询所有社区，示例：/address/龙华区/民治街道?limit=10")
 	@GetMapping("/{district}/{street}")
 	public String selectByStreetNode(
-			@ApiParam(value = "街道所在的区，固定为龙华区") @PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = false) String path_district,
-			@ApiParam(value = "街道，如：民治街道") @PathVariable(value = IControllerConstant.ADDRESS_STREET, required = true) String path_street,
+			@ApiParam(value = "街道所在的区，固定为龙华区") @PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = false) String district,
+			@ApiParam(value = "街道，如：民治街道") @PathVariable(value = IControllerConstant.ADDRESS_STREET, required = true) String street,
 			@ApiParam(value = "查询字段，如 id,community") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
 			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
 			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
-		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_street, null, orderby, limit);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, street, null, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		return ControllerUtils.getResponseBody(rows);
 	}
 
 	/**
 	 * <b>查询一个社区的所有地址</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
 	 * http://localhost:8083/address/龙华区/民治街道/民治社区?limit=5
+	 * </p>
 	 * 
 	 * @param path_district  String 路径变量，固定为“龙华区”
 	 * @param path_street    String 路径变量，表示所在的街道，如：民治街道
@@ -133,10 +145,11 @@ public class SearcherController {
 
 	/**
 	 * <b>根据条件查询地址</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
-	 * <!--
-	 * http://localhost:8083/address/searcher/?fields=id,address&tablename=民治社区&address=广东省深圳市龙华区民治街道民治社区沙吓村六巷7栋
-	 * -->
+	 * http://localhost:8083/address/searcher/?fields=id,address%26tablename=民治社区%26address=广东省深圳市龙华区民治街道民治社区沙吓村六巷7栋
+	 * </p>
 	 * 
 	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
 	 * @param tablename   String 请求参数，指定查询的数据库表
@@ -215,10 +228,11 @@ public class SearcherController {
 
 	/**
 	 * <b>根据条件模糊查询地址</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
-	 * <!--
-	 * http://localhost:8083/address/fuzzysearcher/?fields=id,address&tablename=民治社区&address=沙吓村六巷7栋
-	 * -->
+	 * http://localhost:8083/address/fuzzysearcher/?fields=id,address%26tablename=民治社区%26address=沙吓村六巷7栋
+	 * </p>
 	 * 
 	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
 	 * @param tablename   String 请求参数，指定查询的数据库表
@@ -297,8 +311,11 @@ public class SearcherController {
 
 	/**
 	 * <b>根据地址ID查询</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
 	 * http://localhost:8083/address/address_id/63EEDE6B9E9D6A3AE0538CC0C0C07BB0
+	 * </p>
 	 * 
 	 * @param address_id String 路径变量，指定查询的地址ID
 	 * @param fields     String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
@@ -323,8 +340,11 @@ public class SearcherController {
 
 	/**
 	 * <b>根据地址编码查询</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
 	 * http://localhost:8083/address/code/44030600960102T0117?limit=5
+	 * </p>
 	 * 
 	 * @param code      String 路径变量，指定查询的地址编码
 	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
@@ -348,8 +368,11 @@ public class SearcherController {
 
 	/**
 	 * <b>根据街道名称查询</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
 	 * http://localhost:8083/address/street/民治街道?limit=5
+	 * </p>
 	 * 
 	 * @param street    String 路径变量，指定查询的街道名称
 	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,address
@@ -373,8 +396,11 @@ public class SearcherController {
 
 	/**
 	 * <b>根据社区名称查询</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
 	 * http://localhost:8083/address/community/龙塘社区?limit=5
+	 * </p>
 	 * 
 	 * @param community String 路径变量，指定查询的社区名称
 	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,address
@@ -398,8 +424,11 @@ public class SearcherController {
 
 	/**
 	 * <b>根据建筑物ID查询</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
 	 * http://localhost:8083/address/buildingID/44030600960102T0117?limit=5
+	 * </p>
 	 * 
 	 * @param building_id String 路径变量，指定查询的建筑物ID
 	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
@@ -423,8 +452,11 @@ public class SearcherController {
 
 	/**
 	 * <b>根据建筑物名称查询</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
 	 * http://localhost:8083/address/building/L25号铁皮房?limit=5
+	 * </p>
 	 * 
 	 * @param building  String 路径变量，指定查询的建筑物名称
 	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
@@ -448,8 +480,11 @@ public class SearcherController {
 
 	/**
 	 * <b>根据村名称查询</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
 	 * http://localhost:8083/address/village/上塘农贸建材市场?limit=5
+	 * </p>
 	 * 
 	 * @param village   String 路径变量，指定查询的村名称
 	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
@@ -473,8 +508,11 @@ public class SearcherController {
 
 	/**
 	 * <b>根据道路名称查询</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
 	 * http://localhost:8083/address/road/下围工业二路?limit=5
+	 * </p>
 	 * 
 	 * @param road      String 路径变量，指定查询的道路名称
 	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
@@ -497,9 +535,284 @@ public class SearcherController {
 	}
 
 	/**
-	 * <b>根据关键词进行模糊查询</b><br>
+	 * <b>根据数据库id进行查询</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
-	 * <!-- http://localhost:8083/address/hint?keywords=龙华&limit=10 -->
+	 * http://localhost:8083/address/id/1
+	 * </p>
+	 * 
+	 * @param id Integer 请求参数，指定查询的数据库id
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据id查询详细信息", notes = "根据id查询详细信息，示例：/address/id/1")
+	@GetMapping("/id/{id}")
+	public String selectById(
+			@ApiParam(value = "指定查询的地址数据库id") @PathVariable(value = "id", required = true) Integer id) {
+		Long start = System.currentTimeMillis();
+		List<AddressRow> row = ControllerUtils.mapper.selectById(id);
+		Long end = System.currentTimeMillis();
+		System.out.println("selectById wasted time: " + (end - start));
+		return ControllerUtils.getResponseBody(row);
+	}
+
+	/**
+	 * <b>根据一组数据库id进行查询</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/ids?in=1,2,3
+	 * </p>
+	 * 
+	 * @param ids Integer 请求参数，指定查询的一组数据库id，以,分隔
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据一组id查询详细信息", notes = "根据一组id查询详细信息，示例：/address/ids?in=1,2,3")
+	@GetMapping("/ids")
+	public String selectByIds(
+			@ApiParam(value = "指定查询的地址数据库id，以,分隔") @RequestParam(value = "in", required = true) String ids) {
+		List<Integer> idList = new ArrayList<Integer>();
+		String listString[] = ids.split(",");
+		for (String str : listString) {
+			idList.add(Integer.parseInt(str));
+		}
+		List<AddressRow> row = ControllerUtils.mapper.selectByIds(idList);
+		return ControllerUtils.getResponseBody(row);
+	}
+
+	/**
+	 * <b>返回记录总数</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/count?tablename=油松社区
+	 * </p>
+	 * 
+	 * @param tablename String 请求参数，指定查询的数据库表，如：油松社区
+	 * @return String 返回记录总数
+	 */
+	@ApiOperation(value = "返回记录总数", notes = "返回记录总数")
+	@GetMapping("/count")
+	public String getCount(
+			@ApiParam(value = "查询的数据库表，如油松社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename) {
+		Map<String, Object> map = ControllerUtils.getRequestMap(null, tablename, null, null, 0);
+		return "{ \"total\": " + ControllerUtils.mapper.getCount(map) + "}";
+	}
+
+	/**
+	 * <b>获取address字段模糊查询结果个数</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/total?keywords=工商银行
+	 * </p>
+	 * 
+	 * @param keywords String 请求参数，指定查询的数据库表，如：工商银行
+	 * @return String 返回记录总数
+	 */
+	@ApiOperation(value = "获取address字段模糊查询结果个数", notes = "获取address字段模糊查询结果个数")
+	@GetMapping("/total")
+	public String getTotalLike(
+			@ApiParam(value = "查询关键词，如工商银行") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS, required = true) String keywords) {
+		// 关键词转换处理
+		keywords = AddressProcessor.transform(keywords, this.settings);
+		// 设置查询条件
+		String tablename = IControllerConstant.ADDRESS_TABLE;
+		for (String community : IGazetteerConstant.COMMUNITY_LIST) {
+			if (keywords.contains(community)) {
+				tablename = community;
+				break;
+			}
+		}
+		AddressRow row = new AddressRow();
+		row.setAddress("%" + keywords + "%");
+		Map<String, Object> map = ControllerUtils.getRequestMap(null, tablename, row, null, 0);
+		// 返回结果
+		return "{ \"total\": " + ControllerUtils.mapper.getTotalLike(map) + "}";
+	}
+
+	/**
+	 * <b>根据地址关键词进行模糊查询</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/address?keywords=工商银行
+	 * </p>
+	 * 
+	 * @param keywords String 请求参数，查询关键词
+	 * @param limit    Integer 请求参数，最多查询记录个数
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据地址关键词进行模糊查询", notes = "根据地址关键词进行模糊查询，示例：/address/address?keywords=工商银行&limit=10")
+	@GetMapping("/address")
+	public String selectByAddressLike(
+			@ApiParam(value = "查询关键词，如：工商银行") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "10") Integer limit) {
+		// 关键词转换处理
+		keywords = AddressProcessor.transform(keywords, this.settings);
+		// 设置查询条件
+		String tablename = IControllerConstant.ADDRESS_TABLE;
+		for (String community : IGazetteerConstant.COMMUNITY_LIST) {
+			if (keywords.contains(community)) {
+				tablename = community;
+				break;
+			}
+		}
+		String fieldString = IControllerConstant.ADDRESS_FIELDS;
+		AddressRow row = new AddressRow();
+		row.setAddress("%" + keywords + "%");
+		Map<String, Object> map = ControllerUtils.getRequestMap(fieldString, tablename, row, null, limit);
+		// 返回查询结果
+		return ControllerUtils.getResponseBody4(ControllerUtils.mapper.findSimpleLike(map));
+	}
+
+	/**
+	 * <b>根据地址关键词进行模糊、分页查询</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/address/page/1?keywords=工商银行
+	 * </p>
+	 * 
+	 * @param index    Integer 路径变量，当前页，从1开始
+	 * @param keywords String 请求参数，查询关键词
+	 * @param limit    Integer 请求参数，页大小
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据地址关键词进行模糊、分页查询", notes = "根据地址关键词进行模糊、分页查询，示例：/address/address/page/1?keywords=工商银行&limit=10")
+	@GetMapping("/address/page/{index}")
+	public String selectByAddressLikePage(
+			@ApiParam(value = "当前页面索引，从1开始") @PathVariable(value = "index", required = true) Integer index,
+			@ApiParam(value = "查询关键词，如：工商银行") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
+			@ApiParam(value = "每页查询的记录个数，缺省为10") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "10") Integer limit) {
+		// 关键词转换处理
+		keywords = AddressProcessor.transform(keywords, this.settings);
+		// 设置查询条件
+		String tablename = IControllerConstant.ADDRESS_TABLE;
+		for (String community : IGazetteerConstant.COMMUNITY_LIST) {
+			if (keywords.contains(community)) {
+				tablename = community;
+				break;
+			}
+		}
+		String fieldString = IControllerConstant.ADDRESS_FIELDS;
+		AddressRow row = new AddressRow();
+		row.setAddress("%" + keywords + "%");
+		Map<String, Object> map = ControllerUtils.getRequestMap(fieldString, tablename, row, null, 0);
+		Integer page_start = (index - 1) * limit;
+		map.put("page_start", page_start);
+		// 返回查询结果
+		return ControllerUtils.getResponseBody4(ControllerUtils.mapper.findSimpleLikePage(map));
+	}
+
+	/**
+	 * <b>获取查询结果个数</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/sum?keywords=工商银行
+	 * </p>
+	 * 
+	 * @param keywords String 请求参数，查询关键词，如：工商银行
+	 * @return String 返回记录总数
+	 */
+	@ApiOperation(value = "获取查询结果个数", notes = "获取查询结果个数")
+	@GetMapping("/sum")
+	public String getSum(
+			@ApiParam(value = "查询关键词，如工商银行") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS, required = true) String keywords) {
+		// 关键词转换处理
+		keywords = AddressProcessor.transform(keywords, this.settings);
+		// 如果是数据库查询
+		if (true == this.settings.isDatabaseSearch()) {
+			return getTotalLike(keywords);
+		}
+		long sum = 0L;
+		// 其他为lucene搜索
+		// 如果是地名
+		if (this.settings.isGeoName()) {
+			sum = GeoNameSearcher.getCount(keywords);
+		}
+		// 如果是POI
+		else if (this.settings.isPOI()) {
+			sum = POISearcher.getCount(keywords);
+		}
+		// 如果是建筑物编码
+		else if (this.settings.isBuildingCode()) {
+			sum = ControllerUtils.getCodeQuerys(keywords);
+		}
+		// 如果是坐标
+		else if (this.settings.isCoordinates()) {
+			sum = ControllerUtils.getCoordQuerys(keywords);
+		}
+		// 如果是地址
+		else {
+			sum = LuceneUtil.getCount(keywords);
+		}
+		// 返回结果
+		return "{ \"total\": " + sum + "}";
+	}
+
+	/**
+	 * <b>根据关键词进分页查询</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/page/1?keywords=工商银行%26limit=10
+	 * </p>
+	 * 
+	 * @param index    Integer 页面索引
+	 * @param keywords String 请求参数，查询关键词
+	 * @param limit    Integer 页面的大小
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据关键词进行分页查询", notes = "根据关键词进行分页查询，示例：/address/page/1?keywords=工商银行&limit=10")
+	@GetMapping("/page/{index}")
+	public String selectAddressPage(
+			@ApiParam(value = "当前页面索引，从1开始") @PathVariable(value = "index", required = true) Integer index,
+			@ApiParam(value = "查询关键词，如：工商银行") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
+			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = true, defaultValue = "10") Integer limit) {
+		// 关键词转换处理
+		keywords = AddressProcessor.transform(keywords, this.settings);
+		// 如果是数据库查询
+		if (true == this.settings.isDatabaseSearch()) {
+			return selectByAddressLikePage(index,keywords,limit);
+		}
+		List<SimpleAddressRow> rows = null;
+		// 其他为lucene搜索
+		// 如果是地名
+		if (this.settings.isGeoName()) {
+			//暂时用这个
+			rows = LuceneUtil.searchByPage(keywords, index, limit);
+		}
+		// 如果是POI
+		else if (this.settings.isPOI()) {
+			//暂时用这个
+			rows = LuceneUtil.searchByPage(keywords, index, limit);
+		}
+		// 如果是建筑物编码
+		else if (this.settings.isBuildingCode()) {
+			rows = ControllerUtils.getCodeQuerysPage(keywords, index,limit);
+		}
+		// 如果是坐标
+		else if (this.settings.isCoordinates()) {
+			rows = ControllerUtils.getCoordQuerysPage(keywords, index,limit);
+		}
+		// 如果是地址
+		else {
+			rows = LuceneUtil.searchByPage(keywords, index, limit);
+		}
+		// 返回结果
+		return ControllerUtils.getResponseBody4(rows);
+	}
+	
+
+	/**
+	 * <b>根据关键词进行快速模糊查询</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/hint?keywords=龙华%26limit=10
+	 * </p>
 	 * 
 	 * @param keywords String 请求参数，查询关键词，多个关键词以空格分隔
 	 * @param limit    Integer 请求参数，最多查询记录个数
@@ -554,21 +867,52 @@ public class SearcherController {
 	}
 
 	/**
-	 * <b>根据关键词进行模糊查询分页展示</b><br>
+	 * <b>根据关键词进行模糊查询，返回记录总数</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
-	 * <!-- http://localhost:8083/address/hint/1?keywords=民治街道&pageNo=10&pageSize=10
-	 * -->
+	 * http://localhost:8083/address/hint/count?keywords=中华工业园
+	 * </P>
+	 * 
+	 * @param keywords String 请求参数，查询关键词
+	 * @return String 返回JSON格式的记录总数
+	 */
+	@ApiOperation(value = "返回查询记录总数", notes = "返回查询记录总数")
+	@GetMapping("/hint/count")
+	public String getHits(
+			@ApiParam(value = "查询关键词，如：中华工业园") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords) {
+		// 关键词转换处理
+		keywords = AddressProcessor.transform(keywords, this.settings);
+		long count = 0L;
+		// 如果是查询地名
+		if (this.settings.isGeoName()) {
+			count = GeoNameSearcher.getCount(keywords);
+		}
+		// 如果是POI查询
+		else if (this.settings.isPOI()) {
+			count = POISearcher.getCount(keywords);
+		}
+		return "{ \"total\": " + count + "}";
+	}
+
+	/**
+	 * <b>根据关键词进行模糊、分页查询</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/hint/1?keywords=中华工业园%26limit=10
+	 * </p>
 	 * 
 	 * @param index    Integer 页面索引
-	 * @param keywords String 请求参数，查询关键词，多个关键词以空格分隔
+	 * @param keywords String 请求参数，查询关键词
 	 * @param limit    Integer 页面的大小
 	 * @return String 返回JSON格式的查询结果
 	 */
-	@ApiOperation(value = "根据关键词进行模糊查询分页展示", notes = "根据关键词进行模糊查询分页展示，示例：/address/hint/page/1?keywords=龙华民治&limit=10")
+	@ApiOperation(value = "根据关键词进行模糊查询分页展示", notes = "根据关键词进行模糊查询分页展示，示例：/address/hint/page/1?keywords=中华工业园&limit=10")
 	@GetMapping("/hint/page/{index}")
 	public String selectAddressByKeywords(
 			@ApiParam(value = "当前页面索引，从1开始") @PathVariable(value = "index", required = true) Integer index,
-			@ApiParam(value = "查询关键词，多个关键词以空格分隔，如：龙华") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
+			@ApiParam(value = "查询关键词，如：中华工业园") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
 			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = true, defaultValue = "10") Integer limit) {
 		keywords = AddressProcessor.transform(keywords, this.settings);
 		if (this.settings.isGeoName()) {
@@ -582,9 +926,11 @@ public class SearcherController {
 
 	/**
 	 * <b>根据关键词进行模糊查询分页展示(加上了同音字搜索功能)</b><br>
+	 * 
+	 * <p>
 	 * examples:<br>
-	 * <!-- http://localhost:8083/address/hint/page/pinyin/2?keywords=神针是&limit=10
-	 * -->
+	 * http://localhost:8083/address/hint/page/pinyin/2?keywords=神针是%26limit=10
+	 * </p>
 	 * 
 	 * @param index    Integer 页面索引
 	 * @param keywords String 请求参数，查询关键词，多个关键词以空格分隔
@@ -599,47 +945,7 @@ public class SearcherController {
 			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = true, defaultValue = "10") Integer limit) {
 		String pinyin = AddressIndexer.toPinyin(keywords);
 
-		return JSON.toJSONString(LuceneUtil.searchByPinyin(pinyin, index, limit));
-	}
-
-	/**
-	 * <b>根据数据库id进行查询</b><br>
-	 * examples:<br>
-	 * http://localhost:8083/address/id/1
-	 * 
-	 * @param id Integer 请求参数，指定查询的数据库id
-	 * @return String 返回JSON格式的查询结果
-	 */
-	@ApiOperation(value = "根据id查询详细信息", notes = "根据id查询详细信息，示例：/address/id/1")
-	@GetMapping("/id/{id}")
-	public String selectById(
-			@ApiParam(value = "指定查询的地址数据库id") @PathVariable(value = "id", required = true) Integer id) {
-		Long start = System.currentTimeMillis();
-		List<AddressRow> row = ControllerUtils.mapper.selectById(id);
-		Long end = System.currentTimeMillis();
-		System.out.println("selectById wasted time: " + (end - start));
-		return ControllerUtils.getResponseBody(row);
-	}
-
-	/**
-	 * <b>根据一组数据库id进行查询</b><br>
-	 * examples:<br>
-	 * http://localhost:8083/address/ids?in=1,2,3
-	 * 
-	 * @param ids Integer 请求参数，指定查询的一组数据库id，以,分隔
-	 * @return String 返回JSON格式的查询结果
-	 */
-	@ApiOperation(value = "根据一组id查询详细信息", notes = "根据一组id查询详细信息，示例：/address/ids?in=1,2,3")
-	@GetMapping("/ids")
-	public String selectByIds(
-			@ApiParam(value = "指定查询的地址数据库id，以,分隔") @RequestParam(value = "in", required = true) String ids) {
-		List<Integer> idList = new ArrayList<Integer>();
-		String listString[] = ids.split(",");
-		for (String str : listString) {
-			idList.add(Integer.parseInt(str));
-		}
-		List<AddressRow> row = ControllerUtils.mapper.selectByIds(idList);
-		return ControllerUtils.getResponseBody(row);
+		return JSON.toJSONString(AddressSearcherPinyin.searchPage(pinyin, index, limit));
 	}
 
 }

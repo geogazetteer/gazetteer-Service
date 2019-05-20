@@ -28,45 +28,44 @@ import top.geomatics.gazetteer.config.ResourcesManager;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 
 /**
- * <b>lucene工具类</b>
+ * <b>地名地址搜索（支持拼音搜索）类</b>
  * 
  * @author whudyj
  *
  */
-public class LuceneUtil {
+public class AddressSearcherPinyin {
 	// 添加slf4j日志实例对象
-	final static Logger logger = LoggerFactory.getLogger(LuceneUtil.class);
+	final static Logger logger = LoggerFactory.getLogger(AddressSearcherPinyin.class);
 
-	// 搜索
 	private static ResourcesManager manager = ResourcesManager.getInstance();
-	private static final String LUCENE_INDEX_PATH = Messages.getString("LuceneUtil.0"); //$NON-NLS-1$
-	public static String INDEX_PATH = manager.getValue(LUCENE_INDEX_PATH);
+	// 带拼音搜索
+	private static final String LUCENE_INDEX_PATH_PINYIN = Messages.getString("AddressSearcherPinyin.0"); //$NON-NLS-1$
+	public static String INDEX_PATH_PINYIN = manager.getValue(LUCENE_INDEX_PATH_PINYIN);
+	private static IndexSearcher indexSearcherPinyin = null;
 
-	private static IndexSearcher indexSearcher = null;
-
-	private static final String ADDRESS_ID = Messages.getString("LuceneUtil.1"); //$NON-NLS-1$
-	private static final String ADDRESS = Messages.getString("LuceneUtil.2"); //$NON-NLS-1$
+	private static final String ADDRESS_ID = Messages.getString("AddressSearcherPinyin.1"); //$NON-NLS-1$
+	private static final String ADDRESS = Messages.getString("AddressSearcherPinyin.2"); //$NON-NLS-1$
+	private static final String ADDRESSPINYIN = Messages.getString("AddressSearcherPinyin.3"); //$NON-NLS-1$
 	private static final int MAX_HITS = 100000000;
 	private static TopDocs topDocs = null;
 	private static TotalHits totalHits = null;
 
 	static {
-		if (indexSearcher == null) {
+		if (indexSearcherPinyin == null) {
 
 			Directory directory = null;
 			DirectoryReader directoryReader = null;
 			try {
-				directory = FSDirectory.open(Path.of(INDEX_PATH));
+				directory = FSDirectory.open(Path.of(INDEX_PATH_PINYIN));
 				directoryReader = DirectoryReader.open(directory);
-				indexSearcher = new IndexSearcher(directoryReader);
+				indexSearcherPinyin = new IndexSearcher(directoryReader);
 			} catch (IOException e) {
 				e.printStackTrace();
-				String logMsgString = String.format(Messages.getString("LuceneUtil.3"), directory.toString()); //$NON-NLS-1$
+				String logMsgString = String.format(Messages.getString("AddressSearcherPinyin.4"), directory.toString()); //$NON-NLS-1$
 				logger.error(logMsgString);
 			}
 
 		}
-
 	}
 
 	/**
@@ -76,11 +75,11 @@ public class LuceneUtil {
 	 */
 	public static void buildSearch(Query query) {
 		try {
-			topDocs = indexSearcher.search(query, MAX_HITS);
+			topDocs = indexSearcherPinyin.search(query, MAX_HITS);
 			totalHits = topDocs.totalHits;
 		} catch (IOException e) {
 			e.printStackTrace();
-			String logMsgString = String.format(Messages.getString("LuceneUtil.4"), query.toString()); //$NON-NLS-1$
+			String logMsgString = String.format(Messages.getString("AddressSearcherPinyin.5"), query.toString()); //$NON-NLS-1$
 			logger.error(logMsgString);
 		}
 	}
@@ -99,20 +98,20 @@ public class LuceneUtil {
 		QueryParser queryParser = null;
 		switch (queryType) {
 		case 1:
-			query = new TermQuery(new Term(ADDRESS, keyword));
+			query = new TermQuery(new Term(ADDRESSPINYIN, keyword));
 			break;
 
 		case 2:
-			query = new WildcardQuery(new Term(ADDRESS, keyword));
+			query = new WildcardQuery(new Term(ADDRESSPINYIN, keyword));
 			break;
 		case 0:
 		default:
-			queryParser = new QueryParser(ADDRESS, new AnsjAnalyzer(TYPE.query_ansj));
+			queryParser = new QueryParser(ADDRESSPINYIN, new AnsjAnalyzer(TYPE.query_ansj));
 			try {
 				query = queryParser.parse(keyword);
 			} catch (ParseException e) {
 				e.printStackTrace();
-				String logMsgString = String.format(Messages.getString("LuceneUtil.5"), keyword); //$NON-NLS-1$
+				String logMsgString = String.format(Messages.getString("AddressSearcherPinyin.6"), keyword); //$NON-NLS-1$
 				logger.error(logMsgString);
 			}
 			break;
@@ -142,7 +141,8 @@ public class LuceneUtil {
 	 * @return 查询结果个数
 	 */
 	public static long getCount(String keyword) {
-		return getCount(keyword, 0);
+		buildSearch(buildQuery(0, keyword));
+		return totalHits.value;
 	}
 
 	/**
@@ -157,10 +157,10 @@ public class LuceneUtil {
 		for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 			Document doc = null;
 			try {
-				doc = indexSearcher.doc(scoreDoc.doc);
+				doc = indexSearcherPinyin.doc(scoreDoc.doc);
 			} catch (IOException e) {
 				e.printStackTrace();
-				String logMsgString = String.format(Messages.getString("LuceneUtil.6"), keywords); //$NON-NLS-1$
+				String logMsgString = String.format(Messages.getString("AddressSearcherPinyin.7"), keywords); //$NON-NLS-1$
 				logger.error(logMsgString);
 			}
 			SimpleAddressRow row = new SimpleAddressRow();
@@ -175,11 +175,13 @@ public class LuceneUtil {
 	/**
 	 * <b> 根据关键词进行搜索</b>
 	 * 
+	 * @deprecated
 	 * @param keywords String 搜索关键词
 	 * @param maxHits  int 搜索词的最大个数
 	 * @return List 返回一个简单地址数组
 	 */
 	public static List<SimpleAddressRow> search(String keywords, int maxHits) {
+
 		return search(keywords);
 	}
 
@@ -192,7 +194,7 @@ public class LuceneUtil {
 	 * 
 	 * @return List 返回一个地址数组
 	 */
-	public static List<SimpleAddressRow> searchByPage(String keywords, int pageIndex, int pageSize) {
+	public static List<SimpleAddressRow> searchPage(String keywords, int pageIndex, int pageSize) {
 		List<SimpleAddressRow> list = new ArrayList<SimpleAddressRow>();
 		buildSearch(buildQuery(0, keywords));
 		int start = (pageIndex - 1) * pageSize;
@@ -202,10 +204,10 @@ public class LuceneUtil {
 			ScoreDoc scoreDoc = topDocs.scoreDocs[i];
 			Document doc = null;
 			try {
-				doc = indexSearcher.doc(scoreDoc.doc);
+				doc = indexSearcherPinyin.doc(scoreDoc.doc);
 			} catch (IOException e) {
 				e.printStackTrace();
-				String logMsgString = String.format(Messages.getString("LuceneUtil.7"), keywords); //$NON-NLS-1$
+				String logMsgString = String.format(Messages.getString("AddressSearcherPinyin.8"), keywords); //$NON-NLS-1$
 				logger.error(logMsgString);
 			}
 			// System.out.println(keywords + "\t" + scoreDoc.score + "\t" + doc.get(GEONAME)

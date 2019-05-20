@@ -18,7 +18,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import top.geomatics.gazetteer.config.ResourcesManager;
 import top.geomatics.gazetteer.utilities.csv.MYCSVReader;
@@ -34,14 +33,14 @@ public class POIIndexer {
 	final static Logger logger = LoggerFactory.getLogger(POIIndexer.class);
 
 	private static ResourcesManager manager = ResourcesManager.getInstance();
-	private static final String LUCENE_INDEX_PATH = "poi_index_path";
-	private static final String POI_FILE = "poi_file";
+	private static final String LUCENE_INDEX_PATH = Messages.getString("POIIndexer.0"); //$NON-NLS-1$
+	private static final String POI_FILE = Messages.getString("POIIndexer.1"); //$NON-NLS-1$
 
 	public static String INDEX_PATH = manager.getValue(LUCENE_INDEX_PATH);
 	private static String poi_file_name = manager.getValue(POI_FILE);
 	private static Directory dir;
-	private static final String GEONAME = "name";
-	private static final String ADDRESS = "address";
+	private static final String GEONAME = Messages.getString("POIIndexer.2"); //$NON-NLS-1$
+	private static final String ADDRESS = Messages.getString("POIIndexer.3"); //$NON-NLS-1$
 	public static MYCSVReader csv = new MYCSVReader(poi_file_name);
 
 	/**
@@ -74,7 +73,7 @@ public class POIIndexer {
 			writer.deleteAll();
 		} catch (IOException e) {
 			e.printStackTrace();
-			String logMsgString = String.format("删除索引目录：%s 失败", dir.toString());
+			String logMsgString = String.format(Messages.getString("POIIndexer.4"), dir.toString()); //$NON-NLS-1$
 			logger.error(logMsgString);
 		}
 
@@ -87,7 +86,7 @@ public class POIIndexer {
 				continue;
 			}
 			String first = row[0];
-			String temp[] = first.split("\\p{Blank}+");
+			String temp[] = first.split("\\p{Blank}+"); //$NON-NLS-1$
 			if (temp.length < 2) {
 				continue;
 			}
