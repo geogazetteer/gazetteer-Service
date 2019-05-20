@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="warn">
     <Properties>
-        <Property name="basePath">D:\\gazetteer\\log</Property>
+        <Property name="basePath">c:\\gazetteer\\log</Property>
     </Properties>
  
     <Appenders>

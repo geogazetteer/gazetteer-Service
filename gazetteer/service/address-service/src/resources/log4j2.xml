@@ -3,7 +3,7 @@
 
 <Configuration status="warn">
 	<Properties>
-		<Property name="basePath">D:\\gazetteer\\log</Property>
+		<Property name="basePath">c:\\gazetteer\\log</Property>
 	</Properties>
 
 	<Appenders>
