@@ -3,7 +3,6 @@
  */
 const IP = 'http://119.3.72.23';
 const serverUrl = IP+':8083/';//服务器地址
-var ProxyServlet = 'http://localhost:9192/ProxyServlet/proxyHandler?url=';//代理服务器地址
 const URLCFG={
   searchCtxUrl:serverUrl+'address/hint',//搜索联想，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
   searchAddressUrl:serverUrl+'address/hint',//搜索，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
@@ -35,6 +34,9 @@ const URLCFG={
   searchByPointUrl:serverUrl+'building/address',//(param:x=114.019777&y=22.672456)
   //根据地址获取门楼号
   getHouseNumberByAddrUrl:serverUrl+'transform/houseNumber',//(params,chars=chars)
+  
+   //根据楼栋编号查询坐标
+  getCoordinatesByCodeUrl:serverUrl+'building/point',//(param:code='')
 };
 
 const geoServerUrl=IP + ':8085/';//geoserver服务地址
