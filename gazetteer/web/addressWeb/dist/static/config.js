@@ -34,10 +34,10 @@ const URLCFG={
   searchByPointUrl:serverUrl+'building/address',//(param:x=114.019777&y=22.672456)
   //根据地址获取门楼号
   getHouseNumberByAddrUrl:serverUrl+'transform/houseNumber',//(params,chars=chars)
-  
-   //根据楼栋编号查询坐标
+
+  //根据楼栋编号查询坐标
   getCoordinatesByCodeUrl:serverUrl+'building/point',//(param:code='')
-    //获取搜索结果总数
+  //获取搜索结果总数
   searchCtxTotalUrl:serverUrl+'address/sum',//param：keywords=''
   //根据页码获取搜索结果
   searchListUrl:serverUrl+'address/page',// "/1?keywords=a&limit=10"
@@ -64,27 +64,36 @@ const EDITSELECTORCFG={
 
 
 //搜索设置字典
-const SETDICT={
-  '别名识别':"addressAlias",
-  "数字转换": 'chineseNumber',
-  "地址补全": 'completed',
+const SETDICT={//默认为false的配置项
   "繁体转换": 'complexChar',
-  "坐标识别": 'coordinates',
   "全角转换": 'fullChar',
+  "中文数字转换": 'chineseNumber',
+
+  '别名转换':"alias",
+  "同音字转换": 'homophone',
+  "同义词转换":"synonym",
+  "通假字转换": 'interchangeable',
+
+
+
   "地名": 'geoName',
-  "地名别名": 'geoNameAlias',
-  "通假字识别": 'interchangeable',
-  "同音字识别": 'homophone',
   "POI": 'poi',
-  "POI别名": 'poialias',
-  "地址范围识别": 'withtin',
-  '楼栋编码':'buildingCode'
+  "坐标": 'coordinates',
+  "建筑物编码":"buildingCode",
+
+  "普通搜索": 'databaseSearch',
+  "快速搜索": 'luceneSearch',
 };
+const SETDICT_DEFAULT={//默认为true的配置项
+  "地址": 'address',
+  "普通搜索": 'databaseSearch',
+};
+
 const SETLABELARR={
-  settings_1:['繁体转换','全角转换','数字转换'],
-  settings_2:['别名识别','同音字识别','通假字识别'],
-  settings_3:['地址补全','地名','地名别名','POI','POI别名'],
-  settings_4:['地址范围识别','坐标识别','楼栋编码'],
+  settings_1:['繁体转换','全角转换','中文数字转换'],
+  settings_2:['别名转换','同音字转换','同义词转换','通假字转换'],
+  settings_3:['地址','地名','POI','坐标','建筑物编码'],
+  settings_4:['普通搜索','快速搜索'],
 };
 
 const BATCHSERVICE={
