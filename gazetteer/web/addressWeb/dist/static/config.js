@@ -37,6 +37,10 @@ const URLCFG={
   
    //根据楼栋编号查询坐标
   getCoordinatesByCodeUrl:serverUrl+'building/point',//(param:code='')
+    //获取搜索结果总数
+  searchCtxTotalUrl:serverUrl+'address/sum',//param：keywords=''
+  //根据页码获取搜索结果
+  searchListUrl:serverUrl+'address/page',// "/1?keywords=a&limit=10"
 };
 
 const geoServerUrl=IP + ':8085/';//geoserver服务地址
@@ -48,8 +52,8 @@ const MAPURL={
   mapTile:webUrl+"mapboxLayer/{z}/{x}/{y}.pbf",
   //字体
   glyphs:webUrl+"myfonts/{fontstack}/{range}.pbf",
-  //立德底图
-  ol_map_tile:'http://61.144.226.122:10000/geoserver/gwc/service/tms/1.0.0/shenzhen:WgbLoudong@EPSG:4490@png/{z}/{x}/{y}.png',
+  //政务内网底图  http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile/0/1072/1461
+  ol_map_tile:'http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile',
   //房屋面
   building_vec_tile:geoServerUrl+"geoserver/gwc/service/tms/1.0.0/gazetteer%3ALH_building_4490@EPSG%3A900913@png/{z}/{x}/{y}.png"
 };

@@ -223,3 +223,7 @@ body {
 .autoHeight .similar{
   height: 35px !important;
 }
+
+#check-map-code{
+  display: none;
+}
