@@ -325,7 +325,7 @@ public class ControllerUtils {
 
 	public static List<SimpleAddressRow> getCoordQuerysPage(String keywords, int pageIndex, int pageSize) {
 		if (null == coordQueryResults || 0 > coordQueryResults.size()) {
-			return null;
+			getCoordQuerys(keywords);
 		}
 		List<SimpleAddressRow> rows = new ArrayList<SimpleAddressRow>();
 		int start = (pageIndex - 1) * pageSize;
@@ -338,7 +338,7 @@ public class ControllerUtils {
 
 	public static List<SimpleAddressRow> getCodeQuerysPage(String keywords, int pageIndex, int pageSize) {
 		if (null == buildingCodeQueryResults || 0 > buildingCodeQueryResults.size()) {
-			return null;
+			getCodeQuerys(keywords);
 		}
 		List<SimpleAddressRow> rows = new ArrayList<SimpleAddressRow>();
 		int start = (pageIndex - 1) * pageSize;
