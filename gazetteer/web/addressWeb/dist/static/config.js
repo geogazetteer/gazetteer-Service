@@ -1,8 +1,9 @@
 /**
  * Created by lixiaochao on 2019/3/21.
  */
-const IP = 'http://119.3.72.23';
-const serverUrl = IP+':8083/';//服务器地址
+const localIP = 'http://localhost';
+const huaweiIP = 'http://119.3.72.23';	//http://119.3.72.23
+const serverUrl = localIP+':8083/';//服务器地址
 const URLCFG={
   searchCtxUrl:serverUrl+'address/hint',//搜索联想，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
   searchAddressUrl:serverUrl+'address/hint',//搜索，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
@@ -43,8 +44,8 @@ const URLCFG={
   searchListUrl:serverUrl+'address/page',// "/1?keywords=a&limit=10"
 };
 
-const geoServerUrl=IP + ':8085/';//geoserver服务地址
-const webUrl=IP + ':8087/';
+const geoServerUrl=huaweiIP + ':8085/';//geoserver服务地址
+const webUrl=huaweiIP + ':8087/';
 const MAPURL={
   //雪碧图
   sprite:webUrl+'sprite/sprite',

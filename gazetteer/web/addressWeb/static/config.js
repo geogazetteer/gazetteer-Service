@@ -1,9 +1,9 @@
 /**
  * Created by lixiaochao on 2019/3/21.
  */
-
-const serverUrl = 'http://119.3.72.23:8083/';//服务器地址
-var ProxyServlet = 'http://localhost:9192/ProxyServlet/proxyHandler?url=';//代理服务器地址
+const localIP = 'http://localhost';
+const huaweiIP = 'http://119.3.72.23';	//http://119.3.72.23
+const serverUrl = localIP+':8083/';//服务器地址
 const URLCFG={
   searchCtxUrl:serverUrl+'address/hint',//搜索联想，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
   searchAddressUrl:serverUrl+'address/hint',//搜索，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
@@ -35,10 +35,17 @@ const URLCFG={
   searchByPointUrl:serverUrl+'building/address',//(param:x=114.019777&y=22.672456)
   //根据地址获取门楼号
   getHouseNumberByAddrUrl:serverUrl+'transform/houseNumber',//(params,chars=chars)
+
+  //根据楼栋编号查询坐标
+  getCoordinatesByCodeUrl:serverUrl+'building/point',//(param:code='')
+  //获取搜索结果总数
+  searchCtxTotalUrl:serverUrl+'address/sum',//param：keywords=''
+  //根据页码获取搜索结果
+  searchListUrl:serverUrl+'address/page',// "/1?keywords=a&limit=10"
 };
 
-const geoServerUrl='http://119.3.72.23:8085/';//geoserver服务地址
-const webUrl=ProxyServlet+'http://localhost:9192/';
+const geoServerUrl=huaweiIP + ':8085/';//geoserver服务地址
+const webUrl=huaweiIP + ':8087/';
 const MAPURL={
   //雪碧图
   sprite:webUrl+'sprite/sprite',
@@ -46,8 +53,10 @@ const MAPURL={
   mapTile:webUrl+"mapboxLayer/{z}/{x}/{y}.pbf",
   //字体
   glyphs:webUrl+"myfonts/{fontstack}/{range}.pbf",
+  //政务内网底图  http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile/0/1072/1461
+  ol_map_tile:'http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile',
   //房屋面
-  building_vec_tile:geoServerUrl+"geoserver/gwc/service/tms/1.0.0/gazetteer%3ALH_building_4490@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+  building_vec_tile:geoServerUrl+"geoserver/gwc/service/tms/1.0.0/gazetteer%3ALH_building_4490@EPSG%3A900913@png/{z}/{x}/{y}.png"
 };
 //编辑模块，左侧街道社区selector配置
 const EDITSELECTORCFG={
@@ -56,30 +65,39 @@ const EDITSELECTORCFG={
 
 
 //搜索设置字典
-const SETDICT={
-  '别名识别':"addressAlias",
-  "数字转换": 'chineseNumber',
-  "地址补全": 'completed',
+const SETDICT={//默认为false的配置项
   "繁体转换": 'complexChar',
-  "坐标识别": 'coordinates',
   "全角转换": 'fullChar',
+  "中文数字转换": 'chineseNumber',
+
+  '别名转换':"alias",
+  "同音字转换": 'homophone',
+  "同义词转换":"synonym",
+  "通假字转换": 'interchangeable',
+
+
+
   "地名": 'geoName',
-  "地名别名": 'geoNameAlias',
-  "通假字识别": 'interchangeable',
-  "同音字识别": 'homophone',
   "POI": 'poi',
-  "POI别名": 'poialias',
-  "地址范围识别": 'withtin',
-  '楼栋编码':'buildingCode'
+  "坐标": 'coordinates',
+  "建筑物编码":"buildingCode",
+
+  "普通搜索": 'databaseSearch',
+  "快速搜索": 'luceneSearch',
 };
+const SETDICT_DEFAULT={//默认为true的配置项
+  "地址": 'address',
+  "普通搜索": 'databaseSearch',
+};
+
 const SETLABELARR={
-  settings_1:['繁体转换','全角转换','数字转换'],
-  settings_2:['别名识别','同音字识别','通假字识别'],
-  settings_3:['地址补全','地名','地名别名','POI','POI别名'],
-  settings_4:['地址范围识别','坐标识别','楼栋编码'],
+  settings_1:['繁体转换','全角转换','中文数字转换'],
+  settings_2:['别名转换','同音字转换','同义词转换','通假字转换'],
+  settings_3:['地址','地名','POI','坐标','建筑物编码'],
+  settings_4:['普通搜索','快速搜索'],
 };
 
 const BATCHSERVICE={
-  modelUrl:'http://119.3.72.23:8087/files/downloads/批量处理模版.xlsx',//模板地址
-  uploadUrl:'http://119.3.72.23:8083/fileUpload',//文件上传
+  modelUrl:webUrl+'files/downloads/批量处理模版.xls',//模板地址
+  uploadUrl:serverUrl+'data/upload/matcher',//文件上传
 };

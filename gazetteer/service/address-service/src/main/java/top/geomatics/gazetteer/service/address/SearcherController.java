@@ -652,12 +652,6 @@ public class SearcherController {
 		keywords = AddressProcessor.transform(keywords, this.settings);
 		// 设置查询条件
 		String tablename = IControllerConstant.ADDRESS_TABLE;
-		for (String community : IGazetteerConstant.COMMUNITY_LIST) {
-			if (keywords.contains(community)) {
-				tablename = community;
-				break;
-			}
-		}
 		String fieldString = IControllerConstant.ADDRESS_FIELDS;
 		AddressRow row = new AddressRow();
 		row.setAddress("%" + keywords + "%");
@@ -689,12 +683,6 @@ public class SearcherController {
 		keywords = AddressProcessor.transform(keywords, this.settings);
 		// 设置查询条件
 		String tablename = IControllerConstant.ADDRESS_TABLE;
-		for (String community : IGazetteerConstant.COMMUNITY_LIST) {
-			if (keywords.contains(community)) {
-				tablename = community;
-				break;
-			}
-		}
 		String fieldString = IControllerConstant.ADDRESS_FIELDS;
 		AddressRow row = new AddressRow();
 		row.setAddress("%" + keywords + "%");

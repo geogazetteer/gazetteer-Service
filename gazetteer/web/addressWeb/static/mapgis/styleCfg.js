@@ -15,11 +15,25 @@ const MAPSTYLE={
   "pitch": 0,
   "sources": {
     "mapbox_vec": {
-      type:'vector',
+      type: 'vector',
       "scheme": "xyz",
       "tiles": [
         MAPURL['mapTile']
-        ]
+      ]
+    },
+    //立德地图
+    'tile_ol': {
+      "type": "raster",
+      "tileSize": 256,
+      "tiles":[MAPURL['ol_map_tile']],
+      "scheme": "tms",
+    },
+    //龙华房屋面
+    'tile_building': {
+      "type": "raster",
+      "tileSize": 256,
+      "tiles":[MAPURL['building_vec_tile']],
+      "scheme": "tms",
     }
   },
   "sprite": MAPURL['sprite'],
@@ -1060,6 +1074,43 @@ const MAPSTYLE={
         "text-halo-color": "hsl(0, 0%, 100%)",
         "text-color": "hsl(0, 0%, 0%)"
       }
+    },
+    {
+      'id': '3d-buildings',
+      'source': 'mapbox_vec',
+      'source-layer': 'building',
+      'filter': ['==', 'extrude', 'true'],
+      'type': 'fill-extrusion',
+      'minzoom': 10,
+      'paint': {
+        'fill-extrusion-color': '#aaa',
+
+// use an 'interpolate' expression to add a smooth transition effect to the
+// buildings as the user zooms in
+        'fill-extrusion-height': [
+          "interpolate", ["linear"], ["zoom"],
+          15, 0,
+          15.05, ["get", "height"]
+        ],
+        'fill-extrusion-base': [
+          "interpolate", ["linear"], ["zoom"],
+          15, 0,
+          15.05, ["get", "min_height"]
+        ],
+        'fill-extrusion-opacity': .6
+      }
+    },
+    //立德地图
+   /* {
+      "id": "tile_ol_layer",
+      "type": "raster",
+      "source": "tile_ol",
+    },*/
+    //龙华房屋面
+    {
+      "id": "tile_building_layer",
+      "type": "raster",
+      "source": "tile_building",
     }
   ]
 };
