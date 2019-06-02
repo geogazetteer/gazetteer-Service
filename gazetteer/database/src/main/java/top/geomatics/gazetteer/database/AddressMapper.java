@@ -149,6 +149,17 @@ public interface AddressMapper {
 	 * @return 搜索结果集
 	 */
 	public List<BuildingPositionRow> findBuildingByPoint(Map<String, Object> map);
+	
+	/**
+	 * <b>根据街道或社区、关键词搜索</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中有条件select语句</i><br>
+	 * 
+	 * @param map select语句中的所有参数
+	 * @return 搜索结果集
+	 */
+	public List<AddressRow> findAddressLike(Map<String, Object> map);
 
 	/**
 	 * <b>删除表</b><br>
