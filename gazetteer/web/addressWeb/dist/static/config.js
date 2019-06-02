@@ -3,6 +3,7 @@
  */
 const localIP = 'http://localhost';
 const huaweiIP = 'http://119.3.72.23';	//http://119.3.72.23
+const governmentIP = 'http://10.148.26.63'; 
 const serverUrl = localIP+':8083/';//服务器地址
 const URLCFG={
   searchCtxUrl:serverUrl+'address/hint',//搜索联想，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
