@@ -34,6 +34,7 @@
 		<module>web</module>
 		<module>account</module>
 		<module>config</module>
+		<module>user</module>
 	</modules>
 
 	<!-- 自定义变量 -->
@@ -213,6 +214,11 @@
 			<dependency>
 				<groupId>top.geomatics.gazetteer.database</groupId>
 				<artifactId>gs-database</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>top.geomatics.gazetteer.user</groupId>
+				<artifactId>gs-user</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
