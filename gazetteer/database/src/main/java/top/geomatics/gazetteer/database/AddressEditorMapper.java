@@ -6,7 +6,7 @@ package top.geomatics.gazetteer.database;
 import java.util.List;
 import java.util.Map;
 
-import top.geomatics.gazetteer.model.EnterpriseRow;
+import top.geomatics.gazetteer.model.AddressEditorRow;
 
 /**
  * <b>企业法人数据库操作的mybatis映射接口</b><br>
@@ -119,7 +119,7 @@ public interface AddressEditorMapper {
 	 * @param map select语句中的所有参数
 	 * @return 搜索结果集
 	 */
-	public List<EnterpriseRow> selectByFid(Map<String, Object> map);
+	public List<AddressEditorRow> selectByFid(Map<String, Object> map);
 
 	/**
 	 * <b>根据一组fid查询</b><br>
@@ -130,7 +130,7 @@ public interface AddressEditorMapper {
 	 * @param map select语句中的所有参数
 	 * @return 搜索结果集
 	 */
-	public List<EnterpriseRow> selectByFids(Map<String, Object> map);
+	public List<AddressEditorRow> selectByFids(Map<String, Object> map);
 
 	/**
 	 * <b>任意精确查询</b><br>
@@ -141,7 +141,7 @@ public interface AddressEditorMapper {
 	 * @param map select语句中的所有参数
 	 * @return 搜索结果集
 	 */
-	public List<EnterpriseRow> findEquals(Map<String, Object> map);
+	public List<AddressEditorRow> findEquals(Map<String, Object> map);
 
 	/**
 	 * <b>任意模糊查询</b><br>
@@ -152,7 +152,7 @@ public interface AddressEditorMapper {
 	 * @param map select语句中的所有参数
 	 * @return 搜索结果集
 	 */
-	public List<EnterpriseRow> findLike(Map<String, Object> map);
+	public List<AddressEditorRow> findLike(Map<String, Object> map);
 
 	/**
 	 * <b>任意分页精确查询</b><br>
@@ -163,7 +163,7 @@ public interface AddressEditorMapper {
 	 * @param map select语句中的所有参数
 	 * @return 搜索结果集
 	 */
-	public List<EnterpriseRow> findPageEquals(Map<String, Object> map);
+	public List<AddressEditorRow> findPageEquals(Map<String, Object> map);
 
 	/**
 	 * <b>获得记录个数</b><br>

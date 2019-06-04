@@ -9,15 +9,17 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
 import top.geomatics.gazetteer.model.user.User;
-import top.geomatics.gazetteer.service.user.IUserService;
+import top.geomatics.gazetteer.service.user.UserServiceImpl;
 
 /**
  * <b>系统用户管理服务类</b><br>
@@ -28,12 +30,12 @@ import top.geomatics.gazetteer.service.user.IUserService;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-	@Autowired
-	private IUserService userService;
+	// @Autowired
+	private UserServiceImpl userService = new UserServiceImpl();
 
 	@ApiOperation(value = "用户注册", notes = "用户注册")
-	@GetMapping("/register")
-	public String register(@RequestParam User user, @RequestParam Model model, BindingResult bindingResult) {
+	@PostMapping("/register")
+	public String register(@RequestBody User user, @RequestParam Model model, BindingResult bindingResult) {
 		if (userService.existUser(user)) {
 			bindingResult.rejectValue("username", "userExist", "用户名已存在");
 
@@ -77,8 +79,8 @@ public class UserController {
 	}
 
 	@ApiOperation(value = "用户更新", notes = "用户更新")
-	@GetMapping("/update")
-	public String update(@RequestParam User user, @RequestParam HttpSession session, @RequestParam long userid) {
+	@PutMapping("/update")
+	public String update(@RequestBody User user, @RequestParam HttpSession session, @RequestParam long userid) {
 		user.setUserid(userid);
 		userService.updateUser(user);
 
