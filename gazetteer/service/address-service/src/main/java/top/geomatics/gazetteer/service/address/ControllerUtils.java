@@ -13,10 +13,8 @@ import org.apache.ibatis.session.SqlSession;
 
 import com.alibaba.fastjson.JSON;
 
-import top.geomatics.gazetteer.database.AddressEditorMapper;
 import top.geomatics.gazetteer.database.AddressMapper;
 import top.geomatics.gazetteer.database.DatabaseHelper;
-import top.geomatics.gazetteer.database.EditorDatabaseHelper;
 import top.geomatics.gazetteer.database.EnterpriseAddressMapper;
 import top.geomatics.gazetteer.database.EnterpriseDatabaseHelper;
 import top.geomatics.gazetteer.model.AddressEditorRow;
@@ -42,10 +40,6 @@ public class ControllerUtils {
 	public static EnterpriseDatabaseHelper helper2 = new EnterpriseDatabaseHelper();
 	public static SqlSession session2 = helper2.getSession();
 	public static EnterpriseAddressMapper mapper2 = session2.getMapper(EnterpriseAddressMapper.class);
-	
-	public static EditorDatabaseHelper helper_revision = new EditorDatabaseHelper();
-	public static SqlSession session_revision = helper_revision.getSession();
-	public static AddressEditorMapper mapper_revision = session_revision.getMapper(AddressEditorMapper.class);
 
 	/**
 	 * @param fields
@@ -175,7 +169,7 @@ public class ControllerUtils {
 			map.put("sql_limit", limit);
 		return map;
 	}
-	
+
 	/**
 	 * @param fields
 	 * @param tablename
@@ -184,8 +178,8 @@ public class ControllerUtils {
 	 * @param limit
 	 * @return
 	 */
-	public static Map<String, Object> getRequestMap_revision(String fields, String tablename, AddressEditorRow row, String orderby,
-			int limit) {
+	public static Map<String, Object> getRequestMap_revision(String fields, String tablename, AddressEditorRow row,
+			String orderby, int limit) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("sql_fields", fields);
 		map.put("sql_tablename", tablename);
@@ -269,7 +263,7 @@ public class ControllerUtils {
 		return responseString;
 
 	}
-	
+
 	/**
 	 * @param rows
 	 * @return

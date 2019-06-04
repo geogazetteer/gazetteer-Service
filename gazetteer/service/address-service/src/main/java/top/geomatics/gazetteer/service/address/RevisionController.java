@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import top.geomatics.gazetteer.database.AddressEditorMapper;
+import top.geomatics.gazetteer.database.EditorDatabaseHelper;
 import top.geomatics.gazetteer.model.AddressEditorRow;
 
 /**
@@ -49,6 +52,11 @@ public class RevisionController {
 	private static final String SIMILAR_ADDRESS_NEW = "new_similar_address";
 	private static final String STANDARD_ADDRESS_NEW = "new_standard_address";
 
+	private String userName = "enterprise1";
+	private EditorDatabaseHelper helper_revision = new EditorDatabaseHelper(userName);
+	private SqlSession session_revision = helper_revision.getSession();
+	private AddressEditorMapper mapper_revision = session_revision.getMapper(AddressEditorMapper.class);
+
 	/**
 	 * <b>列出需要编辑的地址</b><br>
 	 * <i>examples:<br>
@@ -71,7 +79,7 @@ public class RevisionController {
 			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit,
 			AddressEditorRow row) {
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(fields, tablename, row, orderby, limit);
-		List<AddressEditorRow> rows = ControllerUtils.mapper_revision.findEquals(map);
+		List<AddressEditorRow> rows = mapper_revision.findEquals(map);
 		return ControllerUtils.getResponseBody_revision(rows);
 	}
 
@@ -88,7 +96,7 @@ public class RevisionController {
 	public String getCount(
 			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename) {
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(null, tablename, null, null, 0);
-		return "{ \"total\": " + ControllerUtils.mapper_revision.getCount(map) + "}";
+		return "{ \"total\": " + mapper_revision.getCount(map) + "}";
 	}
 
 	/**
@@ -117,7 +125,7 @@ public class RevisionController {
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(fields, tablename, row, orderby, limit);
 		Integer page_start = (index - 1) * limit;
 		map.put("page_start", page_start);
-		List<AddressEditorRow> rows = ControllerUtils.mapper_revision.findPageEquals(map);
+		List<AddressEditorRow> rows = mapper_revision.findPageEquals(map);
 		return ControllerUtils.getResponseBody_revision(rows);
 	}
 
@@ -139,7 +147,7 @@ public class RevisionController {
 			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename) {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put(IControllerConstant.ENTERPRISE_DB_ID, fid);
-		List<AddressEditorRow> rows = ControllerUtils.mapper_revision.selectByFid(map);
+		List<AddressEditorRow> rows = mapper_revision.selectByFid(map);
 		return ControllerUtils.getResponseBody_revision(rows);
 	}
 
@@ -166,7 +174,7 @@ public class RevisionController {
 		}
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put("fids", idList);
-		List<AddressEditorRow> row = ControllerUtils.mapper_revision.selectByFids(map);
+		List<AddressEditorRow> row = mapper_revision.selectByFids(map);
 		return ControllerUtils.getResponseBody_revision(row);
 	}
 
@@ -227,7 +235,7 @@ public class RevisionController {
 			row.setModifier(modifier);
 
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(fields, tablename, row, orderby, limit);
-		List<AddressEditorRow> rows = ControllerUtils.mapper_revision.findEquals(map);
+		List<AddressEditorRow> rows = mapper_revision.findEquals(map);
 		return ControllerUtils.getResponseBody_revision(rows);
 	}
 
@@ -288,7 +296,7 @@ public class RevisionController {
 			row.setModifier("%" + modifier + "%");
 
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(fields, tablename, row, orderby, limit);
-		List<AddressEditorRow> rows = ControllerUtils.mapper_revision.findLike(map);
+		List<AddressEditorRow> rows = mapper_revision.findLike(map);
 		return ControllerUtils.getResponseBody_revision(rows);
 	}
 
@@ -508,8 +516,8 @@ public class RevisionController {
 		if (null != new_update_building_code && !new_update_building_code.isEmpty())
 			map.put(UPDATE_BUILDING_CODE_NEW, new_update_building_code);
 
-		Integer updatedRows = ControllerUtils.mapper_revision.updateAll(map);
-		ControllerUtils.session_revision.commit(true);
+		Integer updatedRows = mapper_revision.updateAll(map);
+		session_revision.commit(true);
 		return ControllerUtils.getUpdateResponseBody(updatedRows);
 	}
 
