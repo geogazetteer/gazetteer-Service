@@ -27,7 +27,7 @@ public class ResourcesManager2 {
 	public ResourcesManager2(String userName) {
 		// String pathString = "C:\\gazetteer\\config";//System.getProperty("user.home")
 		// + File.separator + R_PATH;
-		String pathString = user_workspace_root + File.separator + "user_" + userName + File.separator + "config";
+		String pathString = user_workspace_root + File.separator + userName + File.separator + "config";
 		pathString = pathString + File.separator + R_NAME;
 		File resFile = new File(pathString);
 		if (!resFile.exists()) {

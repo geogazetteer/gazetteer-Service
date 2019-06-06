@@ -52,7 +52,7 @@ public class RevisionController {
 	private static final String SIMILAR_ADDRESS_NEW = "new_similar_address";
 	private static final String STANDARD_ADDRESS_NEW = "new_standard_address";
 
-	private String userName = "enterprise1";
+	private String userName = "user_enterprise1";
 	private EditorDatabaseHelper helper_revision = new EditorDatabaseHelper(userName);
 	private SqlSession session_revision = helper_revision.getSession();
 	private AddressEditorMapper mapper_revision = session_revision.getMapper(AddressEditorMapper.class);

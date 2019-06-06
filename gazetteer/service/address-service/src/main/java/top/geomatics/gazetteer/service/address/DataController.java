@@ -3,9 +3,12 @@ package top.geomatics.gazetteer.service.address;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,13 +27,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.fastjson.JSON;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 import top.geomatics.gazetteer.config.ResourcesManager;
+import top.geomatics.gazetteer.config.ResourcesManager2;
 import top.geomatics.gazetteer.model.MatcherResultRow;
 import top.geomatics.gazetteer.utilities.database.excel.BatchDealExcel;
+import top.geomatics.gazetteer.utilities.database.excel2gpkg.Excel2Geopackage;
+import top.geomatics.gazetteer.utilities.database.shp2gpkg.Shapefile2Geopackage;
 
 /**
  * <b>地址数据上传下载服务类</b><br>
@@ -41,11 +49,15 @@ import top.geomatics.gazetteer.utilities.database.excel.BatchDealExcel;
 @Controller
 @RequestMapping("/data")
 public class DataController {
-	// 文件上传路径
-	private String upload_file_path = ResourcesManager.getInstance().getValue(Messages.getString("DataController.0")); //$NON-NLS-1$
-
 	// 添加slf4j日志实例对象
 	private final static Logger logger = LoggerFactory.getLogger(DataController.class);
+	private String username = "user_enterprise1";
+
+	ResourcesManager2 rm = new ResourcesManager2(username);
+	// 文件上传路径
+	private String upload_file_path = rm.getValue(Messages.getString("DataController.0")); //$NON-NLS-1$
+	// 文件下载路径
+	private String download_file_path = rm.getValue("download_file_path");
 
 	/**
 	 * <b>上传数据文件</b><br>
@@ -195,6 +207,109 @@ public class DataController {
 		 * String zipName = "shp_" + id; ShpZip.createCardImgZip(sourcePath, zipName);
 		 * long end = System.currentTimeMillis(); System.out.println(end - start);
 		 */
+
+	}
+
+	/**
+	 * <b>获得数据文件中的字段</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>数据文件格式为excel格式或shapefile格式<br>
+	 * 
+	 * examples:<br>
+	 * http://localhost:8083/data/fields?fileName= </i>
+	 * 
+	 * @param file String 请求参数，文件名
+	 * @return String 返回JSON格式的结果
+	 */
+	@ApiOperation(value = "获得数据文件中的字段", notes = "获得数据文件中的字段")
+	@GetMapping("/fields")
+	public String getFields(@ApiParam(value = "文件名") @RequestParam("fileName") String fileName) {
+		File file = new File(fileName);
+
+		if (!file.exists()) {
+			// 日志
+			String logMsgString = String.format("文件 %s 不存在", fileName);
+			logger.error(logMsgString);
+			return "";
+		}
+		String ftype = fileName.substring(fileName.lastIndexOf('.')+1, fileName.length());
+		List<String> fields = null;
+		if (ftype.compareToIgnoreCase("shp") == 0) {
+			Shapefile2Geopackage s2g = new Shapefile2Geopackage(fileName);
+			fields = s2g.getFields();
+		} else if (ftype.compareToIgnoreCase("xlsx") == 0) {
+			Excel2Geopackage x2g = new Excel2Geopackage(fileName);
+			fields = x2g.getFields();
+		}
+		return JSON.toJSONString(fields);
+
+	}
+
+	/**
+	 * <b>列出已经上传的数据文件</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>数据文件格式为excel格式或shapefile格式<br>
+	 * 
+	 * examples:<br>
+	 * http://localhost:8083/data/source </i>
+	 * 
+	 * @return String 返回JSON格式的结果
+	 */
+	@ApiOperation(value = "列出已经上传的数据文件", notes = "列出已经上传的数据文件")
+	@GetMapping("/source")
+	public String getSource() {
+		File file = new File(upload_file_path);
+
+		if (!file.exists()) {
+			// 日志
+			String logMsgString = String.format("文件路径 %s 不存在", upload_file_path);
+			logger.error(logMsgString);
+			return "";
+		}
+		List<String> fs = new ArrayList<String>();
+		for (String fileName : file.list()) {
+			String ftype = fileName.substring(fileName.lastIndexOf('.') + 1, fileName.length());
+			if (ftype.compareToIgnoreCase("shp") == 0 || ftype.compareToIgnoreCase("xlsx") == 0) {
+				fs.add(fileName);
+			}
+		}
+		if (fs.size() > 0) {
+			return JSON.toJSONString(fs);
+		} else {
+			return "";
+		}
+
+	}
+
+	/**
+	 * <b>列出可以下载的数据文件</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>数据文件格式为geopackage格式<br>
+	 * 
+	 * examples:<br>
+	 * http://localhost:8083/data/target </i>
+	 * 
+	 * @return String 返回JSON格式的结果
+	 */
+	@ApiOperation(value = "列出可以下载的数据文件", notes = "列出可以下载的数据文件")
+	@GetMapping("/target")
+	public String getTarget() {
+		File file = new File(download_file_path);
+
+		if (!file.exists()) {
+			// 日志
+			String logMsgString = String.format("文件路径 %s 不存在", download_file_path);
+			logger.error(logMsgString);
+			return "";
+		}
+		if (file.list().length > 0) {
+			return JSON.toJSONString(file.list());
+		} else {
+			return "";
+		}
 
 	}
 
