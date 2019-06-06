@@ -3,19 +3,30 @@ package top.geomatics.gazetteer.service.address;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.zip.ZipFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -35,7 +46,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
-import top.geomatics.gazetteer.config.ResourcesManager;
 import top.geomatics.gazetteer.config.ResourcesManager2;
 import top.geomatics.gazetteer.model.MatcherResultRow;
 import top.geomatics.gazetteer.utilities.database.excel.BatchDealExcel;
@@ -363,7 +373,7 @@ public class DataController {
 		}
 		// 服务器上存储的文件名
 		String sfn = file.getOriginalFilename();
-		File sf= new File(sfn);
+		File sf = new File(sfn);
 		String dfn = sf.getName();
 		String destFN = upload_file_path + File.separator + dfn;
 		File dest = new File(destFN);
@@ -372,7 +382,6 @@ public class DataController {
 			dest.getParentFile().mkdir();
 		}
 		dest.setWritable(true);
-		
 
 		try {
 			// 保存文件
@@ -385,11 +394,162 @@ public class DataController {
 			return new ResponseEntity<>(logMsgString, HttpStatus.FORBIDDEN);
 		}
 		// 处理数据
-//		String fileName2 = uuid + Messages.getString("DataController.12"); //$NON-NLS-1$
-//		String destFilePath = upload_file_path + File.separator + fileName2;
-//		List<MatcherResultRow> allRows = BatchDealExcel.batchDealExcel(sourceFilePath, destFilePath);
+		String ftype = dfn.substring(dfn.lastIndexOf('.') + 1, dfn.length());
+		// 如果是压缩文件，需要解压缩
+		if (ftype.compareToIgnoreCase("zip") == 0) {
+			List<String> unzippedFiles = unzip(destFN, upload_file_path);
+			for (String impString : unzippedFiles) {
+				if (impString.contains("import.xml")) {
+					// 转换到数据库
+					dataImport(impString);
+				}
+			}
+		} else if (dfn.contains("import.xml")) {
+			// 转换到数据库
+			dataImport(dfn);
+		}
+
+		// 修改用户配置文件
 
 		return new ResponseEntity<>("数据上传成功!", HttpStatus.OK);
+	}
+
+	private boolean dataImport(String importXML) {
+		String destFN = upload_file_path + File.separator + importXML;
+		File xmlFile = new File(destFN);
+		if (!xmlFile.exists()) {
+			return false;
+		}
+		Document document = load(destFN);
+		Element root = document.getRootElement();
+		List<Element> nodes = root.elements("DataFile");
+		Iterator<Element> it = nodes.iterator();
+		while (it.hasNext()) {
+			Element elm = it.next();
+			// 文件名和设置
+			String fnString = "";
+			String originString = "";
+			String XString = "";
+			String YString = "";
+			String geometryString = "";
+			List<Element> fElements = elm.elements("FileName");
+			if (fElements.size() > 0) {
+				fnString = fElements.get(0).getText();
+			} else {
+				continue;
+			}
+			if (fnString.trim().isEmpty()) {
+				continue;
+			}
+			List<Element> sElements = elm.elements("Settings");
+			if (sElements.size() > 0) {
+				Element se = sElements.get(0);
+				List<Element> se2 = se.elements("Fields");
+				if (se2.size() > 0) {
+					Element se3 = se2.get(0);
+					List<Element> lse3 = se3.elements("Field");
+					if (lse3.size() > 0) {
+						Element se4 = lse3.get(0);
+						List<Element> lse4_o = se4.elements("origin_address");
+						List<Element> lse4_x = se4.elements("longitude");
+						List<Element> lse4_y = se4.elements("latitude");
+						List<Element> lse4_g = se4.elements("build_geometry");
+						if (lse4_o.size() > 0) {
+							Element se5 = lse4_o.get(0);
+							originString = se5.getText();
+						}
+						if (lse4_x.size() > 0) {
+							Element se5 = lse4_x.get(0);
+							XString = se5.getText();
+						}
+						if (lse4_y.size() > 0) {
+							Element se5 = lse4_y.get(0);
+							YString = se5.getText();
+						}
+						if (lse4_g.size() > 0) {
+							Element se5 = lse4_g.get(0);
+							geometryString = se5.getText();
+						}
+					}
+				}
+
+			}
+			String fname = fnString.substring(0, fnString.lastIndexOf('.'));
+			String ftype = fnString.substring(fnString.lastIndexOf('.') + 1, fnString.length());
+			String sourceFN = upload_file_path + File.separator + fnString;
+			String targetFN = download_file_path + File.separator + fname + ".gpkg";
+			Map<String, String> settings = new HashMap<String, String>();
+			if (!originString.isEmpty()) {
+				settings.put(originString, "origin_address");
+			}
+			if (!XString.isEmpty()) {
+				settings.put(XString, "longitude_");
+			}
+			if (!YString.isEmpty()) {
+				settings.put(YString, "latitude_");
+			}
+			if (!geometryString.isEmpty()) {
+				// settings.put("buildGeometry", geometryString);
+			}
+			if (ftype.compareToIgnoreCase("shp") == 0) {
+				Shapefile2Geopackage s2g = new Shapefile2Geopackage(sourceFN, targetFN, settings);
+				s2g.execute();
+			} else if (ftype.compareToIgnoreCase("xlsx") == 0) {
+				Excel2Geopackage s2g = new Excel2Geopackage(sourceFN, targetFN, settings);
+				s2g.execute();
+			}
+
+		}
+		return true;
+	}
+
+	private Document load(String filename) {
+		Document document = null;
+		try {
+			SAXReader saxReader = new SAXReader();
+			document = saxReader.read(new File(filename)); // 读取XML文件,获得document对象
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return document;
+	}
+
+	/**
+	 * 解压Zip文件
+	 * 
+	 * @param zipFile 需要解压的zip文件位置
+	 * @param destDir 解压的目标位置
+	 */
+	private List<String> unzip(String zipFile, String destDir) {
+		File f;
+		List<String> fileNames = new ArrayList<String>();
+		try (ArchiveInputStream i = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.ZIP,
+				Files.newInputStream(Paths.get(zipFile)))) {
+			ArchiveEntry entry = null;
+			while ((entry = i.getNextEntry()) != null) {
+				if (!i.canReadEntryData(entry)) {
+					continue;
+				}
+				fileNames.add(entry.getName());
+				f = new File(destDir, entry.getName());
+				if (entry.isDirectory()) {
+					if (!f.isDirectory() && !f.mkdirs()) {
+						throw new IOException("failed to create directory " + f);
+					}
+				} else {
+					File parent = f.getParentFile();
+					if (!parent.isDirectory() && !parent.mkdirs()) {
+						throw new IOException("failed to create directory " + parent);
+					}
+					try (OutputStream o = Files.newOutputStream(f.toPath())) {
+						IOUtils.copy(i, o);
+					}
+				}
+			}
+		} catch (IOException | ArchiveException e) {
+			e.printStackTrace();
+		}
+		return fileNames;
 	}
 
 }
