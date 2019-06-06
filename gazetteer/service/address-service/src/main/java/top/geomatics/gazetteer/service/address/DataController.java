@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -224,8 +226,10 @@ public class DataController {
 	 */
 	@ApiOperation(value = "获得数据文件中的字段", notes = "获得数据文件中的字段")
 	@GetMapping("/fields")
+	@ResponseBody
 	public String getFields(@ApiParam(value = "文件名") @RequestParam("fileName") String fileName) {
-		File file = new File(fileName);
+		String ffn = upload_file_path + File.separator + fileName;
+		File file = new File(ffn);
 
 		if (!file.exists()) {
 			// 日志
@@ -233,16 +237,20 @@ public class DataController {
 			logger.error(logMsgString);
 			return "";
 		}
-		String ftype = fileName.substring(fileName.lastIndexOf('.')+1, fileName.length());
+		String ftype = fileName.substring(fileName.lastIndexOf('.') + 1, fileName.length());
 		List<String> fields = null;
 		if (ftype.compareToIgnoreCase("shp") == 0) {
-			Shapefile2Geopackage s2g = new Shapefile2Geopackage(fileName);
+			Shapefile2Geopackage s2g = new Shapefile2Geopackage(ffn);
 			fields = s2g.getFields();
 		} else if (ftype.compareToIgnoreCase("xlsx") == 0) {
-			Excel2Geopackage x2g = new Excel2Geopackage(fileName);
+			Excel2Geopackage x2g = new Excel2Geopackage(ffn);
 			fields = x2g.getFields();
 		}
-		return JSON.toJSONString(fields);
+		if (null != fields && fields.size() > 0) {
+			return JSON.toJSONString(fields);
+		} else {
+			return "";
+		}
 
 	}
 
@@ -259,6 +267,7 @@ public class DataController {
 	 */
 	@ApiOperation(value = "列出已经上传的数据文件", notes = "列出已经上传的数据文件")
 	@GetMapping("/source")
+	@ResponseBody
 	public String getSource() {
 		File file = new File(upload_file_path);
 
@@ -269,11 +278,16 @@ public class DataController {
 			return "";
 		}
 		List<String> fs = new ArrayList<String>();
-		for (String fileName : file.list()) {
-			String ftype = fileName.substring(fileName.lastIndexOf('.') + 1, fileName.length());
-			if (ftype.compareToIgnoreCase("shp") == 0 || ftype.compareToIgnoreCase("xlsx") == 0) {
-				fs.add(fileName);
+		for (File f : file.listFiles()) {
+			if (f.isFile()) {
+				String fileName = f.getName();
+				String ftype = fileName.substring(fileName.lastIndexOf('.') + 1, fileName.length());
+				if (ftype.compareToIgnoreCase("shp") == 0 || ftype.compareToIgnoreCase("xlsx") == 0) {
+					fs.add(fileName);
+				}
 			}
+			// 暂时不考虑子目录
+
 		}
 		if (fs.size() > 0) {
 			return JSON.toJSONString(fs);
@@ -296,6 +310,7 @@ public class DataController {
 	 */
 	@ApiOperation(value = "列出可以下载的数据文件", notes = "列出可以下载的数据文件")
 	@GetMapping("/target")
+	@ResponseBody
 	public String getTarget() {
 		File file = new File(download_file_path);
 
@@ -305,12 +320,76 @@ public class DataController {
 			logger.error(logMsgString);
 			return "";
 		}
-		if (file.list().length > 0) {
-			return JSON.toJSONString(file.list());
+		List<String> fs = new ArrayList<String>();
+		for (File f : file.listFiles()) {
+			if (f.isFile()) {
+				String fileName = f.getName();
+				String ftype = fileName.substring(fileName.lastIndexOf('.') + 1, fileName.length());
+				if (ftype.compareToIgnoreCase("gpkg") == 0) {
+					fs.add(fileName);
+				}
+			}
+			// 暂时不考虑子目录
+
+		}
+		if (fs.size() > 0) {
+			return JSON.toJSONString(fs);
 		} else {
 			return "";
 		}
 
+	}
+
+	/**
+	 * <b>导入数据文件</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>数据文件格式为excel格式或shapefile格式</i><br>
+	 * 
+	 * examples:<br>
+	 * http://localhost:8083/data/import
+	 * 
+	 * @param file MultipartFile 请求参数，前台上传的文件
+	 * @return 返回处理结果
+	 */
+	@ApiOperation(value = "导入数据文件", notes = "导入数据文件")
+	@PostMapping("/import")
+	public ResponseEntity<String> importData(@ApiParam(value = "上传文件") @RequestParam("fileName") MultipartFile file) {
+		if (file.isEmpty()) {
+			// 日志
+			String logMsgString = Messages.getString("DataController.7"); //$NON-NLS-1$
+			logger.error(logMsgString);
+			return new ResponseEntity<>(logMsgString, HttpStatus.NOT_FOUND);
+		}
+		// 服务器上存储的文件名
+		String sfn = file.getOriginalFilename();
+		File sf= new File(sfn);
+		String dfn = sf.getName();
+		String destFN = upload_file_path + File.separator + dfn;
+		File dest = new File(destFN);
+		// 判断文件父目录是否存在，如果不存在，则创建目录
+		if (!dest.getParentFile().exists()) {
+			dest.getParentFile().mkdir();
+		}
+		dest.setWritable(true);
+		
+
+		try {
+			// 保存文件
+			file.transferTo(dest);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// 日志
+			String logMsgString = Messages.getString("DataController.10"); //$NON-NLS-1$
+			logger.error(logMsgString);
+			return new ResponseEntity<>(logMsgString, HttpStatus.FORBIDDEN);
+		}
+		// 处理数据
+//		String fileName2 = uuid + Messages.getString("DataController.12"); //$NON-NLS-1$
+//		String destFilePath = upload_file_path + File.separator + fileName2;
+//		List<MatcherResultRow> allRows = BatchDealExcel.batchDealExcel(sourceFilePath, destFilePath);
+
+		return new ResponseEntity<>("数据上传成功!", HttpStatus.OK);
 	}
 
 }
