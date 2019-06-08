@@ -31,16 +31,19 @@ public class EditorDatabaseHelper {
 	private final static Logger logger = LoggerFactory.getLogger(EditorDatabaseHelper.class);
 
 	private static final String resource = "editor_db_config.xml";
+	private static final String EDITOR_DB_PROPERTIES_FILE = "editor_db_properties_file";
 
 	private static SqlSessionFactory sessionFactory = null;
 
-	private ResourcesManager2 manager = new ResourcesManager2(this.userName);
-	private final String EDITOR_DB_PROPERTIES_FILE = "editor_db_properties_file";
-	private String editor_properties_file = manager.getValue(EDITOR_DB_PROPERTIES_FILE);
+	private ResourcesManager2 manager = null;
+	
+	private String editor_properties_file = null;
 
 	public EditorDatabaseHelper(String userName) {
 		super();
 		this.userName = userName;
+		manager = new ResourcesManager2(this.userName);
+		editor_properties_file = manager.getValue(EDITOR_DB_PROPERTIES_FILE);
 	}
 
 	// 创建能执行映射文件中sql的sqlSession
