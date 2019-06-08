@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,14 +13,17 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import top.geomatics.gazetteer.config.ResourcesManager2;
 import top.geomatics.gazetteer.database.AddressEditorMapper;
 import top.geomatics.gazetteer.database.EditorDatabaseHelper;
 import top.geomatics.gazetteer.model.AddressEditorRow;
+import top.geomatics.gazetteer.model.user.User;
 
 /**
  * <b>非标准地址修正服务</b><br>
@@ -52,13 +57,21 @@ public class RevisionController {
 	private static final String SIMILAR_ADDRESS_NEW = "new_similar_address";
 	private static final String STANDARD_ADDRESS_NEW = "new_standard_address";
 
-	private String userName = "user_admin";// 缺省用户
-	{
-		userName = CurrentSession.getCurrentUserName();// 当前登录用户
+	private static String userName = "user_admin";// 缺省用户
+
+	private static EditorDatabaseHelper helper_revision = new EditorDatabaseHelper(userName);
+	private static SqlSession session_revision = helper_revision.getSession();
+	private static AddressEditorMapper mapper_revision = session_revision.getMapper(AddressEditorMapper.class);
+
+	@GetMapping("/initial")
+	@ApiOperation(value = "初始化", notes = "初始化")
+	@ResponseBody
+	public static void Initialize(@ApiParam(value = "用户名") @RequestParam("username") String username) {
+		RevisionController.userName = username;
+		helper_revision = new EditorDatabaseHelper(userName);
+		session_revision = helper_revision.getSession();
+		mapper_revision = session_revision.getMapper(AddressEditorMapper.class);
 	}
-	private EditorDatabaseHelper helper_revision = new EditorDatabaseHelper(userName);
-	private SqlSession session_revision = helper_revision.getSession();
-	private AddressEditorMapper mapper_revision = session_revision.getMapper(AddressEditorMapper.class);
 
 	/**
 	 * <b>列出需要编辑的地址</b><br>

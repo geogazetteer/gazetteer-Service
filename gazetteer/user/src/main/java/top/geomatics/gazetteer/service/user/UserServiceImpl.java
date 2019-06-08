@@ -46,7 +46,7 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public void updateUser(User user) {
 		userMapper.updateUserById(user);
-
+		session.commit();
 	}
 
 	/*
@@ -84,7 +84,7 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public void register(User user) {
 		userMapper.insertUser(user);
-
+		session.commit();
 	}
 
 }

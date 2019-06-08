@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
@@ -55,9 +56,11 @@ import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import net.bytebuddy.asm.Advice.This;
 import springfox.documentation.annotations.ApiIgnore;
 import top.geomatics.gazetteer.config.ResourcesManager2;
 import top.geomatics.gazetteer.model.MatcherResultRow;
+import top.geomatics.gazetteer.model.user.User;
 import top.geomatics.gazetteer.utilities.database.excel.BatchDealExcel;
 import top.geomatics.gazetteer.utilities.database.excel2gpkg.Excel2Geopackage;
 import top.geomatics.gazetteer.utilities.database.shp2gpkg.Shapefile2Geopackage;
@@ -74,18 +77,27 @@ public class DataController {
 	// 添加slf4j日志实例对象
 	private final static Logger logger = LoggerFactory.getLogger(DataController.class);
 
-	private String username = "user_admin";// 缺省用户
-//	{
-//		username = CurrentSession.getCurrentUserName();//当前登录用户
-//	}
+	public static String username = "user_admin";// 缺省用户
 
 	private static final String EDIT_DB_PROPERTIES = "editor_db_properties_file";
 
-	private ResourcesManager2 rm = new ResourcesManager2(username);
+	private static ResourcesManager2 rm = new ResourcesManager2(username);
 	// 文件上传路径
-	private String upload_file_path = rm.getValue(Messages.getString("DataController.0")); //$NON-NLS-1$
+	private static String upload_file_path = rm.getValue(Messages.getString("DataController.0")); //$NON-NLS-1$
 	// 文件下载路径
-	private String download_file_path = rm.getValue("download_file_path");
+	private static String download_file_path = rm.getValue("download_file_path");
+
+	@GetMapping("/initial")
+	@ApiOperation(value = "初始化", notes = "初始化")
+	@ResponseBody
+	public static void Initialize(@ApiParam(value = "用户名") @RequestParam("username") String username) {
+		DataController.username = username;
+		rm = new ResourcesManager2(username);
+		// 文件上传路径
+		upload_file_path = rm.getValue(Messages.getString("DataController.0")); //$NON-NLS-1$
+		// 文件下载路径
+		download_file_path = rm.getValue("download_file_path");
+	}
 
 	/**
 	 * <b>上传数据文件</b><br>
