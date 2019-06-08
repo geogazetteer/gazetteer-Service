@@ -161,7 +161,7 @@ public class UserController {
 		Writer out_edit = null;
 		try {
 			out_edit = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(edit_prop)), "UTF-8"));
-			dbProperties.store(out_edit, "created by " + username);
+			editProperties.store(out_edit, "created by " + username);
 			out_edit.close();
 		} catch (IOException e) {
 			e.printStackTrace();
