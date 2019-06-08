@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,11 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import top.geomatics.gazetteer.config.ResourcesManager2;
 import top.geomatics.gazetteer.database.AddressEditorMapper;
 import top.geomatics.gazetteer.database.EditorDatabaseHelper;
 import top.geomatics.gazetteer.model.AddressEditorRow;
-import top.geomatics.gazetteer.model.user.User;
 
 /**
  * <b>非标准地址修正服务</b><br>
