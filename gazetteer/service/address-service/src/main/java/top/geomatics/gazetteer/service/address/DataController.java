@@ -1,11 +1,18 @@
 package top.geomatics.gazetteer.service.address;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -13,8 +20,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
-import java.util.zip.ZipFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,10 +42,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.condition.RequestConditionHolder;
 
 import com.alibaba.fastjson.JSON;
 
@@ -63,9 +73,15 @@ import top.geomatics.gazetteer.utilities.database.shp2gpkg.Shapefile2Geopackage;
 public class DataController {
 	// 添加slf4j日志实例对象
 	private final static Logger logger = LoggerFactory.getLogger(DataController.class);
-	private String username = "user_enterprise1";
 
-	ResourcesManager2 rm = new ResourcesManager2(username);
+	private String username = "user_admin";// 缺省用户
+//	{
+//		username = CurrentSession.getCurrentUserName();//当前登录用户
+//	}
+
+	private static final String EDIT_DB_PROPERTIES = "editor_db_properties_file";
+
+	private ResourcesManager2 rm = new ResourcesManager2(username);
 	// 文件上传路径
 	private String upload_file_path = rm.getValue(Messages.getString("DataController.0")); //$NON-NLS-1$
 	// 文件下载路径
@@ -351,6 +367,112 @@ public class DataController {
 	}
 
 	/**
+	 * <b>设置需要编辑的数据文件</b><br>
+	 * 
+	 * <i>examples:<br>
+	 * http://localhost:8083/data/settings?fileName= </i>
+	 * 
+	 * @param fileName String 需要编辑的数据文件名
+	 */
+	@ApiOperation(value = "设置需要编辑的数据文件", notes = "设置需要编辑的数据文件")
+	@PutMapping(value = "/settings")
+	public ResponseEntity<String> setRevisionFile(
+			@ApiParam(value = "需要编辑的数据文件名") @RequestParam("fileName") String fileName) {
+		// 文件目录
+		String folder = download_file_path;
+		File file = new File(folder, fileName);
+		if (!file.exists()) {
+			// 日志
+			String logMsgString = String.format("数据文件 %s 不存在，请重新设置！", fileName);
+			logger.error(logMsgString);
+			return new ResponseEntity<>(logMsgString, HttpStatus.NOT_FOUND);
+		}
+		// 修改相应的配置文件
+		String db_properties = rm.getValue(EDIT_DB_PROPERTIES);
+		Properties prop = new Properties();
+		try {
+			prop.load(new BufferedReader(new InputStreamReader(new FileInputStream(db_properties), "UTF-8")));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			// 日志
+			String logMsgString = String.format("配置文件 %s 不存在！", db_properties);
+			logger.error(logMsgString);
+			return new ResponseEntity<>(logMsgString, HttpStatus.NOT_FOUND);
+		} catch (IOException e) {
+			e.printStackTrace();
+			// 日志
+			String logMsgString = String.format("打开配置文件 %s 失败！", db_properties);
+			logger.error(logMsgString);
+			return new ResponseEntity<>(logMsgString, HttpStatus.NOT_FOUND);
+		}
+		String value = "jdbc:sqlite:";
+		value = value + folder + File.separator + fileName;
+		prop.setProperty("url", value);
+
+		File pf = new File(db_properties);
+
+		Writer out = null;
+		try {
+			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pf), "UTF-8"));
+			prop.store(out, String.format("update database URL"));
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			// 日志
+			String logMsgString = String.format("修改配置文件 %s 失败！", db_properties);
+			logger.error(logMsgString);
+			return new ResponseEntity<>(logMsgString, HttpStatus.FORBIDDEN);
+		}
+
+		return new ResponseEntity<>("设置数据文件成功!", HttpStatus.OK);
+
+	}
+
+	/**
+	 * <b>导出数据</b><br>
+	 * 
+	 * <i>examples:<br>
+	 * http://localhost:8083/data/export?fileName= </i>
+	 * 
+	 * @param fileName String 需要下载的数据文件名
+	 */
+	@ApiOperation(value = "导出数据", notes = "导出数据")
+	@GetMapping(value = "/export")
+	public void export(@ApiParam(value = "需要下载的数据文件名") @RequestParam("fileName") String fileName,
+			HttpServletResponse response) {
+		// 文件目录
+		String folder = download_file_path;
+		InputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(new File(folder, fileName));
+			OutputStream outputStream = response.getOutputStream();
+			// 指明为下载
+			response.setContentType(Messages.getString("DataController.13")); //$NON-NLS-1$
+			// 设置文件名
+			response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+
+			// 把输入流copy到输出流
+			IOUtils.copy(inputStream, outputStream);
+			outputStream.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+			// 日志
+			String logMsgString = String.format("导出数据文件 %s 失败！", fileName);
+			logger.error(logMsgString);
+		} finally {
+			if (null != inputStream) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				inputStream = null;
+			}
+		}
+
+	}
+
+	/**
 	 * <b>导入数据文件</b><br>
 	 * 
 	 * <i>说明：</i><br>
@@ -524,7 +646,7 @@ public class DataController {
 		File f;
 		List<String> fileNames = new ArrayList<String>();
 		try (ArchiveInputStream i = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.ZIP,
-				Files.newInputStream(Paths.get(zipFile)))) {
+				Files.newInputStream(Paths.get(zipFile)), "GBK")) {
 			ArchiveEntry entry = null;
 			while ((entry = i.getNextEntry()) != null) {
 				if (!i.canReadEntryData(entry)) {

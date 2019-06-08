@@ -3,8 +3,9 @@
  */
 package top.geomatics.gazetteer.service.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.ibatis.session.SqlSession;
 
+import top.geomatics.gazetteer.database.UsersDatabaseHelper;
 import top.geomatics.gazetteer.database.UsersMapper;
 import top.geomatics.gazetteer.model.user.User;
 
@@ -14,8 +15,9 @@ import top.geomatics.gazetteer.model.user.User;
  */
 public class UserServiceImpl implements IUserService {
 
-	@Autowired
-	private UsersMapper userMapper;
+	private UsersDatabaseHelper helper = new UsersDatabaseHelper();
+	private SqlSession session = helper.getSession();
+	private UsersMapper userMapper = session.getMapper(UsersMapper.class);
 
 	/*
 	 * (non-Javadoc)
@@ -26,12 +28,11 @@ public class UserServiceImpl implements IUserService {
 	 */
 	@Override
 	public User userLogin(User user) {
-		User user2=userMapper.selectUserByName(user.getUsername());
-		if(user2!=null&&user2.getPassword_().equals(user.getPassword_()))
-		{
+		User user2 = userMapper.selectUserByName(user.getUsername());
+		if (user2 != null && user2.getPassword_().equals(user.getPassword_())) {
 			return user2;
 		}
-		
+
 		return user2;
 	}
 
@@ -67,8 +68,8 @@ public class UserServiceImpl implements IUserService {
 	 */
 	@Override
 	public boolean existUser(User user) {
-		User user2=userMapper.selectUserByName(user.getUsername());
-		if(user2!=null)
+		User user2 = userMapper.selectUserByName(user.getUsername());
+		if (user2 != null)
 			return true;
 		return false;
 	}
