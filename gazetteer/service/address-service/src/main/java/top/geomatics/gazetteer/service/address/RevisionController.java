@@ -55,14 +55,14 @@ public class RevisionController {
 
 	private static String userName = "user_admin";// 缺省用户
 
-	private static EditorDatabaseHelper helper_revision = new EditorDatabaseHelper(userName);
-	private static SqlSession session_revision = helper_revision.getSession();
-	private static AddressEditorMapper mapper_revision = session_revision.getMapper(AddressEditorMapper.class);
+	private EditorDatabaseHelper helper_revision = new EditorDatabaseHelper(userName);
+	private SqlSession session_revision = helper_revision.getSession();
+	private AddressEditorMapper mapper_revision = session_revision.getMapper(AddressEditorMapper.class);
 
 	@GetMapping("/initial")
 	@ApiOperation(value = "初始化", notes = "初始化")
 	@ResponseBody
-	public static void Initialize(@ApiParam(value = "用户名") @RequestParam("username") String username) {
+	public void Initialize(@ApiParam(value = "用户名") @RequestParam("username") String username) {
 		RevisionController.userName = username;
 		helper_revision = new EditorDatabaseHelper(userName);
 		session_revision = helper_revision.getSession();

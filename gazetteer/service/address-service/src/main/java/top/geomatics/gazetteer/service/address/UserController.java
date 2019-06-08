@@ -71,7 +71,7 @@ public class UserController {
 			CurrentSession.setUser(user2);
 
 			DataController.Initialize(user2.getUsername());
-			RevisionController.Initialize(user2.getUsername());
+			new RevisionController().Initialize(user2.getUsername());
 
 			return new ResponseEntity<>("登录成功", HttpStatus.OK);
 		} else {

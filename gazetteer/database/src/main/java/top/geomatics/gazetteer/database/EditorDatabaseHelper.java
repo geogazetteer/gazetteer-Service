@@ -4,7 +4,6 @@
 package top.geomatics.gazetteer.database;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,7 +25,7 @@ import top.geomatics.gazetteer.config.ResourcesManager2;
  *
  */
 public class EditorDatabaseHelper {
-	private String userName = "user_enterprise1";
+	private String userName = "user_admin";
 
 	// 添加slf4j日志实例对象
 	private final static Logger logger = LoggerFactory.getLogger(EditorDatabaseHelper.class);
@@ -51,12 +50,13 @@ public class EditorDatabaseHelper {
 			InputStream inputStream = Resources.getResourceAsStream(resource);
 			Properties prop = new Properties();
 			prop.load(new BufferedReader(new InputStreamReader(new FileInputStream(editor_properties_file), "UTF-8")));
-			//prop.load(new FileInputStream(new File(editor_properties_file)));
+			// prop.load(new FileInputStream(new File(editor_properties_file)));
 			// 构建sqlSession的工厂
 			sessionFactory = new SqlSessionFactoryBuilder().build(inputStream, prop);
 		} catch (Exception e) {
 			e.printStackTrace();
-			String logMsgString = String.format(Messages.getString("EnterpriseDatabaseHelper.1"), editor_properties_file); //$NON-NLS-1$
+			String logMsgString = String.format(Messages.getString("EnterpriseDatabaseHelper.1"), //$NON-NLS-1$
+					editor_properties_file);
 			logger.error(logMsgString);
 		}
 		return sessionFactory.openSession();
