@@ -2,13 +2,19 @@
  * Created by lixiaochao on 2019/3/21.
  */
 <<<<<<< HEAD
+<<<<<<< HEAD
 const IP = 'http://119.3.72.23';
 const serverUrl = IP+':8083/';//服务器地址
 =======
+=======
+>>>>>>> a394729618449d1abd8c03ad513820ad844566e4
 const localIP = 'http://localhost';
 const huaweiIP = 'http://119.3.72.23';	//http://119.3.72.23
 const governmentIP = 'http://10.148.26.63'; 
 const serverUrl = localIP+':8083/';//服务器地址
+<<<<<<< HEAD
+>>>>>>> a394729618449d1abd8c03ad513820ad844566e4
+=======
 >>>>>>> a394729618449d1abd8c03ad513820ad844566e4
 const URLCFG={
   searchCtxUrl:serverUrl+'address/hint',//搜索联想，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
@@ -57,11 +63,16 @@ const URLCFG={
 
 };
 
+<<<<<<< HEAD
 const geoServerUrl=IP + ':8085/';//geoserver服务地址
 const webUrl=IP + ':8087/';
 =======
 };
 
+const geoServerUrl=huaweiIP + ':8085/';//geoserver服务地址
+const webUrl=huaweiIP + ':8087/';
+>>>>>>> a394729618449d1abd8c03ad513820ad844566e4
+=======
 const geoServerUrl=huaweiIP + ':8085/';//geoserver服务地址
 const webUrl=huaweiIP + ':8087/';
 >>>>>>> a394729618449d1abd8c03ad513820ad844566e4

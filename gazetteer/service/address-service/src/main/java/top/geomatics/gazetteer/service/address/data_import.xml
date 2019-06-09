@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:DataFiles xmlns:tns="http://www.geomatics.top/data_import" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.geomatics.top/data_import data_import.xsd ">
+  <tns:DataFile>
+    <tns:FileName>中心医院社康中心.shp</tns:FileName>
+    <tns:Settings>
+      <tns:Fields>
+      <tns:Field>
+      <tns:origin_address>地址</tns:origin_address>
+      <tns:longitude>X</tns:longitude>
+      <tns:latitude>Y</tns:latitude>
+      <tns:build_geometry>true</tns:build_geometry>
+      </tns:Field>
+      </tns:Fields>
+    </tns:Settings>
+  </tns:DataFile>
+  <tns:DataFile>
+  <tns:FileName>民营医院社康中心.shp</tns:FileName>
+  <tns:Settings>
+  <tns:Fields>
+      <tns:Field>
+      <tns:origin_address>地址</tns:origin_address>
+      <tns:longitude>X</tns:longitude>
+      <tns:latitude>Y</tns:latitude>
+      <tns:build_geometry>true</tns:build_geometry>
+      </tns:Field>
+      </tns:Fields>
+  </tns:Settings>
+  </tns:DataFile>
+</tns:DataFiles>

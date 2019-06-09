@@ -17,6 +17,7 @@ import top.geomatics.gazetteer.database.AddressMapper;
 import top.geomatics.gazetteer.database.DatabaseHelper;
 import top.geomatics.gazetteer.database.EnterpriseAddressMapper;
 import top.geomatics.gazetteer.database.EnterpriseDatabaseHelper;
+import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.BuildingPositionRow;
 import top.geomatics.gazetteer.model.ComparableAddress;
@@ -170,6 +171,71 @@ public class ControllerUtils {
 	}
 
 	/**
+	 * @param fields
+	 * @param tablename
+	 * @param row
+	 * @param orderby
+	 * @param limit
+	 * @return
+	 */
+	public static Map<String, Object> getRequestMap_revision(String fields, String tablename, AddressEditorRow row,
+			String orderby, int limit) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("sql_fields", fields);
+		map.put("sql_tablename", tablename);
+		if (null != row) {
+			// 11个字段
+			String street_ = row.getStreet_();
+			String community_ = row.getCommunity_();
+			String origin_address = row.getOrigin_address();
+			String similar_address = row.getSimilar_address();
+			String standard_address = row.getStandard_address();
+			// geometry字段;
+			Integer iStatus = row.getStatus();
+			String modifier = row.getModifier();
+			Date date = row.getUpdate_date();
+			String update_address = row.getUpdate_address();
+			String update_building_code = row.getUpdate_building_code();
+
+			if (street_ != null && !street_.isEmpty())
+				map.put("street_", street_);
+			if (community_ != null && !community_.isEmpty())
+				map.put("community_", community_);
+			if (origin_address != null && !origin_address.isEmpty())
+				map.put("origin_address", origin_address);
+			if (similar_address != null && !similar_address.isEmpty())
+				map.put("similar_address", similar_address);
+			if (standard_address != null && !standard_address.isEmpty())
+				map.put("standard_address", standard_address);
+
+			if (iStatus != null) {
+				String status = iStatus.toString();
+				if (!status.isEmpty()) {
+					map.put("status", status);
+				}
+			}
+			if (modifier != null && !modifier.isEmpty())
+				map.put("modifier", modifier);
+			if (date != null) {
+				String update_date = date.toString();
+				if (!update_date.isEmpty()) {
+					map.put("update_date", update_date);
+				}
+			}
+			if (update_address != null && !update_address.isEmpty())
+				map.put("update_address", update_address);
+			if (update_building_code != null && !update_building_code.isEmpty())
+				map.put("update_building_code", update_building_code);
+		}
+
+		if (orderby != null && !orderby.isEmpty())
+			map.put("sql_orderBy", orderby);
+		if (limit > 0)
+			map.put("sql_limit", limit);
+		return map;
+	}
+
+	/**
 	 * @param rows
 	 * @return
 	 */
@@ -191,6 +257,18 @@ public class ControllerUtils {
 	 * @return
 	 */
 	public static String getResponseBody2(List<EnterpriseRow> rows) {
+		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
+		responseString += JSON.toJSONString(rows);
+		responseString += "}";
+		return responseString;
+
+	}
+
+	/**
+	 * @param rows
+	 * @return
+	 */
+	public static String getResponseBody_revision(List<AddressEditorRow> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
 		responseString += JSON.toJSONString(rows);
 		responseString += "}";
@@ -325,7 +403,7 @@ public class ControllerUtils {
 
 	public static List<SimpleAddressRow> getCoordQuerysPage(String keywords, int pageIndex, int pageSize) {
 		if (null == coordQueryResults || 0 > coordQueryResults.size()) {
-			return null;
+			getCoordQuerys(keywords);
 		}
 		List<SimpleAddressRow> rows = new ArrayList<SimpleAddressRow>();
 		int start = (pageIndex - 1) * pageSize;
@@ -338,7 +416,7 @@ public class ControllerUtils {
 
 	public static List<SimpleAddressRow> getCodeQuerysPage(String keywords, int pageIndex, int pageSize) {
 		if (null == buildingCodeQueryResults || 0 > buildingCodeQueryResults.size()) {
-			return null;
+			getCodeQuerys(keywords);
 		}
 		List<SimpleAddressRow> rows = new ArrayList<SimpleAddressRow>();
 		int start = (pageIndex - 1) * pageSize;

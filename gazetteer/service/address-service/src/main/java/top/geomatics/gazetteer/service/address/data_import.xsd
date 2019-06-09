@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.geomatics.top/data_import" xmlns:tns="http://www.geomatics.top/data_import" elementFormDefault="qualified">
+
+    <complexType name="DataFiles">
+    	<sequence maxOccurs="unbounded" minOccurs="1">
+    		<element name="DataFile" type="tns:DataFileType"></element>
+        </sequence>
+    </complexType>
+
+    <complexType name="SettingsType">
+    	<sequence>
+    		<element name="Fields" type="tns:FieldsType"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="FieldsType">
+    	<sequence maxOccurs="1" minOccurs="0">
+    		<element name="Field" type="tns:FieldType"></element>
+    	</sequence>
+    </complexType>
+    
+
+    <complexType name="FieldType">
+    	<sequence>
+    		<element name="origin_address" type="string" maxOccurs="1" minOccurs="0"></element>
+    		<element name="longitude" type="string" maxOccurs="1" minOccurs="0"></element>
+    		<element name="latitude" type="string" maxOccurs="1" minOccurs="0"></element>
+    		<element name="build_geometry" type="boolean" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+
+    <element name="DataFiles" type="tns:DataFiles"></element>
+
+    <complexType name="DataFileType">
+    	<sequence>
+    		<element name="FileName" type="string"></element>
+    		<element name="Settings" type="tns:SettingsType"></element>
+    	</sequence>
+    </complexType>
+</schema>

@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>top.geomatics.gazetteer</groupId>
+		<artifactId>gs-gazetteer</artifactId>
+		<version>0.0.6-SNAPSHOT</version>
+	</parent>
+	<groupId>top.geomatics.gazetteer.user</groupId>
+	<artifactId>gs-user</artifactId>
+	<name>gazetteer user</name>
+	<description>gazetteer user</description>
+	<packaging>jar</packaging>
+
+	<dependencies>
+		<!-- 增加model模块依赖 -->
+		<dependency>
+			<groupId>top.geomatics.gazetteer.model</groupId>
+			<artifactId>gs-model</artifactId>
+		</dependency>
+		<!-- 增加config模块依赖 -->
+		<dependency>
+			<groupId>top.geomatics.gazetteer.config</groupId>
+			<artifactId>gs-config</artifactId>
+		</dependency>
+		<!-- 增加database模块依赖 -->
+		<dependency>
+			<groupId>top.geomatics.gazetteer.database</groupId>
+			<artifactId>gs-database</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</dependency>
+	</dependencies>
+</project>

@@ -27,7 +27,6 @@ import org.opengis.feature.type.GeometryType;
 
 import top.geomatics.gazetteer.database.AddressMapper;
 import top.geomatics.gazetteer.database.DatabaseHelper;
-import top.geomatics.gazetteer.utilities.database.csv2sqlite.AddressSchema;
 
 /**
  * @author whudyj

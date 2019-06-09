@@ -29,6 +29,11 @@
 			<groupId>top.geomatics.gazetteer.database</groupId>
 			<artifactId>gs-database</artifactId>
 		</dependency>
+		<!-- 增加users模块依赖 -->
+		<dependency>
+			<groupId>top.geomatics.gazetteer.user</groupId>
+			<artifactId>gs-user</artifactId>
+		</dependency>
 		<!-- 增加segment模块依赖 -->
 		<dependency>
 			<groupId>top.geomatics.gazetteer.segment</groupId>
@@ -95,6 +100,14 @@
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
 		</dependency>
 
 	</dependencies>
