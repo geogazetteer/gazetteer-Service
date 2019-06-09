@@ -22,7 +22,6 @@ import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandl
 import org.apache.poi.xssf.model.SharedStrings;
 import org.apache.poi.xssf.model.Styles;
 import org.apache.poi.xssf.model.StylesTable;
-import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -75,6 +74,9 @@ public class Excel2Geopackage {
 
 	private static GeoPackage geopkg = null;
 	private String tablename = "";
+	private static final String TABLE_NAME="dmdz_edit";
+	private static final Integer STATUS = 0;
+	private static final String STAT_STRING = "status";
 	private String geoNameString = "the_geom";
 	private boolean isGeometry = false;
 	private static GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
@@ -213,7 +215,8 @@ public class Excel2Geopackage {
 		}
 
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
-		builder.setName(this.tablename);
+		//builder.setName(this.tablename);
+		builder.setName(TABLE_NAME);
 		builder.setCRS(crsTarget); // <- Coordinate reference system
 
 		// 原属性结构
@@ -252,7 +255,8 @@ public class Excel2Geopackage {
 		SimpleFeatureType targetSFType = createFeatureType();
 		entry.setDataType(Entry.DataType.Feature);
 		entry.setSrid(4490);
-		entry.setTableName(this.tablename);
+		//entry.setTableName(this.tablename);
+		entry.setTableName(TABLE_NAME);
 		// 几何字段
 		if (isGeometry) {
 			entry.setGeometryColumn(geoNameString);
@@ -297,6 +301,7 @@ public class Excel2Geopackage {
 				}
 
 				featureBuilder.set(targetField, value);
+				featureBuilder.set(STAT_STRING, STATUS);
 			}
 			if (isGeometry && x != null && y != null) {
 				Point point = geometryFactory.createPoint(new Coordinate(x, y));

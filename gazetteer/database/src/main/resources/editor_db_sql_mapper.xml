@@ -269,6 +269,35 @@
 		SELECT count(*)
 		FROM
 		${sql_tablename}
+		<where>
+			<if test="fid != null">
+				fid = #{fid}
+			</if>
+			<if test="street_ != null">
+				street_ = #{street_}
+			</if>
+			<if test="community_ != null">
+				AND community_ = #{community_}
+			</if>
+			<if test="origin_address != null">
+				AND origin_address = #{origin_address}
+			</if>
+			<if test="similar_address != null">
+				AND similar_address = #{similar_address}
+			</if>
+			<if test="standard_address != null">
+				AND standard_address = #{standard_address}
+			</if>
+			<if test="status != null">
+				AND status = #{status}
+			</if>
+			<if test="modifier != null">
+				AND modifier = #{modifier}
+			</if>
+			<if test="update_date != null">
+				AND update_date = #{update_date}
+			</if>
+		</where>
 	</select>
 
 	<select id="findPageEquals" resultType="AddressEditorRow">

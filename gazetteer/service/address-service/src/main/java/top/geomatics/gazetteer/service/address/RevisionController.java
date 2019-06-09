@@ -1,6 +1,7 @@
 package top.geomatics.gazetteer.service.address;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -18,8 +19,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import top.geomatics.gazetteer.database.AddressEditorMapper;
+import top.geomatics.gazetteer.database.AddressMapper;
+import top.geomatics.gazetteer.database.DatabaseHelper;
 import top.geomatics.gazetteer.database.EditorDatabaseHelper;
 import top.geomatics.gazetteer.model.AddressEditorRow;
+import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.model.BuildingPositionRow;
+import top.geomatics.gazetteer.utilities.address.AddressProcessor;
+import top.geomatics.gazetteer.utilities.database.BuildingQuery;
 
 /**
  * <b>非标准地址修正服务</b><br>
@@ -54,7 +61,7 @@ public class RevisionController {
 	private static final String STANDARD_ADDRESS_NEW = "new_standard_address";
 
 	private static String userName = "user_admin";// 缺省用户
-
+		
 	private EditorDatabaseHelper helper_revision = new EditorDatabaseHelper(userName);
 	private SqlSession session_revision = helper_revision.getSession();
 	private AddressEditorMapper mapper_revision = session_revision.getMapper(AddressEditorMapper.class);
@@ -101,13 +108,15 @@ public class RevisionController {
 	 * http://localhost:8083/revision/count?tablename=dmdz_edit </i>
 	 * 
 	 * @param tablename String 请求参数，指定查询的数据库表，如：dmdz_edit
+	 * @param row       AddressEditorRow 请求参数，指定查询条件
 	 * @return String 返回记录总数
 	 */
 	@ApiOperation(value = "返回记录总数", notes = "返回记录总数")
 	@GetMapping("/count")
 	public String getCount(
-			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename) {
-		Map<String, Object> map = ControllerUtils.getRequestMap_revision(null, tablename, null, null, 0);
+			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename,
+			AddressEditorRow row) {
+		Map<String, Object> map = ControllerUtils.getRequestMap_revision(null, tablename, row, null, 0);
 		return "{ \"total\": " + mapper_revision.getCount(map) + "}";
 	}
 
@@ -161,6 +170,76 @@ public class RevisionController {
 		map.put(IControllerConstant.ENTERPRISE_DB_ID, fid);
 		List<AddressEditorRow> rows = mapper_revision.selectByFid(map);
 		return ControllerUtils.getResponseBody_revision(rows);
+	}
+	
+	/**
+	 * <b>根据fid查询并补充详细信息</b><br>
+	 * <i>examples:<br>
+	 * http://localhost:8083/revision/guess/1?fields=*%26tablename=dmdz_edit </i>
+	 * 
+	 * @param fid       Integer 路径变量，数据库中记录的fid
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：*表示查询所有字段
+	 * @param tablename String 请求参数，指定查询的数据库表，如：dmdz_edit
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据fid查询并补充详细信息", notes = "根据fid查询并补充详细信息，示例：/revision/guess/1?fields=*&tablename=dmdz_edit")
+	@GetMapping("/guess/{fid}")
+	public String guessByFid(
+			@ApiParam(value = "数据库中记录的fid") @PathVariable(value = IControllerConstant.ENTERPRISE_DB_ID, required = true) Integer fid,
+			@ApiParam(value = "查询字段，如 fid,origin_address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = "*") String fields,
+			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename) {
+		//查询
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
+		map.put(IControllerConstant.ENTERPRISE_DB_ID, fid);
+		List<AddressEditorRow> rows = mapper_revision.selectByFid(map);
+		//计算
+		List<AddressEditorRow> newRows = new ArrayList<AddressEditorRow>();
+		for (AddressEditorRow row :rows) {
+			AddressEditorRow newRow = new AddressEditorRow();
+			//如果没有原地址，则计算一个
+			String originAddress= row.getOrigin_address();
+			String street_= row.getStreet_();
+			String community_=row.getCommunity_();
+			String codeString = null;
+			AddressRow arow= null;
+			if (null == originAddress || originAddress.isEmpty()) {
+				//经纬度
+				double longitude = row.getLongitude_();
+				double latitude = row.getLatitude_();
+				String tempString = longitude + "," + latitude;
+				if (AddressProcessor.isCoordinatesExpression(tempString)) {
+					List<String> buildingCodes = BuildingQuery.query(longitude, latitude);
+					if (buildingCodes.size() > 0) {
+						codeString = buildingCodes.get(0);
+						AddressRow addrow = new AddressRow();
+						addrow.setCode(codeString);
+						Map<String, Object> para = ControllerUtils.getRequestMap("*", "dmdz", addrow, null, 1);
+						List<AddressRow> addResRows = ControllerUtils.mapper.findEquals(map);
+						if (addResRows.size()>0) {
+							arow= addResRows.get(0);
+							originAddress=arow.getAddress();
+						}
+					}
+				}
+			}
+			newRow.setOrigin_address(originAddress);
+			if (null == street_ || street_.isEmpty()) {
+				if (null != arow) {
+					street_ = arow.getStreet();
+				}
+			}
+			newRow.setStreet_(street_);
+			
+			if (null == community_ || community_.isEmpty()) {
+				if (null != arow) {
+					community_ = arow.getCommunity();
+				}
+			}
+			newRow.setCommunity_(community_);
+			
+			newRows.add(newRow);
+		}
+		return ControllerUtils.getResponseBody_revision(newRows);
 	}
 
 	/**
@@ -501,11 +580,15 @@ public class RevisionController {
 			@ApiParam @RequestBody AddressEditorRow row, @ApiParam @RequestBody AddressEditorRow new_row) {
 
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(null, tablename, row, null, 0);
-		String new_status = new_row.getStatus().toString();
-		String new_modifier = new_row.getModifier();
-		String new_update_date = new_row.getUpdate_date().toString();
+		// String new_status = new_row.getStatus().toString();
+		String new_status = "1";
+		// String new_modifier = new_row.getModifier();
+		String new_modifier = userName;
+		// String new_update_date = new_row.getUpdate_date().toString();
+		String new_update_date = new Date().toString();
 		String new_update_address = new_row.getUpdate_address();
 		String new_update_building_code = new_row.getUpdate_building_code();
+
 		String new_origin_address = new_row.getOrigin_address();
 		String new_similar_address = new_row.getSimilar_address();
 		String new_standrad_address = new_row.getStandard_address();

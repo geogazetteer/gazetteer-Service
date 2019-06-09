@@ -48,6 +48,10 @@ public class Shapefile2Geopackage {
 	private String geopackageName = "";
 	private Map<String, String> settings = null;
 
+	private static final String TABLE_NAME = "dmdz_edit";
+	private static final Integer STATUS = 0;
+	private static final String STAT_STRING = "status";
+
 	private static DataStore dataStore = null;
 	private static GeoPackage geopkg = null;
 
@@ -134,7 +138,8 @@ public class Shapefile2Geopackage {
 		}
 
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
-		builder.setName(sfType.getTypeName());
+		// builder.setName(sfType.getTypeName());
+		builder.setName(TABLE_NAME);
 		builder.setCRS(crsTarget); // <- Coordinate reference system
 
 		// 原属性结构
@@ -186,7 +191,8 @@ public class Shapefile2Geopackage {
 		}
 		entry.setDataType(Entry.DataType.Feature);
 		entry.setSrid(4490);
-		entry.setTableName(sfType.getTypeName());
+		// entry.setTableName(sfType.getTypeName());
+		entry.setTableName(TABLE_NAME);
 		// 几何字段
 		String geoNameString = sfType.getGeometryDescriptor().getName().toString();
 		entry.setGeometryColumn(geoNameString);
@@ -219,6 +225,8 @@ public class Shapefile2Geopackage {
 
 				featureBuilder.set(targetField, fieldValue);
 			}
+
+			featureBuilder.set(STAT_STRING, STATUS);
 
 			targetFeature = featureBuilder.buildFeature(null);
 			newFeas.add(targetFeature);
