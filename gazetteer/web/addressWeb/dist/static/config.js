@@ -1,21 +1,8 @@
 /**
  * Created by lixiaochao on 2019/3/21.
  */
-<<<<<<< HEAD
-<<<<<<< HEAD
 const IP = 'http://119.3.72.23';
 const serverUrl = IP+':8083/';//服务器地址
-=======
-=======
->>>>>>> a394729618449d1abd8c03ad513820ad844566e4
-const localIP = 'http://localhost';
-const huaweiIP = 'http://119.3.72.23';	//http://119.3.72.23
-const governmentIP = 'http://10.148.26.63'; 
-const serverUrl = localIP+':8083/';//服务器地址
-<<<<<<< HEAD
->>>>>>> a394729618449d1abd8c03ad513820ad844566e4
-=======
->>>>>>> a394729618449d1abd8c03ad513820ad844566e4
 const URLCFG={
   searchCtxUrl:serverUrl+'address/hint',//搜索联想，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
   searchAddressUrl:serverUrl+'address/hint',//搜索，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
@@ -54,7 +41,6 @@ const URLCFG={
   searchCtxTotalUrl:serverUrl+'address/sum',//param：keywords=''
   //根据页码获取搜索结果
   searchListUrl:serverUrl+'address/page',// "/1?keywords=a&limit=10"
-<<<<<<< HEAD
 
   //用户注册
   registerUserUrl:serverUrl+'user/register',
@@ -63,19 +49,8 @@ const URLCFG={
 
 };
 
-<<<<<<< HEAD
 const geoServerUrl=IP + ':8085/';//geoserver服务地址
 const webUrl=IP + ':8087/';
-=======
-};
-
-const geoServerUrl=huaweiIP + ':8085/';//geoserver服务地址
-const webUrl=huaweiIP + ':8087/';
->>>>>>> a394729618449d1abd8c03ad513820ad844566e4
-=======
-const geoServerUrl=huaweiIP + ':8085/';//geoserver服务地址
-const webUrl=huaweiIP + ':8087/';
->>>>>>> a394729618449d1abd8c03ad513820ad844566e4
 const MAPURL={
   //雪碧图
   sprite:webUrl+'sprite/sprite',
@@ -84,10 +59,7 @@ const MAPURL={
   //字体
   glyphs:webUrl+"myfonts/{fontstack}/{range}.pbf",
   //政务内网底图  http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile/0/1072/1461
-<<<<<<< HEAD
   //http://10.148.26.61:6080/arcgis/rest/services/basemap/szmap_4490/MapServer
-=======
->>>>>>> a394729618449d1abd8c03ad513820ad844566e4
   ol_map_tile:'http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile',
   //房屋面
   building_vec_tile:geoServerUrl+"geoserver/gwc/service/tms/1.0.0/gazetteer%3ALH_building_4490@EPSG%3A900913@png/{z}/{x}/{y}.png"
@@ -131,15 +103,11 @@ const SETLABELARR={
   settings_4:['普通搜索','快速搜索'],
 };
 
-<<<<<<< HEAD
 //批量匹配
-=======
->>>>>>> a394729618449d1abd8c03ad513820ad844566e4
 const BATCHSERVICE={
   modelUrl:webUrl+'files/downloads/批量处理模版.xls',//模板地址
   uploadUrl:serverUrl+'data/upload/matcher',//文件上传
 };
-<<<<<<< HEAD
 
 
 const EDITSERVICE={
@@ -151,6 +119,19 @@ const EDITSERVICE={
   exportUrl:serverUrl+'data/export',//?fileName=
   getCountUrl:serverUrl+'revision/count',//?tablename=
   initialUrl:serverUrl+'revision/initial',//?username=clover
+  getListUrl:serverUrl+'revision/page',//1?fields=fid%2Corigin%2Caddress&limit=10&status=0&tablename=dmdz_edit
+  getInfoByFidUrl:serverUrl+'revision/fid',///1?fields=*&tablename=dmdz_edit
+
+  setEditUrl:serverUrl+'revision/update',///fid?tablename=dmdz_edit&username=user_admin
+  editDict : {
+    "community": "community_",
+    // "modifier": "modifier",
+    // "similar_address": "similar_address",
+    // "standard_address": "standard_address",
+    // "status": "status",
+    "street": "street_",
+    "update_address": "update_address",
+    "code": "update_building_code",
+    // "update_date": "2019-06-10T15:05:06.229Z"
+  }
 };
-=======
->>>>>>> a394729618449d1abd8c03ad513820ad844566e4
