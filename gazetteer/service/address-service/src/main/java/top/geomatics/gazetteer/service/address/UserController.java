@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.file.Files;
 import java.util.Properties;
 
 import javax.servlet.http.HttpSession;
@@ -70,8 +69,7 @@ public class UserController {
 		if (user2 != null) {
 			CurrentSession.setUser(user2);
 
-			DataController.Initialize(user2.getUsername());
-			new RevisionController().Initialize(user2.getUsername());
+			UserManager.addUser(user2);
 
 			return new ResponseEntity<>("登录成功", HttpStatus.OK);
 		} else {
