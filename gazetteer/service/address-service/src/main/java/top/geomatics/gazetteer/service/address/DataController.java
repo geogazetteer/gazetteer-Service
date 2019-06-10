@@ -25,7 +25,6 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
@@ -47,20 +46,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.condition.RequestConditionHolder;
 
 import com.alibaba.fastjson.JSON;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import net.bytebuddy.asm.Advice.This;
 import springfox.documentation.annotations.ApiIgnore;
-import top.geomatics.gazetteer.config.ResourcesManager2;
+import top.geomatics.gazetteer.config.ResourcesManager;
 import top.geomatics.gazetteer.model.MatcherResultRow;
-import top.geomatics.gazetteer.model.user.User;
 import top.geomatics.gazetteer.utilities.database.excel.BatchDealExcel;
 import top.geomatics.gazetteer.utilities.database.excel2gpkg.Excel2Geopackage;
 import top.geomatics.gazetteer.utilities.database.shp2gpkg.Shapefile2Geopackage;
@@ -77,30 +72,8 @@ public class DataController {
 	// 添加slf4j日志实例对象
 	private final static Logger logger = LoggerFactory.getLogger(DataController.class);
 
-	public static String username = "user_admin";// 缺省用户
-
-	private static final String EDIT_DB_PROPERTIES = "editor_db_properties_file";
-
-	private static ResourcesManager2 rm = new ResourcesManager2(username);
-	// 文件上传路径
-	private static String upload_file_path = rm.getValue(Messages.getString("DataController.0")); //$NON-NLS-1$
-	// 文件下载路径
-	private static String download_file_path = rm.getValue("download_file_path");
-
-	@ApiOperation(value = "初始化", notes = "初始化")
-	@GetMapping("/initial")
-	@ResponseBody
-	public void initialize(
-			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true) String username) {
-		DataController.username = username;
-		rm = new ResourcesManager2(username);
-		// 文件上传路径
-		upload_file_path = rm.getValue(Messages.getString("DataController.0")); //$NON-NLS-1$
-		// 文件下载路径
-		download_file_path = rm.getValue("download_file_path");
-
-		new RevisionController().initialize(username);
-	}
+	private static final String UP_PATH = "upload_file_path";
+	private static final String DEFAULT_USERNAME = "user_admin";
 
 	/**
 	 * <b>上传数据文件</b><br>
@@ -129,6 +102,7 @@ public class DataController {
 		UUID uuid = UUID.randomUUID();
 		String fileName = uuid + Messages.getString("DataController.3"); //$NON-NLS-1$
 
+		String upload_file_path = ResourcesManager.getInstance().getValue(UP_PATH);
 		String sourceFilePath = upload_file_path + File.separator + fileName;
 		// 判断文件父目录是否存在，如果不存在，则创建目录
 		File dest = new File(sourceFilePath);
@@ -180,6 +154,7 @@ public class DataController {
 		UUID uuid = UUID.randomUUID();
 		String fileName = uuid + Messages.getString("DataController.9"); //$NON-NLS-1$
 
+		String upload_file_path = ResourcesManager.getInstance().getValue(UP_PATH);
 		String sourceFilePath = upload_file_path + File.separator + fileName;
 		File dest = new File(sourceFilePath);
 		// 判断文件父目录是否存在，如果不存在，则创建目录
@@ -219,7 +194,8 @@ public class DataController {
 	public void download(@ApiParam(value = "下载文件名") @PathVariable("id") String id, HttpServletRequest request,
 			HttpServletResponse response) {
 		// 文件地址
-		String folder = upload_file_path;
+		String folder = ResourcesManager.getInstance().getValue(UP_PATH);
+		;
 		try (
 				// jdk7新特性，可以直接写到try()括号里面，java会自动关闭
 				InputStream inputStream = new FileInputStream(new File(folder, id));
@@ -261,16 +237,19 @@ public class DataController {
 	 * <i>数据文件格式为excel格式或shapefile格式<br>
 	 * 
 	 * examples:<br>
-	 * http://localhost:8083/data/fields?fileName= </i>
+	 * http://localhost:8083/data/fields?username=%26fileName= </i>
 	 * 
-	 * @param file String 请求参数，文件名
+	 * @param username String 请求参数，用户名
+	 * @param file     String 请求参数，文件名
 	 * @return String 返回JSON格式的结果
 	 */
 	@ApiOperation(value = "获得数据文件中的字段", notes = "获得数据文件中的字段")
 	@GetMapping("/fields")
 	@ResponseBody
 	public String getFields(
+			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
 			@ApiParam(value = "文件名") @RequestParam(value = "fileName", required = true) String fileName) {
+		String upload_file_path = UserManager.getUserInfo(username).getUploadPath();
 		String ffn = upload_file_path + File.separator + fileName;
 		File file = new File(ffn);
 
@@ -306,12 +285,15 @@ public class DataController {
 	 * examples:<br>
 	 * http://localhost:8083/data/source </i>
 	 * 
+	 * @param username String 请求参数，用户名
 	 * @return String 返回JSON格式的结果
 	 */
 	@ApiOperation(value = "列出已经上传的数据文件", notes = "列出已经上传的数据文件")
 	@GetMapping("/source")
 	@ResponseBody
-	public String getSource() {
+	public String getSource(
+			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username) {
+		String upload_file_path = UserManager.getUserInfo(username).getUploadPath();
 		File file = new File(upload_file_path);
 
 		if (!file.exists()) {
@@ -349,12 +331,15 @@ public class DataController {
 	 * examples:<br>
 	 * http://localhost:8083/data/target </i>
 	 * 
+	 * @param username String 请求参数，用户名
 	 * @return String 返回JSON格式的结果
 	 */
 	@ApiOperation(value = "列出可以下载的数据文件", notes = "列出可以下载的数据文件")
 	@GetMapping("/target")
 	@ResponseBody
-	public String getTarget() {
+	public String getTarget(
+			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username) {
+		String download_file_path = UserManager.getUserInfo(username).getDownloadPath();
 		File file = new File(download_file_path);
 
 		if (!file.exists()) {
@@ -389,14 +374,16 @@ public class DataController {
 	 * <i>examples:<br>
 	 * http://localhost:8083/data/settings?fileName= </i>
 	 * 
+	 * @param username String 请求参数，用户名
 	 * @param fileName String 需要编辑的数据文件名
 	 */
 	@ApiOperation(value = "设置需要编辑的数据文件", notes = "设置需要编辑的数据文件")
 	@PutMapping(value = "/settings")
 	public ResponseEntity<String> setRevisionFile(
+			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
 			@ApiParam(value = "需要编辑的数据文件名") @RequestParam(value = "fileName", required = true) String fileName) {
 		// 文件目录
-		String folder = download_file_path;
+		String folder = UserManager.getUserInfo(username).getDownloadPath();
 		File file = new File(folder, fileName);
 		if (!file.exists()) {
 			// 日志
@@ -405,7 +392,7 @@ public class DataController {
 			return new ResponseEntity<>(logMsgString, HttpStatus.NOT_FOUND);
 		}
 		// 修改相应的配置文件
-		String db_properties = rm.getValue(EDIT_DB_PROPERTIES);
+		String db_properties = UserManager.getUserInfo(username).getDbProperties();
 		Properties prop = new Properties();
 		try {
 			prop.load(new BufferedReader(new InputStreamReader(new FileInputStream(db_properties), "UTF-8")));
@@ -451,15 +438,17 @@ public class DataController {
 	 * <i>examples:<br>
 	 * http://localhost:8083/data/export?fileName= </i>
 	 * 
+	 * @param username String 请求参数，用户名
 	 * @param fileName String 需要下载的数据文件名
 	 */
 	@ApiOperation(value = "导出数据", notes = "导出数据")
 	@GetMapping(value = "/export")
 	public void export(
+			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
 			@ApiParam(value = "需要下载的数据文件名") @RequestParam(value = "fileName", required = true) String fileName,
 			HttpServletResponse response) {
 		// 文件目录
-		String folder = download_file_path;
+		String folder = UserManager.getUserInfo(username).getDownloadPath();
 		InputStream inputStream = null;
 		try {
 			inputStream = new FileInputStream(new File(folder, fileName));
@@ -499,12 +488,14 @@ public class DataController {
 	 * examples:<br>
 	 * http://localhost:8083/data/import
 	 * 
-	 * @param file MultipartFile 请求参数，前台上传的文件
+	 * @param username String 请求参数，用户名
+	 * @param file     MultipartFile 请求参数，前台上传的文件
 	 * @return 返回处理结果
 	 */
 	@ApiOperation(value = "导入数据文件", notes = "导入数据文件")
 	@PostMapping("/import")
 	public ResponseEntity<String> importData(
+			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
 			@ApiParam(value = "上传文件") @RequestParam(value = "fileName", required = true) MultipartFile file) {
 		if (file.isEmpty()) {
 			// 日志
@@ -513,6 +504,8 @@ public class DataController {
 			return new ResponseEntity<>(logMsgString, HttpStatus.NOT_FOUND);
 		}
 		// 服务器上存储的文件名
+		String upload_file_path = UserManager.getUserInfo(username).getUploadPath();
+		String download_file_path = UserManager.getUserInfo(username).getDownloadPath();
 		String sfn = file.getOriginalFilename();
 		File sf = new File(sfn);
 		String dfn = sf.getName();
@@ -542,12 +535,12 @@ public class DataController {
 			for (String impString : unzippedFiles) {
 				if (impString.contains("import.xml")) {
 					// 转换到数据库
-					dataImport(impString);
+					dataImport(impString, upload_file_path, download_file_path);
 				}
 			}
 		} else if (dfn.contains("import.xml")) {
 			// 转换到数据库
-			dataImport(dfn);
+			dataImport(dfn, upload_file_path, download_file_path);
 		}
 
 		// 修改用户配置文件
@@ -555,7 +548,7 @@ public class DataController {
 		return new ResponseEntity<>("数据上传成功!", HttpStatus.OK);
 	}
 
-	private boolean dataImport(String importXML) {
+	private boolean dataImport(String upload_file_path, String importXML, String download_file_path) {
 		String destFN = upload_file_path + File.separator + importXML;
 		File xmlFile = new File(destFN);
 		if (!xmlFile.exists()) {
