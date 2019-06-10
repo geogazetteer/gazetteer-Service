@@ -87,16 +87,19 @@ public class DataController {
 	// 文件下载路径
 	private static String download_file_path = rm.getValue("download_file_path");
 
-	@GetMapping("/initial")
 	@ApiOperation(value = "初始化", notes = "初始化")
+	@GetMapping("/initial")
 	@ResponseBody
-	public static void Initialize(@ApiParam(value = "用户名") @RequestParam(value="username",required=true) String username) {
+	public void initialize(
+			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true) String username) {
 		DataController.username = username;
 		rm = new ResourcesManager2(username);
 		// 文件上传路径
 		upload_file_path = rm.getValue(Messages.getString("DataController.0")); //$NON-NLS-1$
 		// 文件下载路径
 		download_file_path = rm.getValue("download_file_path");
+
+		new RevisionController().initialize(username);
 	}
 
 	/**
@@ -114,7 +117,8 @@ public class DataController {
 	@ApiOperation(value = "上传地址数据", notes = "上传地址数据")
 	@PostMapping("/upload")
 	@ResponseBody
-	public String fileUpload(@ApiParam(value = "前台上传的文件") @RequestParam(value="fileName",required=true) MultipartFile file) {
+	public String fileUpload(
+			@ApiParam(value = "前台上传的文件") @RequestParam(value = "fileName", required = true) MultipartFile file) {
 		if (file.isEmpty()) {
 			// 日志
 			String logMsgString = Messages.getString("DataController.1"); //$NON-NLS-1$
@@ -265,7 +269,8 @@ public class DataController {
 	@ApiOperation(value = "获得数据文件中的字段", notes = "获得数据文件中的字段")
 	@GetMapping("/fields")
 	@ResponseBody
-	public String getFields(@ApiParam(value = "文件名") @RequestParam(value="fileName",required=true) String fileName) {
+	public String getFields(
+			@ApiParam(value = "文件名") @RequestParam(value = "fileName", required = true) String fileName) {
 		String ffn = upload_file_path + File.separator + fileName;
 		File file = new File(ffn);
 
@@ -389,7 +394,7 @@ public class DataController {
 	@ApiOperation(value = "设置需要编辑的数据文件", notes = "设置需要编辑的数据文件")
 	@PutMapping(value = "/settings")
 	public ResponseEntity<String> setRevisionFile(
-			@ApiParam(value = "需要编辑的数据文件名") @RequestParam(value="fileName",required=true) String fileName) {
+			@ApiParam(value = "需要编辑的数据文件名") @RequestParam(value = "fileName", required = true) String fileName) {
 		// 文件目录
 		String folder = download_file_path;
 		File file = new File(folder, fileName);
@@ -450,7 +455,8 @@ public class DataController {
 	 */
 	@ApiOperation(value = "导出数据", notes = "导出数据")
 	@GetMapping(value = "/export")
-	public void export(@ApiParam(value = "需要下载的数据文件名") @RequestParam(value="fileName",required=true) String fileName,
+	public void export(
+			@ApiParam(value = "需要下载的数据文件名") @RequestParam(value = "fileName", required = true) String fileName,
 			HttpServletResponse response) {
 		// 文件目录
 		String folder = download_file_path;
@@ -498,7 +504,8 @@ public class DataController {
 	 */
 	@ApiOperation(value = "导入数据文件", notes = "导入数据文件")
 	@PostMapping("/import")
-	public ResponseEntity<String> importData(@ApiParam(value = "上传文件") @RequestParam(value="fileName",required=true) MultipartFile file) {
+	public ResponseEntity<String> importData(
+			@ApiParam(value = "上传文件") @RequestParam(value = "fileName", required = true) MultipartFile file) {
 		if (file.isEmpty()) {
 			// 日志
 			String logMsgString = Messages.getString("DataController.7"); //$NON-NLS-1$

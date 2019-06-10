@@ -13,8 +13,8 @@ public class AddressEditorRow {
 	private Integer fid;// 第一个字段，数据库自增长，如果原数据中有该字段，忽略原数据中的字段。
 	private String street_;// 表示街道。
 	private String community_;// 表示社区。
-	private double longitude_;// 表示经度。
-	private double latitude_;// 表示纬度。
+	private Double longitude_;// 表示经度。
+	private Double latitude_;// 表示纬度。
 
 	private String origin_address;// 原地址。
 	private String similar_address;// 与原地址相似的标准地址。
@@ -50,19 +50,19 @@ public class AddressEditorRow {
 		this.community_ = community_;
 	}
 
-	public double getLongitude_() {
+	public Double getLongitude_() {
 		return longitude_;
 	}
 
-	public void setLongitude_(double longitude_) {
+	public void setLongitude_(Double longitude_) {
 		this.longitude_ = longitude_;
 	}
 
-	public double getLatitude_() {
+	public Double getLatitude_() {
 		return latitude_;
 	}
 
-	public void setLatitude_(double latitude_) {
+	public void setLatitude_(Double latitude_) {
 		this.latitude_ = latitude_;
 	}
 

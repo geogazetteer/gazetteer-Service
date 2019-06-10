@@ -19,12 +19,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import top.geomatics.gazetteer.database.AddressEditorMapper;
-import top.geomatics.gazetteer.database.AddressMapper;
-import top.geomatics.gazetteer.database.DatabaseHelper;
 import top.geomatics.gazetteer.database.EditorDatabaseHelper;
 import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.AddressRow;
-import top.geomatics.gazetteer.model.BuildingPositionRow;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.database.BuildingQuery;
 
@@ -61,19 +58,21 @@ public class RevisionController {
 	private static final String STANDARD_ADDRESS_NEW = "new_standard_address";
 
 	private static String userName = "user_admin";// 缺省用户
-		
-	private EditorDatabaseHelper helper_revision = new EditorDatabaseHelper(userName);
-	private SqlSession session_revision = helper_revision.getSession();
-	private AddressEditorMapper mapper_revision = session_revision.getMapper(AddressEditorMapper.class);
 
-	@GetMapping("/initial")
+	private static EditorDatabaseHelper helper_revision = new EditorDatabaseHelper(userName);
+	private static SqlSession session_revision = helper_revision.getSession();
+	private static AddressEditorMapper mapper_revision = session_revision.getMapper(AddressEditorMapper.class);
+
 	@ApiOperation(value = "初始化", notes = "初始化")
+	@GetMapping("/initial")
 	@ResponseBody
-	public void Initialize(@ApiParam(value = "用户名") @RequestParam("username") String username) {
+	public void initialize(@ApiParam(value = "用户名") @RequestParam("username") String username) {
 		RevisionController.userName = username;
 		helper_revision = new EditorDatabaseHelper(userName);
 		session_revision = helper_revision.getSession();
 		mapper_revision = session_revision.getMapper(AddressEditorMapper.class);
+
+		new DataController().initialize(username);
 	}
 
 	/**
@@ -116,6 +115,16 @@ public class RevisionController {
 	public String getCount(
 			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename,
 			AddressEditorRow row) {
+		// 选择status=0的记录
+		Integer status = null;
+		if (null != row) {
+			status = row.getStatus();
+		}
+		if (status == null) {
+			status = 0;
+		}
+		row.setStatus(status);
+
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(null, tablename, row, null, 0);
 		return "{ \"total\": " + mapper_revision.getCount(map) + "}";
 	}
@@ -143,6 +152,16 @@ public class RevisionController {
 			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
 			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "10") Integer limit,
 			AddressEditorRow row) {
+		// 选择status=0的记录
+		Integer status = null;
+		if (null != row) {
+			status = row.getStatus();
+		}
+		if (status == null) {
+			status = 0;
+		}
+		row.setStatus(status);
+
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(fields, tablename, row, orderby, limit);
 		Integer page_start = (index - 1) * limit;
 		map.put("page_start", page_start);
@@ -171,7 +190,7 @@ public class RevisionController {
 		List<AddressEditorRow> rows = mapper_revision.selectByFid(map);
 		return ControllerUtils.getResponseBody_revision(rows);
 	}
-	
+
 	/**
 	 * <b>根据fid查询并补充详细信息</b><br>
 	 * <i>examples:<br>
@@ -188,22 +207,22 @@ public class RevisionController {
 			@ApiParam(value = "数据库中记录的fid") @PathVariable(value = IControllerConstant.ENTERPRISE_DB_ID, required = true) Integer fid,
 			@ApiParam(value = "查询字段，如 fid,origin_address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = "*") String fields,
 			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename) {
-		//查询
+		// 查询
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put(IControllerConstant.ENTERPRISE_DB_ID, fid);
 		List<AddressEditorRow> rows = mapper_revision.selectByFid(map);
-		//计算
+		// 计算
 		List<AddressEditorRow> newRows = new ArrayList<AddressEditorRow>();
-		for (AddressEditorRow row :rows) {
+		for (AddressEditorRow row : rows) {
 			AddressEditorRow newRow = new AddressEditorRow();
-			//如果没有原地址，则计算一个
-			String originAddress= row.getOrigin_address();
-			String street_= row.getStreet_();
-			String community_=row.getCommunity_();
+			// 如果没有原地址，则计算一个
+			String originAddress = row.getOrigin_address();
+			String street_ = row.getStreet_();
+			String community_ = row.getCommunity_();
 			String codeString = null;
-			AddressRow arow= null;
+			AddressRow arow = null;
 			if (null == originAddress || originAddress.isEmpty()) {
-				//经纬度
+				// 经纬度
 				double longitude = row.getLongitude_();
 				double latitude = row.getLatitude_();
 				String tempString = longitude + "," + latitude;
@@ -215,9 +234,9 @@ public class RevisionController {
 						addrow.setCode(codeString);
 						Map<String, Object> para = ControllerUtils.getRequestMap("*", "dmdz", addrow, null, 1);
 						List<AddressRow> addResRows = ControllerUtils.mapper.findEquals(map);
-						if (addResRows.size()>0) {
-							arow= addResRows.get(0);
-							originAddress=arow.getAddress();
+						if (addResRows.size() > 0) {
+							arow = addResRows.get(0);
+							originAddress = arow.getAddress();
 						}
 					}
 				}
@@ -229,14 +248,14 @@ public class RevisionController {
 				}
 			}
 			newRow.setStreet_(street_);
-			
+
 			if (null == community_ || community_.isEmpty()) {
 				if (null != arow) {
 					community_ = arow.getCommunity();
 				}
 			}
 			newRow.setCommunity_(community_);
-			
+
 			newRows.add(newRow);
 		}
 		return ControllerUtils.getResponseBody_revision(newRows);
