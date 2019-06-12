@@ -124,14 +124,15 @@ const EDITSERVICE={
 
   setEditUrl:serverUrl+'revision/update',///fid?tablename=dmdz_edit&username=user_admin
   editDict : {
-    "community": "community_",
-    // "modifier": "modifier",
-    // "similar_address": "similar_address",
+    "community": "community_",//社区
+    "username": "modifier",  //修改的用户名
+    "originAddress": "origin_address",//原地址
+    "curSelAddress": "similar_address",//相似标准地址
     // "standard_address": "standard_address",
     // "status": "status",
     "street": "street_",
-    "update_address": "update_address",
-    "code": "update_building_code",
+    // "update_address": "update_address",//标准地址
+    "code": "update_building_code",//楼栋编号
     // "update_date": "2019-06-10T15:05:06.229Z"
   }
 };
