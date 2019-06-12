@@ -56,6 +56,7 @@ import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 import top.geomatics.gazetteer.config.ResourcesManager;
 import top.geomatics.gazetteer.model.MatcherResultRow;
+import top.geomatics.gazetteer.service.user.UserInformation;
 import top.geomatics.gazetteer.utilities.database.excel.BatchDealExcel;
 import top.geomatics.gazetteer.utilities.database.excel2gpkg.Excel2Geopackage;
 import top.geomatics.gazetteer.utilities.database.shp2gpkg.Shapefile2Geopackage;
@@ -249,7 +250,7 @@ public class DataController {
 	public String getFields(
 			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
 			@ApiParam(value = "文件名") @RequestParam(value = "fileName", required = true) String fileName) {
-		String upload_file_path = UserManager.getUserInfo(username).getUploadPath();
+		String upload_file_path = UserManager.getInstance().getUserInfo(username).getUploadPath();
 		String ffn = upload_file_path + File.separator + fileName;
 		File file = new File(ffn);
 
@@ -293,7 +294,7 @@ public class DataController {
 	@ResponseBody
 	public String getSource(
 			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username) {
-		String upload_file_path = UserManager.getUserInfo(username).getUploadPath();
+		String upload_file_path = UserManager.getInstance().getUserInfo(username).getUploadPath();
 		File file = new File(upload_file_path);
 
 		if (!file.exists()) {
@@ -339,7 +340,7 @@ public class DataController {
 	@ResponseBody
 	public String getTarget(
 			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username) {
-		String download_file_path = UserManager.getUserInfo(username).getDownloadPath();
+		String download_file_path = UserManager.getInstance().getUserInfo(username).getDownloadPath();
 		File file = new File(download_file_path);
 
 		if (!file.exists()) {
@@ -383,7 +384,7 @@ public class DataController {
 			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
 			@ApiParam(value = "需要编辑的数据文件名") @RequestParam(value = "fileName", required = true) String fileName) {
 		// 文件目录
-		String folder = UserManager.getUserInfo(username).getDownloadPath();
+		String folder = UserManager.getInstance().getUserInfo(username).getDownloadPath();
 		File file = new File(folder, fileName);
 		if (!file.exists()) {
 			// 日志
@@ -392,7 +393,7 @@ public class DataController {
 			return new ResponseEntity<>(logMsgString, HttpStatus.NOT_FOUND);
 		}
 		// 修改相应的配置文件
-		String db_properties = UserManager.getUserInfo(username).getDbProperties();
+		String db_properties = UserManager.getInstance().getUserInfo(username).getDbProperties();
 		Properties prop = new Properties();
 		try {
 			prop.load(new BufferedReader(new InputStreamReader(new FileInputStream(db_properties), "UTF-8")));
@@ -448,7 +449,7 @@ public class DataController {
 			@ApiParam(value = "需要下载的数据文件名") @RequestParam(value = "fileName", required = true) String fileName,
 			HttpServletResponse response) {
 		// 文件目录
-		String folder = UserManager.getUserInfo(username).getDownloadPath();
+		String folder = UserManager.getInstance().getUserInfo(username).getDownloadPath();
 		InputStream inputStream = null;
 		try {
 			inputStream = new FileInputStream(new File(folder, fileName));
@@ -504,8 +505,15 @@ public class DataController {
 			return new ResponseEntity<>(logMsgString, HttpStatus.NOT_FOUND);
 		}
 		// 服务器上存储的文件名
-		String upload_file_path = UserManager.getUserInfo(username).getUploadPath();
-		String download_file_path = UserManager.getUserInfo(username).getDownloadPath();
+		UserInformation userInfo = UserManager.getInstance().getUserInfo(username);
+		if (null == userInfo) {
+			// 日志
+			String logMsgString = String.format("% 请先登录", username);
+			logger.error(logMsgString);
+			return new ResponseEntity<>(logMsgString, HttpStatus.NOT_FOUND);
+		}
+		String upload_file_path = userInfo.getUploadPath();
+		String download_file_path = userInfo.getDownloadPath();
 		String sfn = file.getOriginalFilename();
 		File sf = new File(sfn);
 		String dfn = sf.getName();
@@ -548,7 +556,7 @@ public class DataController {
 		return new ResponseEntity<>("数据上传成功!", HttpStatus.OK);
 	}
 
-	private boolean dataImport(String upload_file_path, String importXML, String download_file_path) {
+	private boolean dataImport(String importXML,String upload_file_path,  String download_file_path) {
 		String destFN = upload_file_path + File.separator + importXML;
 		File xmlFile = new File(destFN);
 		if (!xmlFile.exists()) {

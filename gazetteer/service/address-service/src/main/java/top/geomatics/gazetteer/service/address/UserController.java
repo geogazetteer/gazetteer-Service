@@ -52,7 +52,8 @@ public class UserController {
 			if (createUserWorkspace(user.getUsername())) {
 				userService.register(user);
 			} else {
-				return new ResponseEntity<>(String.format("注册用户 %s 失败", user.getUsername()), HttpStatus.UNAUTHORIZED);
+				return new ResponseEntity<>(String.format("注册用户 %s 失败，用户空间已经存在！", user.getUsername()),
+						HttpStatus.UNAUTHORIZED);
 			}
 		}
 		return new ResponseEntity<>(String.format("注册用户 %s 成功，请登录", user.getUsername()), HttpStatus.OK);
@@ -69,7 +70,7 @@ public class UserController {
 		if (user2 != null) {
 			CurrentSession.setUser(user2);
 
-			UserManager.addUser(user2);
+			UserManager.getInstance().addUser(user2);
 
 			return new ResponseEntity<>("登录成功", HttpStatus.OK);
 		} else {

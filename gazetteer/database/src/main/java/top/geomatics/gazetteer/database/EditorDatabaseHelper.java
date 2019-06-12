@@ -25,7 +25,7 @@ import top.geomatics.gazetteer.config.ResourcesManager2;
  *
  */
 public class EditorDatabaseHelper {
-	private String userName = "user_admin";
+	private String userName = null;
 
 	// 添加slf4j日志实例对象
 	private final static Logger logger = LoggerFactory.getLogger(EditorDatabaseHelper.class);

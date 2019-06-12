@@ -83,7 +83,7 @@ public class RevisionController {
 			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit,
 			AddressEditorRow row) {
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(fields, tablename, row, orderby, limit);
-		List<AddressEditorRow> rows = UserManager.getUserInfo(username).getMapper().findEquals(map);
+		List<AddressEditorRow> rows = UserManager.getInstance().getUserInfo(username).getMapper().findEquals(map);
 		return ControllerUtils.getResponseBody_revision(rows);
 	}
 
@@ -114,7 +114,7 @@ public class RevisionController {
 		row.setStatus(status);
 
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(null, tablename, row, null, 0);
-		return "{ \"total\": " + UserManager.getUserInfo(username).getMapper().getCount(map) + "}";
+		return "{ \"total\": " + UserManager.getInstance().getUserInfo(username).getMapper().getCount(map) + "}";
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class RevisionController {
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(fields, tablename, row, orderby, limit);
 		Integer page_start = (index - 1) * limit;
 		map.put("page_start", page_start);
-		List<AddressEditorRow> rows = UserManager.getUserInfo(username).getMapper().findPageEquals(map);
+		List<AddressEditorRow> rows = UserManager.getInstance().getUserInfo(username).getMapper().findPageEquals(map);
 		return ControllerUtils.getResponseBody_revision(rows);
 	}
 
@@ -179,7 +179,7 @@ public class RevisionController {
 			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename) {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put(IControllerConstant.ENTERPRISE_DB_ID, fid);
-		List<AddressEditorRow> rows = UserManager.getUserInfo(username).getMapper().selectByFid(map);
+		List<AddressEditorRow> rows = UserManager.getInstance().getUserInfo(username).getMapper().selectByFid(map);
 		return ControllerUtils.getResponseBody_revision(rows);
 	}
 
@@ -204,7 +204,7 @@ public class RevisionController {
 		// 查询
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put(IControllerConstant.ENTERPRISE_DB_ID, fid);
-		List<AddressEditorRow> rows = UserManager.getUserInfo(username).getMapper().selectByFid(map);
+		List<AddressEditorRow> rows = UserManager.getInstance().getUserInfo(username).getMapper().selectByFid(map);
 		// 计算
 		List<AddressEditorRow> newRows = new ArrayList<AddressEditorRow>();
 		for (AddressEditorRow row : rows) {
@@ -280,7 +280,7 @@ public class RevisionController {
 		}
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put("fids", idList);
-		List<AddressEditorRow> row = UserManager.getUserInfo(username).getMapper().selectByFids(map);
+		List<AddressEditorRow> row = UserManager.getInstance().getUserInfo(username).getMapper().selectByFids(map);
 		return ControllerUtils.getResponseBody_revision(row);
 	}
 
@@ -343,7 +343,7 @@ public class RevisionController {
 			row.setModifier(modifier);
 
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(fields, tablename, row, orderby, limit);
-		List<AddressEditorRow> rows = UserManager.getUserInfo(username).getMapper().findEquals(map);
+		List<AddressEditorRow> rows = UserManager.getInstance().getUserInfo(username).getMapper().findEquals(map);
 		return ControllerUtils.getResponseBody_revision(rows);
 	}
 
@@ -406,7 +406,7 @@ public class RevisionController {
 			row.setModifier("%" + modifier + "%");
 
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(fields, tablename, row, orderby, limit);
-		List<AddressEditorRow> rows = UserManager.getUserInfo(username).getMapper().findLike(map);
+		List<AddressEditorRow> rows = UserManager.getInstance().getUserInfo(username).getMapper().findLike(map);
 		return ControllerUtils.getResponseBody_revision(rows);
 	}
 
@@ -619,7 +619,7 @@ public class RevisionController {
 		// String new_status = new_row.getStatus().toString();
 		String new_status = "1";
 		// String new_modifier = new_row.getModifier();
-		String new_modifier = UserManager.getUserInfo(username).getUserName();
+		String new_modifier = UserManager.getInstance().getUserInfo(username).getUserName();
 		// String new_update_date = new_row.getUpdate_date().toString();
 		String new_update_date = new Date().toString();
 		String new_update_address = new_row.getUpdate_address();
@@ -647,8 +647,8 @@ public class RevisionController {
 		if (null != new_update_building_code && !new_update_building_code.isEmpty())
 			map.put(UPDATE_BUILDING_CODE_NEW, new_update_building_code);
 
-		Integer updatedRows = UserManager.getUserInfo(username).getMapper().updateAll(map);
-		UserManager.getUserInfo(username).getSqlSession().commit(true);
+		Integer updatedRows = UserManager.getInstance().getUserInfo(username).getMapper().updateAll(map);
+		UserManager.getInstance().getUserInfo(username).getSqlSession().commit(true);
 		return ControllerUtils.getUpdateResponseBody(updatedRows);
 	}
 
