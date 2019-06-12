@@ -1,17 +1,11 @@
 package top.geomatics.gazetteer.service.address;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -20,7 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +23,12 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.FileBasedConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -56,6 +55,7 @@ import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 import top.geomatics.gazetteer.config.ResourcesManager;
 import top.geomatics.gazetteer.model.MatcherResultRow;
+import top.geomatics.gazetteer.model.user.User;
 import top.geomatics.gazetteer.service.user.UserInformation;
 import top.geomatics.gazetteer.utilities.database.excel.BatchDealExcel;
 import top.geomatics.gazetteer.utilities.database.excel2gpkg.Excel2Geopackage;
@@ -394,39 +394,29 @@ public class DataController {
 		}
 		// 修改相应的配置文件
 		String db_properties = UserManager.getInstance().getUserInfo(username).getDbProperties();
-		Properties prop = new Properties();
+
+		Parameters db_params = new Parameters();
+		File db_propertiesFile = new File(db_properties);
+
+		FileBasedConfigurationBuilder<FileBasedConfiguration> db_builder = new FileBasedConfigurationBuilder<FileBasedConfiguration>(
+				PropertiesConfiguration.class).configure(db_params.fileBased().setFile(db_propertiesFile).setEncoding("UTF-8"));
+		db_builder.setAutoSave(true);
 		try {
-			prop.load(new BufferedReader(new InputStreamReader(new FileInputStream(db_properties), "UTF-8")));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			// 日志
-			String logMsgString = String.format("配置文件 %s 不存在！", db_properties);
-			logger.error(logMsgString);
-			return new ResponseEntity<>(logMsgString, HttpStatus.NOT_FOUND);
-		} catch (IOException e) {
-			e.printStackTrace();
+			Configuration db_config = db_builder.getConfiguration();
+
+			String fpath = folder + File.separator + fileName;
+			String value = String.format("jdbc:sqlite:%s", fpath);
+			db_config.setProperty("url", value);
+			//更新内存中的用户信息
+			User user2 = UserManager.getInstance().getUserInfo(username).getUser();
+			UserManager.getInstance().addUser(user2);
+
+		} catch (ConfigurationException e1) {
+			e1.printStackTrace();
 			// 日志
 			String logMsgString = String.format("打开配置文件 %s 失败！", db_properties);
 			logger.error(logMsgString);
 			return new ResponseEntity<>(logMsgString, HttpStatus.NOT_FOUND);
-		}
-		String value = "jdbc:sqlite:";
-		value = value + folder + File.separator + fileName;
-		prop.setProperty("url", value);
-
-		File pf = new File(db_properties);
-
-		Writer out = null;
-		try {
-			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pf), "UTF-8"));
-			prop.store(out, String.format("update database URL"));
-			out.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-			// 日志
-			String logMsgString = String.format("修改配置文件 %s 失败！", db_properties);
-			logger.error(logMsgString);
-			return new ResponseEntity<>(logMsgString, HttpStatus.FORBIDDEN);
 		}
 
 		return new ResponseEntity<>("设置数据文件成功!", HttpStatus.OK);
@@ -556,7 +546,7 @@ public class DataController {
 		return new ResponseEntity<>("数据上传成功!", HttpStatus.OK);
 	}
 
-	private boolean dataImport(String importXML,String upload_file_path,  String download_file_path) {
+	private boolean dataImport(String importXML, String upload_file_path, String download_file_path) {
 		String destFN = upload_file_path + File.separator + importXML;
 		File xmlFile = new File(destFN);
 		if (!xmlFile.exists()) {

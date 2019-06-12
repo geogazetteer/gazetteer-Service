@@ -1,15 +1,19 @@
 package top.geomatics.gazetteer.service.address;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.Properties;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.FileBasedConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +39,9 @@ import top.geomatics.gazetteer.service.user.UserServiceImpl;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+	// 添加slf4j日志实例对象
+	private final static Logger logger = LoggerFactory.getLogger(DataController.class);
+
 	private UserServiceImpl userService = new UserServiceImpl();
 	private static HttpSession session = null;
 
@@ -131,39 +138,74 @@ public class UserController {
 		// 增加两个属性文件
 		String db_prop = config_path + File.separator + "db.properties";
 		String edit_prop = config_path + File.separator + "editor_db.properties";
-		Properties dbProperties = new Properties();
-		Properties editProperties = new Properties();
 
-		// editor_db_properties_file =
-		// D:\\gazetteer\\data\\user_enterprise1\\config\\editor_db.properties
-		dbProperties.setProperty("editor_db_properties_file", edit_prop);
-		// upload_file_path = D:\\gazetteer\\data\\user_enterprise1\\source
-		dbProperties.setProperty("upload_file_path", source_path);
-		// download_file_path = D:\\gazetteer\\data\\user_enterprise1\\target
-		dbProperties.setProperty("download_file_path", target_path);
-		Writer out_db = null;
-		try {
-			out_db = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(db_prop)), "UTF-8"));
-			dbProperties.store(out_db, "created by " + username);
-			out_db.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		Configurations db_configs = new Configurations();
+		File db_propertiesFile = new File(db_prop);
+		if (!db_propertiesFile.exists()) {
+			try {
+				if (!db_propertiesFile.createNewFile()) {
+					return false;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		// driver=org.sqlite.JDBC
-		// url=
-		// username=
-		// password=
-		editProperties.setProperty("driver", "org.sqlite.JDBC");
-		editProperties.setProperty("url", "");
-		editProperties.setProperty("username", "");
-		editProperties.setProperty("password", "");
-		Writer out_edit = null;
+		FileBasedConfigurationBuilder.setDefaultEncoding(PropertiesConfiguration.class, "UTF-8");
+		FileBasedConfigurationBuilder<PropertiesConfiguration> db_builder = db_configs
+				.propertiesBuilder(db_propertiesFile);
+
 		try {
-			out_edit = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(edit_prop)), "UTF-8"));
-			editProperties.store(out_edit, "created by " + username);
-			out_edit.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+			Configuration db_config = db_builder.getConfiguration();
+			// editor_db_properties_file =
+			// D:\\gazetteer\\data\\user_enterprise1\\config\\editor_db.properties
+			db_config.setProperty("editor_db_properties_file", edit_prop);
+			// upload_file_path = D:\\gazetteer\\data\\user_enterprise1\\source
+			db_config.setProperty("upload_file_path", source_path);
+			// download_file_path = D:\\gazetteer\\data\\user_enterprise1\\target
+			db_config.setProperty("download_file_path", target_path);
+
+			db_builder.save();
+
+		} catch (ConfigurationException e1) {
+			e1.printStackTrace();
+			// 日志
+			String logMsgString = String.format("创建配置文件 %s 失败！", db_prop);
+			logger.error(logMsgString);
+			return false;
+		}
+
+		Parameters edit_params = new Parameters();
+		File edit_propertiesFile = new File(edit_prop);
+		if (!edit_propertiesFile.exists()) {
+			try {
+				if (!edit_propertiesFile.createNewFile()) {
+					return false;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		FileBasedConfigurationBuilder<FileBasedConfiguration> edit_builder = new FileBasedConfigurationBuilder<FileBasedConfiguration>(
+				PropertiesConfiguration.class).configure(edit_params.fileBased().setFile(edit_propertiesFile));
+		try {
+			Configuration edit_config = edit_builder.getConfiguration();
+			// driver=org.sqlite.JDBC
+			// url=
+			// username=
+			// password=
+			edit_config.setProperty("driver", "org.sqlite.JDBC");
+			edit_config.setProperty("url", "");
+			edit_config.setProperty("username", "");
+			edit_config.setProperty("password", "");
+
+			edit_builder.save();
+
+		} catch (ConfigurationException e1) {
+			e1.printStackTrace();
+			// 日志
+			String logMsgString = String.format("创建配置文件 %s 失败！", edit_prop);
+			logger.error(logMsgString);
+			return false;
 		}
 
 		return true;
