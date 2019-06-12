@@ -84,6 +84,32 @@ public class SearcherController {
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		return ControllerUtils.getResponseBody(rows);
 	}
+	
+	/**
+	 * <b>查询一个区的所有街道</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/龙华区?limit=10
+	 * </p>
+	 * 
+	 * @param district String 路径变量，固定为“龙华区”
+	 * @param fields   String 请求参数，需要选择的字段，多个字段以,分隔，如：id,street
+	 * @param orderby  String 请求参数，指定查询结果排序方式
+	 * @param limit    int 请求参数，限定查询的记录个数，如：limit=10
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "查询一个区的所有街道", notes = "按区查询所有街道，示例：/address/龙华区?limit=10")
+	@GetMapping("/{district}")
+	public String selectByDistrictNode(
+			@ApiParam(value = "街道所在的区，固定为龙华区") @PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = true) String district,
+			@ApiParam(value = "查询字段，如 id,street") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, district, null, orderby, limit);
+		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
+		return ControllerUtils.getResponseBody(rows);
+	}
 
 	/**
 	 * <b>查询一个街道的所有社区</b><br>
