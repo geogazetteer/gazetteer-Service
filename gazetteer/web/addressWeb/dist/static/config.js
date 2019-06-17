@@ -41,6 +41,14 @@ const URLCFG={
   searchCtxTotalUrl:serverUrl+'address/sum',//param：keywords=''
   //根据页码获取搜索结果
   searchListUrl:serverUrl+'address/page',// "/1?keywords=a&limit=10"
+  //获取龙华区所有街道
+  getAllStreetUrl:serverUrl+'address/龙华区',
+  //根据街道获取社区
+  getComByStrUrl:serverUrl+'address/龙华区',
+  //根据社区获取小区
+  getVillByComUrl:serverUrl+'address/龙华区',
+
+
 
   //用户注册
   registerUserUrl:serverUrl+'user/register',

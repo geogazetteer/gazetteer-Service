@@ -1,0 +1,3 @@
+1./address/{district}/{street}/{community}查询一个社区的所有地址
+接口返回结果多，当limit没有默认值时，接口返回失败
+可考虑做成翻页
