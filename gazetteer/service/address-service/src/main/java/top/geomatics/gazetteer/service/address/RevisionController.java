@@ -2,6 +2,7 @@ package top.geomatics.gazetteer.service.address;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -675,6 +677,141 @@ public class RevisionController {
 		row.setFid(fid);
 
 		return updateAll(username, tablename, row, new_row);
+	}
+
+	/**
+	 * <b>新增加一个地址</b><br>
+	 * <i> examples: <br>
+	 * http://localhost:8083/revision/insert?tablename=dmdz_edit </i>
+	 * 
+	 * @param username  String 请求参数，用户名
+	 * @param tablename String 请求参数，需要更新的数据库表名
+	 * @param new_row   AddressEditorRow 更新后的数据
+	 * @return String 返回JSON格式的更新结果说明
+	 */
+	@ApiOperation(value = "新增加一个地址", notes = "新增加一个地址，示例：/revision/insert?tablename=dmdz_edit")
+	@PostMapping("/insert")
+	public String insert(
+			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
+			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename,
+			@ApiParam @RequestBody AddressEditorRow new_row) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+
+//		street_ ,
+//		community_ ,
+//		longitude_ ,
+//		latitude_ ,
+//		origin_address ,
+//		similar_address ,
+//		standard_address ,
+//		status ,
+//		modifier ,
+//		update_date ,
+//		update_address ,
+//		update_building_code
+		if (null != new_row && null != new_row.getStreet_() && !new_row.getStreet_().trim().isEmpty()) {
+			map.put("street_", new_row.getStreet_());
+		}
+		if (null != new_row && null != new_row.getCommunity_() && !new_row.getCommunity_().trim().isEmpty()) {
+			map.put("community_", new_row.getCommunity_());
+		}
+		if (null != new_row && null != new_row.getLongitude_()) {
+			map.put("longitude_", new_row.getLongitude_());
+		}
+		if (null != new_row && null != new_row.getLatitude_()) {
+			map.put("latitude_", new_row.getLatitude_());
+		}
+		if (null != new_row && null != new_row.getOrigin_address() && !new_row.getOrigin_address().trim().isEmpty()) {
+			map.put("origin_address", new_row.getOrigin_address());
+		}
+		if (null != new_row && null != new_row.getSimilar_address() && !new_row.getSimilar_address().trim().isEmpty()) {
+			map.put("similar_address", new_row.getSimilar_address());
+		}
+		if (null != new_row && null != new_row.getStandard_address()
+				&& !new_row.getStandard_address().trim().isEmpty()) {
+			map.put("standard_address", new_row.getStandard_address());
+		}
+
+//		if (null != new_row && null != new_row.getStatus()) {
+//			map.put("status", new_row.getStatus());
+//		}
+		map.put("status", 3);
+
+//		if (null != new_row && null != new_row.getModifier() && !new_row.getModifier().trim().isEmpty()) {
+//			map.put("modifier", new_row.getModifier());
+//		}
+		map.put("modifier", username);
+//		if (null != new_row && null != new_row.getUpdate_date()) {
+//			map.put("update_date", new_row.getUpdate_date());
+//		}
+		map.put("update_date", new Date());
+		if (null != new_row && null != new_row.getUpdate_address() && !new_row.getUpdate_address().trim().isEmpty()) {
+			map.put("update_address", new_row.getUpdate_address());
+		}
+		if (null != new_row && null != new_row.getUpdate_building_code()
+				&& !new_row.getUpdate_building_code().trim().isEmpty()) {
+			map.put("update_building_code", new_row.getUpdate_building_code());
+		}
+
+		Integer updatedRows = UserManager.getInstance().getUserInfo(username).getMapper().insertAddress(map);
+		UserManager.getInstance().getUserInfo(username).getSqlSession().commit(true);
+
+		return ControllerUtils.getUpdateResponseBody(updatedRows);
+	}
+
+	/**
+	 * <b>构建一个地址</b><br>
+	 * <i> examples: <br>
+	 * http://localhost:8083/revision/compose? </i>
+	 * 
+	 * @param username  String 请求参数，用户名
+	 * @param tablename String 请求参数，需要更新的数据库表名
+	 * @param street    String 请求参数， 街道
+	 * @param community String 请求参数，社区
+	 * @param village   String 请求参数， 小区
+	 * @param code      String 请求参数， 建筑物编码
+	 * @param suffix    String 请求参数， 地址后缀
+	 * @return String 返回JSON格式的更新地址
+	 */
+	@ApiOperation(value = "构建一个地址", notes = "构建一个地址，示例：/revision/compose?street=民治街道&community=民治社区&village=梅花山庄&suffix=欣梅园D5栋&code=4403060090042100005")
+	@PostMapping("/compose")
+	public String compose(
+			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
+			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename,
+			@ApiParam(value = "街道") @RequestParam(value = "street", required = false) String street,
+			@ApiParam(value = "社区") @RequestParam(value = "community", required = false) String community,
+			@ApiParam(value = "小区") @RequestParam(value = "village", required = false) String village,
+			@ApiParam(value = "楼栋编码") @RequestParam(value = "code", required = false) String code,
+			@ApiParam(value = "其他") @RequestParam(value = "suffix", required = false) String suffix) {
+
+		String address = "";
+		AddressEditorRow new_row = new AddressEditorRow();
+		if (null != street && !street.trim().isEmpty()) {
+			new_row.setStreet_(street);
+			address += street;
+		}
+		if (null != community && !community.trim().isEmpty()) {
+			new_row.setCommunity_(community);
+			address += community;
+		}
+		if (null != village && !village.trim().isEmpty()) {
+			address += village;
+		}
+		if (null != suffix && !suffix.trim().isEmpty()) {
+			address += suffix;
+		}
+		if (null != code && !code.trim().isEmpty()) {
+			new_row.setUpdate_building_code(code);
+		}
+		if (!address.trim().isEmpty()) {
+			address = "广东省深圳市龙华区" + address;
+			new_row.setUpdate_address(address);
+		}
+
+		insert(username, tablename, new_row);
+
+		return new_row.getUpdate_address();
 	}
 
 }

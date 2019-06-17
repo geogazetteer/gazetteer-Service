@@ -218,6 +218,9 @@ public class Shapefile2Geopackage {
 			SimpleFeature aFeature = iterator.next();
 			SimpleFeature targetFeature = null;
 			featureBuilder.addAll(aFeature.getAttributes());
+			//几何
+			aFeature.getDefaultGeometry();
+			
 			// 增加新的属性
 			for (String originField : attrMap.keySet()) {
 				String targetField = attrMap.get(originField);
@@ -225,7 +228,7 @@ public class Shapefile2Geopackage {
 
 				featureBuilder.set(targetField, fieldValue);
 			}
-
+		
 			featureBuilder.set(STAT_STRING, STATUS);
 
 			targetFeature = featureBuilder.buildFeature(null);

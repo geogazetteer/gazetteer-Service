@@ -1,6 +1,7 @@
 package top.geomatics.gazetteer.service.address;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -84,7 +85,7 @@ public class SearcherController {
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		return ControllerUtils.getResponseBody(rows);
 	}
-	
+
 	/**
 	 * <b>查询一个区的所有街道</b><br>
 	 * 
@@ -167,6 +168,80 @@ public class SearcherController {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_community, null, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		return ControllerUtils.getResponseBody(rows);
+	}
+
+	/**
+	 * <b>查询一个社区的所有小区</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/villages/龙华区/民治街道/民治社区
+	 * </p>
+	 * 
+	 * @param path_district  String 路径变量，固定为“龙华区”
+	 * @param path_street    String 路径变量，表示所在的街道，如：民治街道
+	 * @param path_community String 路径变量，表示所在的社区，如：民治社区
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "查询一个社区的所有小区", notes = "查询一个社区的所有小区，示例：/address/villages/龙华区/民治街道/民治社区")
+	@GetMapping("/villages/{district}/{street}/{community}")
+	public String selectVillageByCommunityNode(
+			@ApiParam(value = "街道所在的区，固定为龙华区") @PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = false) String path_district,
+			@ApiParam(value = "街道，如：民治街道") @PathVariable(value = IControllerConstant.ADDRESS_STREET, required = false) String path_street,
+			@ApiParam(value = "社区，如：民治社区") @PathVariable(value = IControllerConstant.ADDRESS_COMMUNITY, required = true) String path_community) {
+		String fields = "village";
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_community, null, null, 0);
+		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
+		// 查找社区下所有的小区，不重复
+		List<AddressRow> new_rows = new ArrayList<AddressRow>();
+		Map<String, String> vMap = new HashMap<>();
+		for (AddressRow row : rows) {
+			String key = row.getVillage();
+			if (!vMap.containsKey(key)) {
+				vMap.put(key, key);
+				new_rows.add(row);
+			}
+		}
+		return ControllerUtils.getResponseBody(new_rows);
+	}
+
+	/**
+	 * <b>查询一个小区的所有建筑物编码</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/codes/龙华区/民治街道/民治社区/梅花山庄
+	 * </p>
+	 * 
+	 * @param path_district  String 路径变量，固定为“龙华区”
+	 * @param path_street    String 路径变量，表示所在的街道，如：民治街道
+	 * @param path_community String 路径变量，表示所在的社区，如：民治社区
+	 * @param path_village   String 路径变量，表示所在的小区，如：梅花山庄
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "查询一个小区的所有建筑物编码", notes = "查询一个小区的所有建筑物编码，示例：/address/codes/龙华区/民治街道/民治社区/梅花山庄")
+	@GetMapping("/codes/{community}/{village}")
+	public String selectCodeByVillageNode(
+			@ApiParam(value = "街道所在的区，固定为龙华区") @PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = false) String path_district,
+			@ApiParam(value = "街道，如：民治街道") @PathVariable(value = IControllerConstant.ADDRESS_STREET, required = false) String path_street,
+			@ApiParam(value = "社区，如：民治社区") @PathVariable(value = IControllerConstant.ADDRESS_COMMUNITY, required = true) String path_community,
+			@ApiParam(value = "小区，如：梅花山庄") @PathVariable(value = IControllerConstant.ADDRESS_VILLAGE, required = true) String path_village) {
+		String fields = "code";
+		AddressRow aaRow = new AddressRow();
+		aaRow.setVillage(path_village);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_community, aaRow, null, 0);
+		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
+		// 查找小区下所有的建筑物编码，不重复
+		List<AddressRow> new_rows = new ArrayList<AddressRow>();
+		Map<String, String> vMap = new HashMap<>();
+		for (AddressRow row : rows) {
+			String key = row.getCode();
+			if (!vMap.containsKey(key)) {
+				vMap.put(key, key);
+				new_rows.add(row);
+			}
+		}
+		return ControllerUtils.getResponseBody(new_rows);
 	}
 
 	/**
@@ -789,27 +864,27 @@ public class SearcherController {
 		keywords = AddressProcessor.transform(keywords, this.settings);
 		// 如果是数据库查询
 		if (true == this.settings.isDatabaseSearch()) {
-			return selectByAddressLikePage(index,keywords,limit);
+			return selectByAddressLikePage(index, keywords, limit);
 		}
 		List<SimpleAddressRow> rows = null;
 		// 其他为lucene搜索
 		// 如果是地名
 		if (this.settings.isGeoName()) {
-			//暂时用这个
+			// 暂时用这个
 			rows = LuceneUtil.searchByPage(keywords, index, limit);
 		}
 		// 如果是POI
 		else if (this.settings.isPOI()) {
-			//暂时用这个
+			// 暂时用这个
 			rows = LuceneUtil.searchByPage(keywords, index, limit);
 		}
 		// 如果是建筑物编码
 		else if (this.settings.isBuildingCode()) {
-			rows = ControllerUtils.getCodeQuerysPage(keywords, index,limit);
+			rows = ControllerUtils.getCodeQuerysPage(keywords, index, limit);
 		}
 		// 如果是坐标
 		else if (this.settings.isCoordinates()) {
-			rows = ControllerUtils.getCoordQuerysPage(keywords, index,limit);
+			rows = ControllerUtils.getCoordQuerysPage(keywords, index, limit);
 		}
 		// 如果是地址
 		else {
@@ -818,7 +893,6 @@ public class SearcherController {
 		// 返回结果
 		return ControllerUtils.getResponseBody4(rows);
 	}
-	
 
 	/**
 	 * <b>根据关键词进行快速模糊查询</b><br>
@@ -961,7 +1035,7 @@ public class SearcherController {
 
 		return JSON.toJSONString(AddressSearcherPinyin.searchPage(pinyin, index, limit));
 	}
-	
+
 	/**
 	 * <b>根据街道或社区、关键词查询地址</b><br>
 	 * 
@@ -1025,15 +1099,15 @@ public class SearcherController {
 		if (null != community && !community.isEmpty())
 			row.setCommunity(community);
 		if (null != keywords && !keywords.isEmpty()) {
-			if(!keywords.startsWith("%")) {
-				keywords = "%" + keywords ;
+			if (!keywords.startsWith("%")) {
+				keywords = "%" + keywords;
 			}
-			if(!keywords.endsWith("%")) {
+			if (!keywords.endsWith("%")) {
 				keywords = keywords + "%";
 			}
 			row.setAddress(keywords);
 		}
-			
+
 		if (null != address_id && !address_id.isEmpty())
 			row.setAddress_id(address_id);
 		if (null != building && !building.isEmpty())
