@@ -227,3 +227,13 @@ body {
 #check-map-code{
   display: none;
 }
+
+/*禁止输入的input*/
+.cannot input{
+  border: 1px solid #E8EBED !important;
+  cursor: auto;
+}
+.cannot input:hover{
+  border: 1px solid #E8EBED !important;
+  cursor: auto;
+}

@@ -1,0 +1,15 @@
+1./address/{district}/{street}/{community}查询一个社区的所有地址
+接口返回结果多，当limit没有默认值时，接口返回失败
+可考虑做成翻页
+且有重复值
+
+2./address/codes/{community}/{village}
+查询一个小区的所有建筑物编码
+返回的数量很大
+
+3.输入提示如何接入？
+
+4.新增地址
+suffix是否是必填项？
+填写了suffix后，接口仍然报错
+

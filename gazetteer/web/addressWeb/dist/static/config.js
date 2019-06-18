@@ -47,6 +47,10 @@ const URLCFG={
   getComByStrUrl:serverUrl+'address/龙华区',
   //根据社区获取小区
   getVillByComUrl:serverUrl+'address/龙华区',
+  //查询某个小区的所有楼栋编号
+  getCodeByVillageUrl:serverUrl+'address/codes',//http://119.3.72.23:8083/address/codes/community/village
+  //相似查找
+  getAddressLikeUrl:serverUrl+'address/like',
 
 
 
@@ -142,5 +146,7 @@ const EDITSERVICE={
     // "update_address": "update_address",//标准地址
     "code": "update_building_code",//楼栋编号
     // "update_date": "2019-06-10T15:05:06.229Z"
-  }
+  },
+  //构建一个地址
+  addSiteUrl:serverUrl+'revision/compose',//?street=民治街道&community=民治社区&village=梅花山庄&suffix=欣梅园D5栋&code=4403060090042100005
 };
