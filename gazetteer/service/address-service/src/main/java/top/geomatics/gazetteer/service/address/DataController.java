@@ -37,14 +37,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
@@ -62,12 +61,12 @@ import top.geomatics.gazetteer.utilities.database.excel2gpkg.Excel2Geopackage;
 import top.geomatics.gazetteer.utilities.database.shp2gpkg.Shapefile2Geopackage;
 
 /**
- * <b>地址数据上传下载服务类</b><br>
+ * <b>地址数据服务类</b><br>
  * 
  * @author whudyj
  */
-@Api(value = "/data", tags = "地址数据上传下载")
-@Controller
+@Api(value = "/data", tags = "地址数据服务")
+@RestController
 @RequestMapping("/data")
 public class DataController {
 	// 添加slf4j日志实例对象
@@ -80,7 +79,7 @@ public class DataController {
 	 * <b>上传数据文件</b><br>
 	 * 
 	 * <i>说明：</i><br>
-	 * <i>数据文件格式为excel格式</i><br>
+	 * <i>数据文件格式为excel格式，文件上传到服务器上固定位置</i><br>
 	 * 
 	 * examples:<br>
 	 * http://localhost:8083/data/upload?fileName=
@@ -90,19 +89,19 @@ public class DataController {
 	 */
 	@ApiOperation(value = "上传地址数据", notes = "上传地址数据")
 	@PostMapping("/upload")
-	@ResponseBody
-	public String fileUpload(
-			@ApiParam(value = "前台上传的文件") @RequestParam(value = "fileName", required = true) MultipartFile file) {
+	public ResponseEntity<String> fileUpload(
+			@ApiParam(value = "上传数据文件") @RequestParam(value = "fileName", required = true) MultipartFile file) {
 		if (file.isEmpty()) {
 			// 日志
 			String logMsgString = Messages.getString("DataController.1"); //$NON-NLS-1$
 			logger.error(logMsgString);
-			return ""; //$NON-NLS-1$
+			return new ResponseEntity<>(logMsgString, HttpStatus.NOT_FOUND);
 		}
 		// 服务器上存储的文件名
 		UUID uuid = UUID.randomUUID();
 		String fileName = uuid + Messages.getString("DataController.3"); //$NON-NLS-1$
 
+		// 配置的存储路径
 		String upload_file_path = ResourcesManager.getInstance().getValue(UP_PATH);
 		String sourceFilePath = upload_file_path + File.separator + fileName;
 		// 判断文件父目录是否存在，如果不存在，则创建目录
@@ -116,21 +115,18 @@ public class DataController {
 			file.transferTo(dest);
 			String logMsgString = Messages.getString("DataController.4"); //$NON-NLS-1$
 			logger.info(logMsgString);
-			return logMsgString;
-		} catch (IllegalStateException e) {
+			return new ResponseEntity<>(logMsgString, HttpStatus.OK);
+		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error(e.getMessage());
-			return ""; //$NON-NLS-1$
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
-			return ""; //$NON-NLS-1$
+			String logMsgString = String.format("上传文件失败！");
+			logger.error(logMsgString);
+			return new ResponseEntity<>(logMsgString, HttpStatus.EXPECTATION_FAILED);
 		}
 
 	}
 
 	/**
-	 * <b>上传批量匹配处理数据文件</b><br>
+	 * <b>上传数据文件，并进行地址批量匹配处理</b><br>
 	 * 
 	 * <i>说明：</i><br>
 	 * <i>数据文件格式为excel格式</i><br>
@@ -138,23 +134,24 @@ public class DataController {
 	 * examples:<br>
 	 * http://localhost:8083/data/upload/matcher
 	 * 
-	 * @param file MultipartFile 请求参数，前台上传的文件
+	 * @param file MultipartFile 请求参数，上传的数据文件
 	 * @return String 返回JSON格式的批量匹配处理结果
 	 */
-	@ApiOperation(value = "上传批量匹配处理数据", notes = "上传批量匹配处理数据")
+	@ApiOperation(value = "上传数据文件，并进行地址批量匹配处理", notes = "上传数据文件，并进行地址批量匹配处理")
 	@PostMapping("/upload/matcher")
-	@ResponseBody
-	public String uploadMatcherFile(@ApiParam(value = "前台上传的文件") @RequestParam("fileName") MultipartFile file) {
+	public ResponseEntity<String> uploadMatcherFile(
+			@ApiParam(value = "上传数据文件") @RequestParam("fileName") MultipartFile file) {
 		if (file.isEmpty()) {
 			// 日志
 			String logMsgString = Messages.getString("DataController.7"); //$NON-NLS-1$
 			logger.error(logMsgString);
-			return ""; //$NON-NLS-1$
+			return new ResponseEntity<>(logMsgString, HttpStatus.NOT_FOUND);
 		}
 		// 服务器上存储的文件名
 		UUID uuid = UUID.randomUUID();
 		String fileName = uuid + Messages.getString("DataController.9"); //$NON-NLS-1$
 
+		// 配置的存储路径
 		String upload_file_path = ResourcesManager.getInstance().getValue(UP_PATH);
 		String sourceFilePath = upload_file_path + File.separator + fileName;
 		File dest = new File(sourceFilePath);
@@ -171,14 +168,15 @@ public class DataController {
 			// 日志
 			String logMsgString = Messages.getString("DataController.10"); //$NON-NLS-1$
 			logger.error(logMsgString);
-			return ""; //$NON-NLS-1$
+			return new ResponseEntity<>(logMsgString, HttpStatus.EXPECTATION_FAILED);
 		}
 		// 批量匹配处理数据
 		String fileName2 = uuid + Messages.getString("DataController.12"); //$NON-NLS-1$
 		String destFilePath = upload_file_path + File.separator + fileName2;
 		List<MatcherResultRow> allRows = BatchDealExcel.batchDealExcel(sourceFilePath, destFilePath);
 
-		return ControllerUtils.getResponseBody6(allRows);
+		String responseString = ControllerUtils.getResponseBody6(allRows);
+		return new ResponseEntity<>(responseString, HttpStatus.OK);
 	}
 
 	/**
@@ -187,48 +185,37 @@ public class DataController {
 	 * examples:<br>
 	 * http://localhost:8083/data/download/
 	 * 
-	 * @param id String 路径变量，服务器上下载文件名
+	 * @param fileName String 请求参数，服务器上需要下载的数据文件名
+	 * @param response HttpServletResponse 服务器响应
 	 */
 	@ApiIgnore
 	@ApiOperation(value = "下载数据", notes = "下载数据")
-	@GetMapping("/download/{id}")
-	public void download(@ApiParam(value = "下载文件名") @PathVariable("id") String id, HttpServletRequest request,
+	@GetMapping("/download")
+	public ResponseEntity<String> download(
+			@ApiParam(value = "需要下载的数据文件名") @RequestParam(value = "fileName", required = true) String fileName,
 			HttpServletResponse response) {
-		// 文件地址
+		// 配置的数据文件路径
 		String folder = ResourcesManager.getInstance().getValue(UP_PATH);
-		;
 		try (
 				// jdk7新特性，可以直接写到try()括号里面，java会自动关闭
-				InputStream inputStream = new FileInputStream(new File(folder, id));
+				InputStream inputStream = new FileInputStream(new File(folder, fileName));
 				OutputStream outputStream = response.getOutputStream()) {
 			// 指明为下载
 			response.setContentType(Messages.getString("DataController.13")); //$NON-NLS-1$
-			response.addHeader(Messages.getString("DataController.14"), Messages.getString("DataController.15") + id); // 设置文件名 //$NON-NLS-1$ //$NON-NLS-2$
+			response.addHeader(Messages.getString("DataController.14"), //$NON-NLS-1$
+					Messages.getString("DataController.15") + fileName); //$NON-NLS-1$
 
 			// 把输入流copy到输出流
 			IOUtils.copy(inputStream, outputStream);
 			outputStream.flush();
 
-		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			String logMsgString = String.format("文件下载失败！");
+			logger.error(logMsgString);
+			return new ResponseEntity<>(logMsgString, HttpStatus.EXPECTATION_FAILED);
 		}
-
-		/*
-		 * long start = System.currentTimeMillis(); String path = upload_file_path +
-		 * File.separator + id; File file = new File(path); file.mkdir();
-		 * 
-		 * String xlsfile = upload_file_path + File.separator + id + ".xlsx";
-		 * System.out.println(xlsfile); String shppath = path + "/shp_" + id + ".shp";
-		 * System.out.println(shppath); // excel转shp Excel2Shp.excel2Shp(xlsfile,
-		 * shppath);
-		 * 
-		 * // 将生成的shp文件压缩 String sourcePath = upload_file_path + File.separator + id;
-		 * String zipName = "shp_" + id; ShpZip.createCardImgZip(sourcePath, zipName);
-		 * long end = System.currentTimeMillis(); System.out.println(end - start);
-		 */
-
+		return new ResponseEntity<>("数据下载成功！", HttpStatus.OK);
 	}
 
 	/**
@@ -246,7 +233,6 @@ public class DataController {
 	 */
 	@ApiOperation(value = "获得数据文件中的字段", notes = "获得数据文件中的字段")
 	@GetMapping("/fields")
-	@ResponseBody
 	public String getFields(
 			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
 			@ApiParam(value = "文件名") @RequestParam(value = "fileName", required = true) String fileName) {
@@ -291,7 +277,6 @@ public class DataController {
 	 */
 	@ApiOperation(value = "列出已经上传的数据文件", notes = "列出已经上传的数据文件")
 	@GetMapping("/source")
-	@ResponseBody
 	public String getSource(
 			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username) {
 		String upload_file_path = UserManager.getInstance().getUserInfo(username).getUploadPath();
@@ -337,7 +322,6 @@ public class DataController {
 	 */
 	@ApiOperation(value = "列出可以下载的数据文件", notes = "列出可以下载的数据文件")
 	@GetMapping("/target")
-	@ResponseBody
 	public String getTarget(
 			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username) {
 		String download_file_path = UserManager.getInstance().getUserInfo(username).getDownloadPath();
@@ -399,7 +383,8 @@ public class DataController {
 		File db_propertiesFile = new File(db_properties);
 
 		FileBasedConfigurationBuilder<FileBasedConfiguration> db_builder = new FileBasedConfigurationBuilder<FileBasedConfiguration>(
-				PropertiesConfiguration.class).configure(db_params.fileBased().setFile(db_propertiesFile).setEncoding("UTF-8"));
+				PropertiesConfiguration.class)
+						.configure(db_params.fileBased().setFile(db_propertiesFile).setEncoding("UTF-8"));
 		db_builder.setAutoSave(true);
 		try {
 			Configuration db_config = db_builder.getConfiguration();
@@ -407,7 +392,7 @@ public class DataController {
 			String fpath = folder + File.separator + fileName;
 			String value = String.format("jdbc:sqlite:%s", fpath);
 			db_config.setProperty("url", value);
-			//更新内存中的用户信息
+			// 更新内存中的用户信息
 			User user2 = UserManager.getInstance().getUserInfo(username).getUser();
 			UserManager.getInstance().addUser(user2);
 

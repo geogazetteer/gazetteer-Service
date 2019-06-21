@@ -697,6 +697,8 @@ public class RevisionController {
 			@ApiParam @RequestBody AddressEditorRow new_row) {
 
 		Map<String, Object> map = new HashMap<String, Object>();
+		
+		map.put("sql_tablename", "newAddress");
 
 //		street_ ,
 //		community_ ,

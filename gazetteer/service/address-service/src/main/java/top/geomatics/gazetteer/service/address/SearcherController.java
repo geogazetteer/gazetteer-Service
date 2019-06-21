@@ -164,7 +164,7 @@ public class SearcherController {
 			@ApiParam(value = "社区，如：民治社区") @PathVariable(value = IControllerConstant.ADDRESS_COMMUNITY, required = true) String path_community,
 			@ApiParam(value = "查询字段，如 id,code,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
 			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
-			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "10") int limit) {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_community, null, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		return ControllerUtils.getResponseBody(rows);
@@ -197,6 +197,9 @@ public class SearcherController {
 		Map<String, String> vMap = new HashMap<>();
 		for (AddressRow row : rows) {
 			String key = row.getVillage();
+			if (key.trim().isEmpty()) {
+				continue;
+			}
 			if (!vMap.containsKey(key)) {
 				vMap.put(key, key);
 				new_rows.add(row);
@@ -236,6 +239,9 @@ public class SearcherController {
 		Map<String, String> vMap = new HashMap<>();
 		for (AddressRow row : rows) {
 			String key = row.getCode();
+			if (key.trim().isEmpty()) {
+				continue;
+			}
 			if (!vMap.containsKey(key)) {
 				vMap.put(key, key);
 				new_rows.add(row);

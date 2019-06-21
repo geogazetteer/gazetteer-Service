@@ -9,7 +9,7 @@
 	</update>
 
 	<!--create table -->
-	<update id="createAddressEditorTable" parameterType="String">
+	<update id="createAddressTable" parameterType="String">
 		CREATE TABLE
 		${_parameter} (
 		fid INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,37 +33,37 @@
 	</update>
 
 	<!--insert into table -->
-	<insert id="insertAddressEditor" parameterType="map">
+	<insert id="insertAddress" parameterType="map">
 		insert into
 		${sql_tablename}
 		(
-		street_ ,
-		community_ ,
-		longitude_ ,
-		latitude_ ,
-		origin_address ,
-		similar_address ,
-		standard_address ,
-		status ,
-		modifier ,
-		update_date ,
-		update_address ,
-		update_building_code
+		<if test="street_ != null">street_,</if>
+		<if test="community_ != null">community_,</if>
+		<if test="longitude_ != null">longitude_,</if>
+		<if test="latitude_ != null">latitude_,</if>
+		<if test="origin_address != null">origin_address,</if>
+		<if test="similar_address != null">similar_address,</if>
+		<if test="standard_address != null">standard_address,</if>
+		<if test="status != null">status,</if>
+		<if test="modifier != null">modifier,</if>
+		<if test="update_date != null">update_date,</if>
+		<if test="update_address != null">update_address,</if>
+		<if test="update_building_code != null">update_building_code</if>
 		)
 		values
 		(
-		#{street_} ,
-		#{community_} ,
-		#{longitude_} ,
-		#{latitude_} ,
-		#{origin_address} ,
-		#{similar_address} ,
-		#{standard_address} ,
-		#{status} ,
-		#{modifier} ,
-		#{update_date} ,
-		#{update_address} ,
-		#{update_building_code}
+		<if test="street_ != null">#{street_},</if>
+		<if test="community_ != null">#{community_},</if>
+		<if test="longitude_ != null">#{longitude_},</if>
+		<if test="latitude_ != null">#{latitude_},</if>
+		<if test="origin_address != null">#{origin_address},</if>
+		<if test="similar_address != null">#{similar_address},</if>
+		<if test="standard_address != null">#{standard_address},</if>
+		<if test="status != null">#{status},</if>
+		<if test="modifier != null">#{modifier},</if>
+		<if test="update_date != null">#{update_date},</if>
+		<if test="update_address != null">#{update_address},</if>
+		<if test="update_building_code != null">#{update_building_code}</if>
 		)
 	</insert>
 
