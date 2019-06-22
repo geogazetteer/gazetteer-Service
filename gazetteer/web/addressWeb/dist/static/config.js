@@ -149,4 +149,6 @@ const EDITSERVICE={
   },
   //构建一个地址
   addSiteUrl:serverUrl+'revision/compose',//?street=民治街道&community=民治社区&village=梅花山庄&suffix=欣梅园D5栋&code=4403060090042100005
+  //新增地址输入联想
+  addressLikeUrl:serverUrl+'address/address/like'
 };

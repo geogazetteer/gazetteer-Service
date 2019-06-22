@@ -1,0 +1,9 @@
+1.构建一个地址接口:
+username 合法值是什么？只能是user_health吗
+
+2.根据fid更新需要编辑的地址
+revision/update/{fid}
+a.是否只需要更新similar_address ？
+
+3.导出数据
+username 合法值是什么？user_health
