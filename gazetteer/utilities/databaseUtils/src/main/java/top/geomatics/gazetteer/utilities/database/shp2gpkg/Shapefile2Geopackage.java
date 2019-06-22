@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import top.geomatics.gazetteer.model.AddressEditorRow;
+import top.geomatics.gazetteer.utilities.database.gpkg.GPKGProcessor;
 
 /**
  * @author whudyj
@@ -51,6 +52,8 @@ public class Shapefile2Geopackage {
 	private static final String TABLE_NAME = "dmdz_edit";
 	private static final Integer STATUS = 0;
 	private static final String STAT_STRING = "status";
+	private static final String CREATE_INDEX = "create_spatial_index";
+	private boolean isCreateIndex = false;
 
 	private static DataStore dataStore = null;
 	private static GeoPackage geopkg = null;
@@ -109,6 +112,9 @@ public class Shapefile2Geopackage {
 			String logMsgString = String.format("初始化geopackage文件：%s 失败！", this.geopackageName);
 			logger.error(logMsgString);
 			return false;
+		}
+		if (this.settings != null && this.settings.containsKey(CREATE_INDEX)) {
+			isCreateIndex = Boolean.parseBoolean(this.settings.get(CREATE_INDEX));
 		}
 		return true;
 	}
@@ -218,9 +224,9 @@ public class Shapefile2Geopackage {
 			SimpleFeature aFeature = iterator.next();
 			SimpleFeature targetFeature = null;
 			featureBuilder.addAll(aFeature.getAttributes());
-			//几何
+			// 几何
 			aFeature.getDefaultGeometry();
-			
+
 			// 增加新的属性
 			for (String originField : attrMap.keySet()) {
 				String targetField = attrMap.get(originField);
@@ -228,7 +234,7 @@ public class Shapefile2Geopackage {
 
 				featureBuilder.set(targetField, fieldValue);
 			}
-		
+
 			featureBuilder.set(STAT_STRING, STATUS);
 
 			targetFeature = featureBuilder.buildFeature(null);
@@ -236,12 +242,18 @@ public class Shapefile2Geopackage {
 		}
 		try {
 			geopkg.add(entry, new ListFeatureCollection(targetSFType, newFeas));
-			geopkg.createSpatialIndex(entry);
+			if (isCreateIndex) {
+				geopkg.createSpatialIndex(entry);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		iterator.close();
 		////////////////////
+
+		// 增加一个表newAddress
+		GPKGProcessor processor = new GPKGProcessor(geopkg);
+		processor.createAddressTable();
 
 		close();
 		return true;

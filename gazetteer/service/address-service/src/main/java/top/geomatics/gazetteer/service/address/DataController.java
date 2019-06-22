@@ -2,10 +2,10 @@ package top.geomatics.gazetteer.service.address;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -38,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +51,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 import top.geomatics.gazetteer.config.ResourcesManager;
+import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.MatcherResultRow;
 import top.geomatics.gazetteer.model.user.User;
 import top.geomatics.gazetteer.service.user.UserInformation;
@@ -537,6 +536,8 @@ public class DataController {
 		if (!xmlFile.exists()) {
 			return false;
 		}
+		Field[] fileds = AddressEditorRow.class.getDeclaredFields();
+
 		Document document = load(destFN);
 		Element root = document.getRootElement();
 		List<Element> nodes = root.elements("DataFile");
@@ -545,9 +546,6 @@ public class DataController {
 			Element elm = it.next();
 			// 文件名和设置
 			String fnString = "";
-			String originString = "";
-			String XString = "";
-			String YString = "";
 			String geometryString = "";
 			List<Element> fElements = elm.elements("FileName");
 			if (fElements.size() > 0) {
@@ -558,6 +556,7 @@ public class DataController {
 			if (fnString.trim().isEmpty()) {
 				continue;
 			}
+			Map<String, String> settings = new HashMap<String, String>();
 			List<Element> sElements = elm.elements("Settings");
 			if (sElements.size() > 0) {
 				Element se = sElements.get(0);
@@ -567,26 +566,29 @@ public class DataController {
 					List<Element> lse3 = se3.elements("Field");
 					if (lse3.size() > 0) {
 						Element se4 = lse3.get(0);
-						List<Element> lse4_o = se4.elements("origin_address");
-						List<Element> lse4_x = se4.elements("longitude");
-						List<Element> lse4_y = se4.elements("latitude");
+						for (int i = 0; i < fileds.length; i++) {
+							Field fld = fileds[i];
+							String fldName = fld.getName();
+							List<Element> lse4 = se4.elements(fldName);
+							if (lse4.size() > 0) {
+								Element se5 = lse4.get(0);
+								String orgin = se5.getText();
+								if (!orgin.isEmpty()) {
+									settings.put(orgin, fldName);
+								}
+							}
+
+						}
 						List<Element> lse4_g = se4.elements("build_geometry");
-						if (lse4_o.size() > 0) {
-							Element se5 = lse4_o.get(0);
-							originString = se5.getText();
-						}
-						if (lse4_x.size() > 0) {
-							Element se5 = lse4_x.get(0);
-							XString = se5.getText();
-						}
-						if (lse4_y.size() > 0) {
-							Element se5 = lse4_y.get(0);
-							YString = se5.getText();
-						}
+
 						if (lse4_g.size() > 0) {
 							Element se5 = lse4_g.get(0);
 							geometryString = se5.getText();
+							if (!geometryString.isEmpty()) {
+								// settings.put("buildGeometry", geometryString);
+							}
 						}
+
 					}
 				}
 
@@ -595,19 +597,7 @@ public class DataController {
 			String ftype = fnString.substring(fnString.lastIndexOf('.') + 1, fnString.length());
 			String sourceFN = upload_file_path + File.separator + fnString;
 			String targetFN = download_file_path + File.separator + fname + ".gpkg";
-			Map<String, String> settings = new HashMap<String, String>();
-			if (!originString.isEmpty()) {
-				settings.put(originString, "origin_address");
-			}
-			if (!XString.isEmpty()) {
-				settings.put(XString, "longitude_");
-			}
-			if (!YString.isEmpty()) {
-				settings.put(YString, "latitude_");
-			}
-			if (!geometryString.isEmpty()) {
-				// settings.put("buildGeometry", geometryString);
-			}
+
 			if (ftype.compareToIgnoreCase("shp") == 0) {
 				Shapefile2Geopackage s2g = new Shapefile2Geopackage(sourceFN, targetFN, settings);
 				s2g.execute();

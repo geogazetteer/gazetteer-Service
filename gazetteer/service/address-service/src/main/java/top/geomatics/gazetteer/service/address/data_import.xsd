@@ -16,6 +16,7 @@
     <complexType name="FieldsType">
     	<sequence maxOccurs="1" minOccurs="0">
     		<element name="Field" type="tns:FieldType"></element>
+    		<element name="create_spatial_index" type="boolean" maxOccurs="1" minOccurs="0"></element>
     	</sequence>
     </complexType>
     

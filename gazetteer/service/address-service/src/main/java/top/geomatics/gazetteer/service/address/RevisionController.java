@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.model.IConstant;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.database.BuildingQuery;
 
@@ -682,23 +683,23 @@ public class RevisionController {
 	/**
 	 * <b>新增加一个地址</b><br>
 	 * <i> examples: <br>
-	 * http://localhost:8083/revision/insert?tablename=dmdz_edit </i>
+	 * http://localhost:8083/revision/insert?tablename=newAddress </i>
 	 * 
 	 * @param username  String 请求参数，用户名
 	 * @param tablename String 请求参数，需要更新的数据库表名
 	 * @param new_row   AddressEditorRow 更新后的数据
 	 * @return String 返回JSON格式的更新结果说明
 	 */
-	@ApiOperation(value = "新增加一个地址", notes = "新增加一个地址，示例：/revision/insert?tablename=dmdz_edit")
+	@ApiOperation(value = "新增加一个地址", notes = "新增加一个地址，示例：/revision/insert?tablename=newAddress")
 	@PostMapping("/insert")
 	public String insert(
 			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
-			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename,
+			@ApiParam(value = "查询的数据库表，如newAddress") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IConstant.TABLE_NEW_ADDRESS) String tablename,
 			@ApiParam @RequestBody AddressEditorRow new_row) {
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		
-		map.put("sql_tablename", "newAddress");
+		map.put("sql_tablename", tablename);
 
 //		street_ ,
 //		community_ ,
@@ -780,7 +781,7 @@ public class RevisionController {
 	@PostMapping("/compose")
 	public String compose(
 			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
-			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename,
+			@ApiParam(value = "查询的数据库表，如newAddress") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IConstant.TABLE_NEW_ADDRESS) String tablename,
 			@ApiParam(value = "街道") @RequestParam(value = "street", required = false) String street,
 			@ApiParam(value = "社区") @RequestParam(value = "community", required = false) String community,
 			@ApiParam(value = "小区") @RequestParam(value = "village", required = false) String village,

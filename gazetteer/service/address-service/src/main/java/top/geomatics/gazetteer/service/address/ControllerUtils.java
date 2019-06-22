@@ -184,7 +184,8 @@ public class ControllerUtils {
 		map.put("sql_fields", fields);
 		map.put("sql_tablename", tablename);
 		if (null != row) {
-			// 11个字段
+			// 字段
+			Integer fid = row.getFid();
 			String street_ = row.getStreet_();
 			String community_ = row.getCommunity_();
 			String origin_address = row.getOrigin_address();
@@ -197,6 +198,13 @@ public class ControllerUtils {
 			String update_address = row.getUpdate_address();
 			String update_building_code = row.getUpdate_building_code();
 
+			if (fid != null) {
+				String fidString = fid.toString();
+				if (!fidString.isEmpty()) {
+					map.put("fid", fidString);
+				}
+			}
+			
 			if (street_ != null && !street_.isEmpty())
 				map.put("street_", street_);
 			if (community_ != null && !community_.isEmpty())

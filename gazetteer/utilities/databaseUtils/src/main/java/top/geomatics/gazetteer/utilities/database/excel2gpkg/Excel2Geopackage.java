@@ -48,6 +48,7 @@ import org.xml.sax.XMLReader;
 import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.utilities.database.csv2sqlite.AddressRecord;
 import top.geomatics.gazetteer.utilities.database.csv2sqlite.AddressSchema;
+import top.geomatics.gazetteer.utilities.database.gpkg.GPKGProcessor;
 
 /**
  * @author whudyj
@@ -59,6 +60,9 @@ public class Excel2Geopackage {
 
 	private static final String SRID = "srid";
 	private static final String BUILD_GEOMETRY = "buildGeometry";
+
+	private static final String CREATE_INDEX = "create_spatial_index";
+	private boolean isCreateIndex = false;
 
 	private String excelfileName = "";
 	private String geopackageName = "";
@@ -74,7 +78,7 @@ public class Excel2Geopackage {
 
 	private static GeoPackage geopkg = null;
 	private String tablename = "";
-	private static final String TABLE_NAME="dmdz_edit";
+	private static final String TABLE_NAME = "dmdz_edit";
 	private static final Integer STATUS = 0;
 	private static final String STAT_STRING = "status";
 	private String geoNameString = "the_geom";
@@ -188,6 +192,9 @@ public class Excel2Geopackage {
 			logger.error(logMsgString);
 			return false;
 		}
+		if (this.settings != null && this.settings.containsKey(CREATE_INDEX)) {
+			isCreateIndex = Boolean.parseBoolean(this.settings.get(CREATE_INDEX));
+		}
 		return true;
 	}
 
@@ -215,7 +222,7 @@ public class Excel2Geopackage {
 		}
 
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
-		//builder.setName(this.tablename);
+		// builder.setName(this.tablename);
 		builder.setName(TABLE_NAME);
 		builder.setCRS(crsTarget); // <- Coordinate reference system
 
@@ -235,7 +242,7 @@ public class Excel2Geopackage {
 		Field[] fileds = AddressEditorRow.class.getDeclaredFields();
 		for (Field fld : fileds) {
 			// add attributes in order
-			if (fld.getName().compareToIgnoreCase("fid")==0) {
+			if (fld.getName().compareToIgnoreCase("fid") == 0) {
 				continue;
 			}
 			builder.add(fld.getName(), fld.getType());
@@ -255,7 +262,7 @@ public class Excel2Geopackage {
 		SimpleFeatureType targetSFType = createFeatureType();
 		entry.setDataType(Entry.DataType.Feature);
 		entry.setSrid(4490);
-		//entry.setTableName(this.tablename);
+		// entry.setTableName(this.tablename);
 		entry.setTableName(TABLE_NAME);
 		// 几何字段
 		if (isGeometry) {
@@ -314,13 +321,17 @@ public class Excel2Geopackage {
 
 		try {
 			geopkg.add(entry, new ListFeatureCollection(targetSFType, newFeas));
-			if (isGeometry) {
+			if (isCreateIndex) {
 				geopkg.createSpatialIndex(entry);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		////////////////////
+
+		// 增加一个表newAddress
+		GPKGProcessor processor = new GPKGProcessor(geopkg);
+		processor.createAddressTable();
 
 		close();
 		return true;
