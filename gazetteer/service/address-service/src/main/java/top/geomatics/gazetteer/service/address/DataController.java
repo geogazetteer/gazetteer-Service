@@ -232,7 +232,7 @@ public class DataController {
 	 */
 	@ApiOperation(value = "获得数据文件中的字段", notes = "获得数据文件中的字段")
 	@GetMapping("/fields")
-	public String getFields(
+	public ResponseEntity<String> getFields(
 			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
 			@ApiParam(value = "文件名") @RequestParam(value = "fileName", required = true) String fileName) {
 		String upload_file_path = UserManager.getInstance().getUserInfo(username).getUploadPath();
@@ -243,7 +243,7 @@ public class DataController {
 			// 日志
 			String logMsgString = String.format("文件 %s 不存在", fileName);
 			logger.error(logMsgString);
-			return "";
+			return new ResponseEntity<>(logMsgString, HttpStatus.EXPECTATION_FAILED);
 		}
 		String ftype = fileName.substring(fileName.lastIndexOf('.') + 1, fileName.length());
 		List<String> fields = null;
@@ -255,9 +255,10 @@ public class DataController {
 			fields = x2g.getFields();
 		}
 		if (null != fields && fields.size() > 0) {
-			return JSON.toJSONString(fields);
+			String body = JSON.toJSONString(fields);
+			return new ResponseEntity<>(body, HttpStatus.OK);
 		} else {
-			return "";
+			return new ResponseEntity<>("", HttpStatus.OK);
 		}
 
 	}
