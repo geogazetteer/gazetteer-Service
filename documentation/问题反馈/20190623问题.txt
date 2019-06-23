@@ -1,0 +1,12 @@
+1.road_like/road_num_like/village_like/code_like输入联想接口报错
+接入的参数为
+http://119.3.72.23:8083/address/road_like?community=润城社区&fields=id,address&keywords=观澜大道&limit=10&street=观湖街道&tablename=dmdz
+
+http://119.3.72.23:8083/address/road_num_like?community=龙塘社区&fields=road_num&keywords=7&street=民治街道&limit=10&tablename=dmdz
+
+http://119.3.72.23:8083/address/village_like?community=龙塘社区&fields=village&keywords=汽车&street=民治街道&limit=10&tablename=dmdz
+
+http://119.3.72.23:8083/address/code_like?community=龙塘社区&fields=code&keywords=44&street=民治街道&limit=10&tablename=dmdz
+
+报错信息为：
+message: "?### Error querying database.  Cause: org.apache.ibatis.executor.ExecutorException: Error preparing statement.  Cause: java.lang.ArrayIndexOutOfBoundsException: Index -1 out of bounds for length 0?### The error may exist in gazetteer_sql_mapper.xml?### The error may involve top.geomatics.gazetteer.database.AddressMapper.findCodeLike?### The error occurred while executing a query?### SQL: SELECT code   FROM dmdz    WHERE  street = ?             AND community = ?                             AND code LIKE ?             LIMIT ??### Cause: org.apache.ibatis.executor.ExecutorException: Error preparing statement.  Cause: java.lang.ArrayIndexOutOfBoundsException: Index -1 out of bounds for length 0"

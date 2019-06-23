@@ -45,8 +45,12 @@ const URLCFG={
   getAllStreetUrl:serverUrl+'address/龙华区',
   //根据街道获取社区
   getComByStrUrl:serverUrl+'address/龙华区',
+  //根据社区获取道路
+  getRoadByComUrl:serverUrl+'address/roads',//{community}
+  //根据道路获取道路编号
+  getRoadCodeByRoadUrl:serverUrl+'address/road_nums',//{community}/{road}
   //根据社区获取小区
-  getVillByComUrl:serverUrl+'address/龙华区',
+  getVillByComUrl:serverUrl+'address/villages',//{community}
   //查询某个小区的所有楼栋编号
   getCodeByVillageUrl:serverUrl+'address/codes',//http://119.3.72.23:8083/address/codes/community/village
   //相似查找
@@ -148,7 +152,12 @@ const EDITSERVICE={
     // "update_date": "2019-06-10T15:05:06.229Z"
   },
   //构建一个地址
-  addSiteUrl:serverUrl+'revision/compose',//?street=民治街道&community=民治社区&village=梅花山庄&suffix=欣梅园D5栋&code=4403060090042100005
-  //新增地址输入联想
-  addressLikeUrl:serverUrl+'address/address/like'
+  addSiteUrl:serverUrl+'revision/build',//?street=民治街道&community=民治社区&village=梅花山庄&suffix=欣梅园D5栋&code=4403060090042100005
+  //道路输入联想
+  roadLikeUrl:serverUrl+'address/road_like',
+  //道路编号联想
+  roadCodeLikeUrl:serverUrl+'address/road_num_like',
+  //小区输入联想
+  addressLikeUrl:serverUrl+'address/village_like',
+  codeLikeUrl:serverUrl+'address/code_like'
 };
