@@ -175,19 +175,15 @@ public class SearcherController {
 	 * 
 	 * <p>
 	 * examples:<br>
-	 * http://localhost:8083/address/villages/龙华区/民治街道/民治社区
+	 * http://localhost:8083/address/villages/民治社区
 	 * </p>
 	 * 
-	 * @param path_district  String 路径变量，固定为“龙华区”
-	 * @param path_street    String 路径变量，表示所在的街道，如：民治街道
 	 * @param path_community String 路径变量，表示所在的社区，如：民治社区
 	 * @return String 返回JSON格式的查询结果
 	 */
-	@ApiOperation(value = "查询一个社区的所有小区", notes = "查询一个社区的所有小区，示例：/address/villages/龙华区/民治街道/民治社区")
-	@GetMapping("/villages/{district}/{street}/{community}")
+	@ApiOperation(value = "查询一个社区的所有小区", notes = "查询一个社区的所有小区，示例：/address/villages/民治社区")
+	@GetMapping("/villages/{community}")
 	public String selectVillageByCommunityNode(
-			@ApiParam(value = "街道所在的区，固定为龙华区") @PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = false) String path_district,
-			@ApiParam(value = "街道，如：民治街道") @PathVariable(value = IControllerConstant.ADDRESS_STREET, required = false) String path_street,
 			@ApiParam(value = "社区，如：民治社区") @PathVariable(value = IControllerConstant.ADDRESS_COMMUNITY, required = true) String path_community) {
 		String fields = "village";
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_community, null, null, 0);
@@ -209,24 +205,94 @@ public class SearcherController {
 	}
 
 	/**
-	 * <b>查询一个小区的所有建筑物编码</b><br>
+	 * <b>查询一个社区的所有道路</b><br>
 	 * 
 	 * <p>
 	 * examples:<br>
-	 * http://localhost:8083/address/codes/龙华区/民治街道/民治社区/梅花山庄
+	 * http://localhost:8083/address/roads/民治社区
 	 * </p>
 	 * 
 	 * @param path_district  String 路径变量，固定为“龙华区”
 	 * @param path_street    String 路径变量，表示所在的街道，如：民治街道
 	 * @param path_community String 路径变量，表示所在的社区，如：民治社区
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "查询一个社区的所有道路", notes = "查询一个社区的所有道路，示例：/address/roads/民治社区")
+	@GetMapping("/roads/{community}")
+	public String selectRoadByCommunityNode(
+			@ApiParam(value = "社区，如：民治社区") @PathVariable(value = IControllerConstant.ADDRESS_COMMUNITY, required = true) String path_community) {
+		String fields = "road";
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_community, null, null, 0);
+		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
+		// 查找社区下所有的道路，不重复
+		List<AddressRow> new_rows = new ArrayList<AddressRow>();
+		Map<String, String> vMap = new HashMap<>();
+		for (AddressRow row : rows) {
+			String key = row.getRoad();
+			if (null == key || key.trim().isEmpty()) {
+				continue;
+			}
+			if (!vMap.containsKey(key)) {
+				vMap.put(key, key);
+				new_rows.add(row);
+			}
+		}
+		return ControllerUtils.getResponseBody(new_rows);
+	}
+
+	/**
+	 * <b>查询一个社区的所有道路号码</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/road_nums/民治社区/民治大道
+	 * </p>
+	 * 
+	 * @param path_community String 路径变量，表示所在的社区，如：民治社区
+	 * @param path_road      String 路径变量，表示所在的道路，如：民治大道
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "查询一个社区道路下的所有道路号码", notes = "查询一个社区道路下的所有道路号码，示例：/address/road_nums/民治社区/民治大道")
+	@GetMapping("/road_nums/{community}/{road}")
+	public String selectRoadNumByRoadNode(
+			@ApiParam(value = "社区，如：民治社区") @PathVariable(value = IControllerConstant.ADDRESS_COMMUNITY, required = true) String path_community,
+			@ApiParam(value = "道路，如：民治大道") @PathVariable(value = IControllerConstant.ADDRESS_ROAD, required = true) String path_road) {
+		String fields = "road_num";
+		AddressRow crow = new AddressRow();
+		crow.setRoad(path_road);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, path_community, crow, null, 0);
+		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
+		// 查找社区下所有的道路号码，不重复
+		List<AddressRow> new_rows = new ArrayList<AddressRow>();
+		Map<String, String> vMap = new HashMap<>();
+		for (AddressRow row : rows) {
+			String key = row.getRoad_num();
+			if (null == key || key.trim().isEmpty()) {
+				continue;
+			}
+			if (!vMap.containsKey(key)) {
+				vMap.put(key, key);
+				new_rows.add(row);
+			}
+		}
+		return ControllerUtils.getResponseBody(new_rows);
+	}
+
+	/**
+	 * <b>查询一个小区的所有建筑物编码</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/codes/民治社区/梅花山庄
+	 * </p>
+	 * 
+	 * @param path_community String 路径变量，表示所在的社区，如：民治社区
 	 * @param path_village   String 路径变量，表示所在的小区，如：梅花山庄
 	 * @return String 返回JSON格式的查询结果
 	 */
-	@ApiOperation(value = "查询一个小区的所有建筑物编码", notes = "查询一个小区的所有建筑物编码，示例：/address/codes/龙华区/民治街道/民治社区/梅花山庄")
+	@ApiOperation(value = "查询一个小区的所有建筑物编码", notes = "查询一个小区的所有建筑物编码，示例：/address/codes/民治社区/梅花山庄")
 	@GetMapping("/codes/{community}/{village}")
 	public String selectCodeByVillageNode(
-			@ApiParam(value = "街道所在的区，固定为龙华区") @PathVariable(value = IControllerConstant.ADDRESS_DISTRICT, required = false) String path_district,
-			@ApiParam(value = "街道，如：民治街道") @PathVariable(value = IControllerConstant.ADDRESS_STREET, required = false) String path_street,
 			@ApiParam(value = "社区，如：民治社区") @PathVariable(value = IControllerConstant.ADDRESS_COMMUNITY, required = true) String path_community,
 			@ApiParam(value = "小区，如：梅花山庄") @PathVariable(value = IControllerConstant.ADDRESS_VILLAGE, required = true) String path_village) {
 		String fields = "code";
@@ -239,7 +305,7 @@ public class SearcherController {
 		Map<String, String> vMap = new HashMap<>();
 		for (AddressRow row : rows) {
 			String key = row.getCode();
-			if (key.trim().isEmpty()) {
+			if (null == key || key.trim().isEmpty()) {
 				continue;
 			}
 			if (!vMap.containsKey(key)) {
@@ -1043,7 +1109,7 @@ public class SearcherController {
 	}
 
 	/**
-	 * <b>根据街道或社区、关键词查询地址</b><br>
+	 * <b>根据街道或社区、地址关键词查询地址</b><br>
 	 * 
 	 * <p>
 	 * examples:<br>
@@ -1070,7 +1136,7 @@ public class SearcherController {
 	 * @param limit       int 请求参数，限定查询的记录个数，如：limit=10
 	 * @return String 返回JSON格式的查询结果
 	 */
-	@ApiOperation(value = "根据街道或社区、关键词查询地址", notes = "根据街道或社区、关键词查询地址，获取满足条件的所有地址信息。示例：/address/address/like?fields=id,address&tablename=dmdz&street=观湖街道&community=润城社区&keywords=工商银行")
+	@ApiOperation(value = "根据街道或社区、地址关键词查询地址", notes = "根据街道或社区、地址关键词查询地址，获取满足条件的所有地址信息。示例：/address/address/like?fields=id,address&tablename=dmdz&street=观湖街道&community=润城社区&keywords=工商银行")
 	@GetMapping("/address/like")
 	public String selectWithConditions2(
 			@ApiParam(value = "查询字段，如 id,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
@@ -1130,6 +1196,362 @@ public class SearcherController {
 			row.setVillage(village);
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findAddressLike(map);
+		return ControllerUtils.getResponseBody(rows);
+	}
+
+	/**
+	 * <b>根据街道或社区、小区关键词查询地址</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/village_like?fields=id,address%26tablename=民治社区%26street=观湖街道%26community=润城社区%26keywords=锦鲤一村
+	 * </p>
+	 * 
+	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：id,address
+	 * @param tablename   String 请求参数，指定查询的数据库表
+	 * @param id          Integer 请求参数，指定查询的id字段值
+	 * @param province    String 请求参数，指定查询的province字段值
+	 * @param city        String 请求参数，指定查询的city字段值
+	 * @param district    String 请求参数，指定查询的district字段值
+	 * @param street      String 请求参数，指定查询的street字段值
+	 * @param community   String 请求参数，指定查询的community字段值
+	 * @param keywords    String 请求参数，指定查询的小区关键词
+	 * @param address_id  String 请求参数，指定查询的address_id字段值
+	 * @param building    String 请求参数，指定查询的building字段值
+	 * @param building_id String 请求参数，指定查询的building_id字段值
+	 * @param code        String 请求参数，指定查询的code字段值
+	 * @param road        String 请求参数，指定查询的road字段值
+	 * @param road_num    String 请求参数，指定查询的road_num字段值
+	 * @param village     String 请求参数，指定查询的village字段值
+	 * @param orderby     String 请求参数，指定查询结果排序方式
+	 * @param limit       int 请求参数，限定查询的记录个数，如：limit=10
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据街道或社区、小区关键词查询地址", notes = "根据街道或社区、小区关键词查询地址，获取满足条件的所有地址信息。示例：/address/village_like?fields=id,address&tablename=dmdz&street=观湖街道&community=润城社区&keywords=锦鲤一村")
+	@GetMapping("/village_like")
+	public String selectByVillageLike(
+			@ApiParam(value = "查询字段，如 id,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如润城社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "条件：指定查询的id") @RequestParam(value = IControllerConstant.ADDRESS_DB_ID, required = false) Integer id,
+			@ApiParam(value = "条件：指定查询的省") @RequestParam(value = IControllerConstant.ADDRESS_PROVINCE, required = false, defaultValue = "") String province,
+			@ApiParam(value = "条件：指定查询的市") @RequestParam(value = IControllerConstant.ADDRESS_CITY, required = false, defaultValue = "") String city,
+			@ApiParam(value = "条件：指定查询的区") @RequestParam(value = IControllerConstant.ADDRESS_DISTRICT, required = false, defaultValue = "") String district,
+			@ApiParam(value = "条件：指定查询的街道") @RequestParam(value = IControllerConstant.ADDRESS_STREET, required = false, defaultValue = "") String street,
+			@ApiParam(value = "条件：指定查询的社区") @RequestParam(value = IControllerConstant.ADDRESS_COMMUNITY, required = false, defaultValue = "") String community,
+			@ApiParam(value = "条件：指定查询的小区地址关键词，如：锦鲤一村") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS, required = true, defaultValue = "") String keywords,
+			@ApiParam(value = "条件：指定查询的地名地址id") @RequestParam(value = IControllerConstant.ADDRESS_ADDRESS_ID, required = false, defaultValue = "") String address_id,
+			@ApiParam(value = "条件：指定查询的建筑物") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING, required = false, defaultValue = "") String building,
+			@ApiParam(value = "条件：指定查询的建筑物id") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING_ID, required = false, defaultValue = "") String building_id,
+			@ApiParam(value = "条件：指定查询的地名地址编码") @RequestParam(value = IControllerConstant.ADDRESS_CODE, required = false, defaultValue = "") String code,
+			@ApiParam(value = "条件：指定查询的道路") @RequestParam(value = IControllerConstant.ADDRESS_ROAD, required = false, defaultValue = "") String road,
+			@ApiParam(value = "条件：指定查询的道路编码") @RequestParam(value = IControllerConstant.ADDRESS_ROAD_NUM, required = false, defaultValue = "") String road_num,
+
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+		AddressRow row = new AddressRow();
+		if (null != id)
+			row.setId(id);
+		if (null != province && !province.isEmpty())
+			row.setProvince(province);
+		if (null != city && !city.isEmpty())
+			row.setCity(city);
+		if (null != district && !district.isEmpty())
+			row.setDistrict(district);
+		if (null != street && !street.isEmpty())
+			row.setStreet(street);
+		if (null != community && !community.isEmpty())
+			row.setCommunity(community);
+		if (null != keywords && !keywords.isEmpty()) {
+			if (!keywords.startsWith("%")) {
+				keywords = "%" + keywords;
+			}
+			if (!keywords.endsWith("%")) {
+				keywords = keywords + "%";
+			}
+			row.setVillage(keywords);
+		}
+
+		if (null != address_id && !address_id.isEmpty())
+			row.setAddress_id(address_id);
+		if (null != building && !building.isEmpty())
+			row.setBuilding(building);
+		if (null != building_id && !building_id.isEmpty())
+			row.setBuilding_id(building_id);
+		if (null != code && !code.isEmpty())
+			row.setCode(code);
+		if (null != road && !road.isEmpty())
+			row.setRoad(road);
+		if (null != road_num && !road_num.isEmpty())
+			row.setRoad_num(road_num);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
+		List<AddressRow> rows = ControllerUtils.mapper.findVillageLike(map);
+		return ControllerUtils.getResponseBody(rows);
+	}
+
+	/**
+	 * <b>根据街道或社区、建筑物代码关键词查询地址</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/code_like?fields=id,address%26tablename=民治社区%26street=观湖街道%26community=润城社区%26keywords=34100023
+	 * </p>
+	 * 
+	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：id,address
+	 * @param tablename   String 请求参数，指定查询的数据库表
+	 * @param id          Integer 请求参数，指定查询的id字段值
+	 * @param province    String 请求参数，指定查询的province字段值
+	 * @param city        String 请求参数，指定查询的city字段值
+	 * @param district    String 请求参数，指定查询的district字段值
+	 * @param street      String 请求参数，指定查询的street字段值
+	 * @param community   String 请求参数，指定查询的community字段值
+	 * @param keywords    String 请求参数，指定查询的建筑物代码关键词
+	 * @param address_id  String 请求参数，指定查询的address_id字段值
+	 * @param building    String 请求参数，指定查询的building字段值
+	 * @param building_id String 请求参数，指定查询的building_id字段值
+	 * @param code        String 请求参数，指定查询的code字段值
+	 * @param road        String 请求参数，指定查询的road字段值
+	 * @param road_num    String 请求参数，指定查询的road_num字段值
+	 * @param village     String 请求参数，指定查询的village字段值
+	 * @param orderby     String 请求参数，指定查询结果排序方式
+	 * @param limit       int 请求参数，限定查询的记录个数，如：limit=10
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据街道或社区、建筑物代码关键词查询地址", notes = "根据街道或社区、建筑物代码关键词查询地址，获取满足条件的所有地址信息。示例：/address/code_like?fields=id,address&tablename=dmdz&street=观湖街道&community=润城社区&keywords=34100023")
+	@GetMapping("/code_like")
+	public String selectByCodeLike(
+			@ApiParam(value = "查询字段，如 id,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如民治社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "条件：指定查询的id") @RequestParam(value = IControllerConstant.ADDRESS_DB_ID, required = false) Integer id,
+			@ApiParam(value = "条件：指定查询的省") @RequestParam(value = IControllerConstant.ADDRESS_PROVINCE, required = false, defaultValue = "") String province,
+			@ApiParam(value = "条件：指定查询的市") @RequestParam(value = IControllerConstant.ADDRESS_CITY, required = false, defaultValue = "") String city,
+			@ApiParam(value = "条件：指定查询的区") @RequestParam(value = IControllerConstant.ADDRESS_DISTRICT, required = false, defaultValue = "") String district,
+			@ApiParam(value = "条件：指定查询的街道") @RequestParam(value = IControllerConstant.ADDRESS_STREET, required = false, defaultValue = "") String street,
+			@ApiParam(value = "条件：指定查询的社区") @RequestParam(value = IControllerConstant.ADDRESS_COMMUNITY, required = false, defaultValue = "") String community,
+			@ApiParam(value = "条件：指定查询的建筑物代码地址关键词，如：34100023") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS, required = true, defaultValue = "") String keywords,
+			@ApiParam(value = "条件：指定查询的地名地址id") @RequestParam(value = IControllerConstant.ADDRESS_ADDRESS_ID, required = false, defaultValue = "") String address_id,
+			@ApiParam(value = "条件：指定查询的建筑物") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING, required = false, defaultValue = "") String building,
+			@ApiParam(value = "条件：指定查询的建筑物id") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING_ID, required = false, defaultValue = "") String building_id,
+			
+			@ApiParam(value = "条件：指定查询的道路") @RequestParam(value = IControllerConstant.ADDRESS_ROAD, required = false, defaultValue = "") String road,
+			@ApiParam(value = "条件：指定查询的道路编码") @RequestParam(value = IControllerConstant.ADDRESS_ROAD_NUM, required = false, defaultValue = "") String road_num,
+			@ApiParam(value = "条件：指定查询的小区或村") @RequestParam(value = IControllerConstant.ADDRESS_VILLAGE, required = false, defaultValue = "") String village,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+		AddressRow row = new AddressRow();
+		if (null != id)
+			row.setId(id);
+		if (null != province && !province.isEmpty())
+			row.setProvince(province);
+		if (null != city && !city.isEmpty())
+			row.setCity(city);
+		if (null != district && !district.isEmpty())
+			row.setDistrict(district);
+		if (null != street && !street.isEmpty())
+			row.setStreet(street);
+		if (null != community && !community.isEmpty())
+			row.setCommunity(community);
+		if (null != keywords && !keywords.isEmpty()) {
+			if (!keywords.startsWith("%")) {
+				keywords = "%" + keywords;
+			}
+			if (!keywords.endsWith("%")) {
+				keywords = keywords + "%";
+			}
+			row.setCode(keywords);
+		}
+
+		if (null != address_id && !address_id.isEmpty())
+			row.setAddress_id(address_id);
+		if (null != building && !building.isEmpty())
+			row.setBuilding(building);
+		if (null != building_id && !building_id.isEmpty())
+			row.setBuilding_id(building_id);
+		if (null != road && !road.isEmpty())
+			row.setRoad(road);
+		if (null != road_num && !road_num.isEmpty())
+			row.setRoad_num(road_num);
+		if (null != village && !village.isEmpty())
+			row.setVillage(village);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
+		List<AddressRow> rows = ControllerUtils.mapper.findCodeLike(map);
+		return ControllerUtils.getResponseBody(rows);
+	}
+	
+	/**
+	 * <b>根据街道或社区、道路关键词查询地址</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/road_like?fields=id,address%26tablename=民治社区%26street=观湖街道%26community=润城社区%26keywords=观澜大道
+	 * </p>
+	 * 
+	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：id,address
+	 * @param tablename   String 请求参数，指定查询的数据库表
+	 * @param id          Integer 请求参数，指定查询的id字段值
+	 * @param province    String 请求参数，指定查询的province字段值
+	 * @param city        String 请求参数，指定查询的city字段值
+	 * @param district    String 请求参数，指定查询的district字段值
+	 * @param street      String 请求参数，指定查询的street字段值
+	 * @param community   String 请求参数，指定查询的community字段值
+	 * @param keywords    String 请求参数，指定查询的地址关键词
+	 * @param address_id  String 请求参数，指定查询的address_id字段值
+	 * @param building    String 请求参数，指定查询的building字段值
+	 * @param building_id String 请求参数，指定查询的building_id字段值
+	 * @param code        String 请求参数，指定查询的code字段值
+	 * @param road        String 请求参数，指定查询的road字段值
+	 * @param road_num    String 请求参数，指定查询的road_num字段值
+	 * @param village     String 请求参数，指定查询的village字段值
+	 * @param orderby     String 请求参数，指定查询结果排序方式
+	 * @param limit       int 请求参数，限定查询的记录个数，如：limit=10
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据街道或社区、道路关键词查询地址", notes = "根据街道或社区、道路关键词查询地址，获取满足条件的所有地址信息。示例：/address/road_like?fields=id,address&tablename=dmdz&street=观湖街道&community=润城社区&keywords=观澜大道")
+	@GetMapping("/road_like")
+	public String selectByRoadLike(
+			@ApiParam(value = "查询字段，如 id,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如民治社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "条件：指定查询的id") @RequestParam(value = IControllerConstant.ADDRESS_DB_ID, required = false) Integer id,
+			@ApiParam(value = "条件：指定查询的省") @RequestParam(value = IControllerConstant.ADDRESS_PROVINCE, required = false, defaultValue = "") String province,
+			@ApiParam(value = "条件：指定查询的市") @RequestParam(value = IControllerConstant.ADDRESS_CITY, required = false, defaultValue = "") String city,
+			@ApiParam(value = "条件：指定查询的区") @RequestParam(value = IControllerConstant.ADDRESS_DISTRICT, required = false, defaultValue = "") String district,
+			@ApiParam(value = "条件：指定查询的街道") @RequestParam(value = IControllerConstant.ADDRESS_STREET, required = false, defaultValue = "") String street,
+			@ApiParam(value = "条件：指定查询的社区") @RequestParam(value = IControllerConstant.ADDRESS_COMMUNITY, required = false, defaultValue = "") String community,
+			@ApiParam(value = "条件：指定查询的道路关键词，如：观澜大道") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS, required = true, defaultValue = "") String keywords,
+			@ApiParam(value = "条件：指定查询的地名地址id") @RequestParam(value = IControllerConstant.ADDRESS_ADDRESS_ID, required = false, defaultValue = "") String address_id,
+			@ApiParam(value = "条件：指定查询的建筑物") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING, required = false, defaultValue = "") String building,
+			@ApiParam(value = "条件：指定查询的建筑物id") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING_ID, required = false, defaultValue = "") String building_id,
+			@ApiParam(value = "条件：指定查询的地名地址编码") @RequestParam(value = IControllerConstant.ADDRESS_CODE, required = false, defaultValue = "") String code,
+			
+			@ApiParam(value = "条件：指定查询的道路编码") @RequestParam(value = IControllerConstant.ADDRESS_ROAD_NUM, required = false, defaultValue = "") String road_num,
+			@ApiParam(value = "条件：指定查询的小区或村") @RequestParam(value = IControllerConstant.ADDRESS_VILLAGE, required = false, defaultValue = "") String village,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+		AddressRow row = new AddressRow();
+		if (null != id)
+			row.setId(id);
+		if (null != province && !province.isEmpty())
+			row.setProvince(province);
+		if (null != city && !city.isEmpty())
+			row.setCity(city);
+		if (null != district && !district.isEmpty())
+			row.setDistrict(district);
+		if (null != street && !street.isEmpty())
+			row.setStreet(street);
+		if (null != community && !community.isEmpty())
+			row.setCommunity(community);
+		if (null != keywords && !keywords.isEmpty()) {
+			if (!keywords.startsWith("%")) {
+				keywords = "%" + keywords;
+			}
+			if (!keywords.endsWith("%")) {
+				keywords = keywords + "%";
+			}
+			row.setRoad(keywords);
+		}
+
+		if (null != address_id && !address_id.isEmpty())
+			row.setAddress_id(address_id);
+		if (null != building && !building.isEmpty())
+			row.setBuilding(building);
+		if (null != building_id && !building_id.isEmpty())
+			row.setBuilding_id(building_id);
+		if (null != code && !code.isEmpty())
+			row.setCode(code);
+		if (null != road_num && !road_num.isEmpty())
+			row.setRoad_num(road_num);
+		if (null != village && !village.isEmpty())
+			row.setVillage(village);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
+		List<AddressRow> rows = ControllerUtils.mapper.findRoadLike(map);
+		return ControllerUtils.getResponseBody(rows);
+	}
+	
+	/**
+	 * <b>根据街道或社区、道路编号关键词查询地址</b><br>
+	 * 
+	 * <p>
+	 * examples:<br>
+	 * http://localhost:8083/address/road_num_like?fields=id,address%26tablename=民治社区%26street=观湖街道%26community=润城社区%26keywords=257
+	 * </p>
+	 * 
+	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：id,address
+	 * @param tablename   String 请求参数，指定查询的数据库表
+	 * @param id          Integer 请求参数，指定查询的id字段值
+	 * @param province    String 请求参数，指定查询的province字段值
+	 * @param city        String 请求参数，指定查询的city字段值
+	 * @param district    String 请求参数，指定查询的district字段值
+	 * @param street      String 请求参数，指定查询的street字段值
+	 * @param community   String 请求参数，指定查询的community字段值
+	 * @param keywords    String 请求参数，指定查询的地址关键词
+	 * @param address_id  String 请求参数，指定查询的address_id字段值
+	 * @param building    String 请求参数，指定查询的building字段值
+	 * @param building_id String 请求参数，指定查询的building_id字段值
+	 * @param code        String 请求参数，指定查询的code字段值
+	 * @param road        String 请求参数，指定查询的road字段值
+	 * @param road_num    String 请求参数，指定查询的road_num字段值
+	 * @param village     String 请求参数，指定查询的village字段值
+	 * @param orderby     String 请求参数，指定查询结果排序方式
+	 * @param limit       int 请求参数，限定查询的记录个数，如：limit=10
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据街道或社区、道路编号关键词查询地址", notes = "根据街道或社区、道路编号关键词查询地址，获取满足条件的所有地址信息。示例：/address/road_num_like?fields=id,address&tablename=dmdz&street=观湖街道&community=润城社区&keywords=257")
+	@GetMapping("/road_num_like")
+	public String selectByRoadNumLike(
+			@ApiParam(value = "查询字段，如 id,address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = IControllerConstant.ADDRESS_ALL_FIELDS) String fields,
+			@ApiParam(value = "查询的数据库表，如民治社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
+			@ApiParam(value = "条件：指定查询的id") @RequestParam(value = IControllerConstant.ADDRESS_DB_ID, required = false) Integer id,
+			@ApiParam(value = "条件：指定查询的省") @RequestParam(value = IControllerConstant.ADDRESS_PROVINCE, required = false, defaultValue = "") String province,
+			@ApiParam(value = "条件：指定查询的市") @RequestParam(value = IControllerConstant.ADDRESS_CITY, required = false, defaultValue = "") String city,
+			@ApiParam(value = "条件：指定查询的区") @RequestParam(value = IControllerConstant.ADDRESS_DISTRICT, required = false, defaultValue = "") String district,
+			@ApiParam(value = "条件：指定查询的街道") @RequestParam(value = IControllerConstant.ADDRESS_STREET, required = false, defaultValue = "") String street,
+			@ApiParam(value = "条件：指定查询的社区") @RequestParam(value = IControllerConstant.ADDRESS_COMMUNITY, required = false, defaultValue = "") String community,
+			@ApiParam(value = "条件：指定查询的道路编号关键词，如：257") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS, required = true, defaultValue = "") String keywords,
+			@ApiParam(value = "条件：指定查询的地名地址id") @RequestParam(value = IControllerConstant.ADDRESS_ADDRESS_ID, required = false, defaultValue = "") String address_id,
+			@ApiParam(value = "条件：指定查询的建筑物") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING, required = false, defaultValue = "") String building,
+			@ApiParam(value = "条件：指定查询的建筑物id") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING_ID, required = false, defaultValue = "") String building_id,
+			@ApiParam(value = "条件：指定查询的地名地址编码") @RequestParam(value = IControllerConstant.ADDRESS_CODE, required = false, defaultValue = "") String code,
+			@ApiParam(value = "条件：指定查询的道路") @RequestParam(value = IControllerConstant.ADDRESS_ROAD, required = false, defaultValue = "") String road,
+			
+			@ApiParam(value = "条件：指定查询的小区或村") @RequestParam(value = IControllerConstant.ADDRESS_VILLAGE, required = false, defaultValue = "") String village,
+			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
+			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {
+		AddressRow row = new AddressRow();
+		if (null != id)
+			row.setId(id);
+		if (null != province && !province.isEmpty())
+			row.setProvince(province);
+		if (null != city && !city.isEmpty())
+			row.setCity(city);
+		if (null != district && !district.isEmpty())
+			row.setDistrict(district);
+		if (null != street && !street.isEmpty())
+			row.setStreet(street);
+		if (null != community && !community.isEmpty())
+			row.setCommunity(community);
+		if (null != keywords && !keywords.isEmpty()) {
+			if (!keywords.startsWith("%")) {
+				keywords = "%" + keywords;
+			}
+			if (!keywords.endsWith("%")) {
+				keywords = keywords + "%";
+			}
+			row.setRoad_num(keywords);
+		}
+
+		if (null != address_id && !address_id.isEmpty())
+			row.setAddress_id(address_id);
+		if (null != building && !building.isEmpty())
+			row.setBuilding(building);
+		if (null != building_id && !building_id.isEmpty())
+			row.setBuilding_id(building_id);
+		if (null != code && !code.isEmpty())
+			row.setCode(code);
+		if (null != road && !road.isEmpty())
+			row.setRoad(road);
+		if (null != village && !village.isEmpty())
+			row.setVillage(village);
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
+		List<AddressRow> rows = ControllerUtils.mapper.findRoadNumLike(map);
 		return ControllerUtils.getResponseBody(rows);
 	}
 
