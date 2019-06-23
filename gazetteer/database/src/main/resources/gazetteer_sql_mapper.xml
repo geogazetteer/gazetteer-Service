@@ -412,7 +412,7 @@
 			LIMIT #{sql_limit}
 		</if>
 	</select>
-	<!-- 根据街道或社区、关键词搜索 -->
+	<!-- 根据街道或社区、地址关键词搜索 -->
 	<select id="findAddressLike" resultType="AddressRow">
 		SELECT ${sql_fields}
 		FROM ${sql_tablename}
@@ -455,6 +455,226 @@
 			</if>
 			<if test="road_num != null">
 				AND road_num = #{road_num}
+			</if>
+			<if test="village != null">
+				AND village = #{village}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<if test="sql_limit != null">
+			LIMIT #{sql_limit}
+		</if>
+	</select>
+	<!-- 根据街道或社区、小区关键词搜索 -->
+	<select id="findVillageLike" resultType="AddressRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="province != null">
+				province = #{province}
+			</if>
+			<if test="city != null">
+				AND city = #{city}
+			</if>
+			<if test="district != null">
+				AND district = #{district}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="community != null">
+				AND community = #{community}
+			</if>
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+			<if test="address_id != null">
+				AND address_id = #{address_id}
+			</if>
+			<if test="building != null">
+				AND building = #{building}
+			</if>
+			<if test="building_id != null">
+				AND building_id = #{building_id}
+			</if>
+			<if test="code != null">
+				AND code = #{code}
+			</if>
+			<if test="road != null">
+				AND road = #{road}
+			</if>
+			<if test="road_num != null">
+				AND road_num = #{road_num}
+			</if>
+			<if test="village != null">
+				AND village LIKE #{village}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<if test="sql_limit != null">
+			LIMIT #{sql_limit}
+		</if>
+	</select>
+	<!-- 根据街道或社区、建筑物代码关键词搜索 -->
+	<select id="findCodeLike" resultType="AddressRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="province != null">
+				province = #{province}
+			</if>
+			<if test="city != null">
+				AND city = #{city}
+			</if>
+			<if test="district != null">
+				AND district = #{district}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="community != null">
+				AND community = #{community}
+			</if>
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+			<if test="address_id != null">
+				AND address_id = #{address_id}
+			</if>
+			<if test="building != null">
+				AND building = #{building}
+			</if>
+			<if test="building_id != null">
+				AND building_id = #{building_id}
+			</if>
+			<if test="code != null">
+				AND code LIKE #{code}
+			</if>
+			<if test="road != null">
+				AND road = #{road}
+			</if>
+			<if test="road_num != null">
+				AND road_num = #{road_num}
+			</if>
+			<if test="village != null">
+				AND village = #{village}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<if test="sql_limit != null">
+			LIMIT #{sql_limit}
+		</if>
+	</select>
+	<!-- 根据街道或社区、道路关键词搜索 -->
+	<select id="findRoadLike" resultType="AddressRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="province != null">
+				province = #{province}
+			</if>
+			<if test="city != null">
+				AND city = #{city}
+			</if>
+			<if test="district != null">
+				AND district = #{district}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="community != null">
+				AND community = #{community}
+			</if>
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+			<if test="address_id != null">
+				AND address_id = #{address_id}
+			</if>
+			<if test="building != null">
+				AND building = #{building}
+			</if>
+			<if test="building_id != null">
+				AND building_id = #{building_id}
+			</if>
+			<if test="code != null">
+				AND code = #{code}
+			</if>
+			<if test="road != null">
+				AND road LIKE #{road}
+			</if>
+			<if test="road_num != null">
+				AND road_num = #{road_num}
+			</if>
+			<if test="village != null">
+				AND village = #{village}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<if test="sql_limit != null">
+			LIMIT #{sql_limit}
+		</if>
+	</select>
+	<!-- 根据街道或社区、道路编号关键词搜索 -->
+	<select id="findRoadNumLike" resultType="AddressRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="id != null">
+				id = #{id}
+			</if>
+			<if test="province != null">
+				province = #{province}
+			</if>
+			<if test="city != null">
+				AND city = #{city}
+			</if>
+			<if test="district != null">
+				AND district = #{district}
+			</if>
+			<if test="street != null">
+				AND street = #{street}
+			</if>
+			<if test="community != null">
+				AND community = #{community}
+			</if>
+			<if test="address != null">
+				AND address = #{address}
+			</if>
+			<if test="address_id != null">
+				AND address_id = #{address_id}
+			</if>
+			<if test="building != null">
+				AND building = #{building}
+			</if>
+			<if test="building_id != null">
+				AND building_id = #{building_id}
+			</if>
+			<if test="code != null">
+				AND code = #{code}
+			</if>
+			<if test="road != null">
+				AND road = #{road}
+			</if>
+			<if test="road_num != null">
+				AND road_num LIKE #{road_num}
 			</if>
 			<if test="village != null">
 				AND village = #{village}

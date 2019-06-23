@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,6 +26,7 @@ import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.IConstant;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
+import top.geomatics.gazetteer.utilities.address.AddressSimilarity;
 import top.geomatics.gazetteer.utilities.database.BuildingQuery;
 
 /**
@@ -698,7 +701,7 @@ public class RevisionController {
 			@ApiParam @RequestBody AddressEditorRow new_row) {
 
 		Map<String, Object> map = new HashMap<String, Object>();
-		
+
 		map.put("sql_tablename", tablename);
 
 //		street_ ,
@@ -815,6 +818,75 @@ public class RevisionController {
 		insert(username, tablename, new_row);
 
 		return new_row.getUpdate_address();
+	}
+
+	/**
+	 * <b>构建一个地址</b><br>
+	 * <i> examples: <br>
+	 * http://localhost:8083/revision/build? </i>
+	 * 
+	 * @param username      String 请求参数，用户名
+	 * @param tablename     String 请求参数，需要更新的数据库表名
+	 * @param originAddress String 请求参数，历史地址
+	 * @param street        String 请求参数， 街道
+	 * @param community     String 请求参数，社区
+	 * @param road          String 请求参数，道路
+	 * @param road_num      String 请求参数，道路编号
+	 * @param village       String 请求参数， 小区
+	 * @param code          String 请求参数， 建筑物编码
+	 * @param suffix        String 请求参数， 地址后缀
+	 * @return String 返回JSON格式的更新地址
+	 */
+	@ApiOperation(value = "构建一个地址", notes = "构建一个地址，示例：/revision/build?street=民治街道&community=民治社区&village=梅花山庄&suffix=欣梅园D5栋&code=4403060090042100005")
+	@PostMapping("/build")
+	public String build(
+			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
+			@ApiParam(value = "查询的数据库表，如newAddress") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IConstant.TABLE_NEW_ADDRESS) String tablename,
+			@ApiParam(value = "历史地址") @RequestParam(value = "originAddress", required = false) String originAddress,
+			@ApiParam(value = "街道") @RequestParam(value = "street", required = false) String street,
+			@ApiParam(value = "社区") @RequestParam(value = "community", required = false) String community,
+			@ApiParam(value = "道路") @RequestParam(value = "road", required = false) String road,
+			@ApiParam(value = "道路编号") @RequestParam(value = "road_num", required = false) String road_num,
+			@ApiParam(value = "小区") @RequestParam(value = "village", required = false) String village,
+			@ApiParam(value = "楼栋编码") @RequestParam(value = "code", required = false) String code,
+			@ApiParam(value = "其他") @RequestParam(value = "suffix", required = false) String suffix) {
+
+		String address = "";
+		AddressEditorRow new_row = new AddressEditorRow();
+		if (null != street && !street.trim().isEmpty()) {
+			new_row.setStreet_(street);
+			address += street;
+		}
+		if (null != community && !community.trim().isEmpty()) {
+			new_row.setCommunity_(community);
+			address += community;
+		}
+		if (null != road && !road.trim().isEmpty()) {
+			address += road;
+		}
+		if (null != road_num && !road_num.trim().isEmpty()) {
+			address += road_num;
+		}
+		if (null != village && !village.trim().isEmpty()) {
+			address += village;
+		}
+		if (null != suffix && !suffix.trim().isEmpty()) {
+			address += suffix;
+		}
+		if (null != code && !code.trim().isEmpty()) {
+			new_row.setUpdate_building_code(code);
+		}
+		if (!address.trim().isEmpty()) {
+			address = "广东省深圳市龙华区" + address;
+			new_row.setUpdate_address(address);
+		}
+
+		insert(username, tablename, new_row);
+
+		// 计算相似性
+		String newAddress = new_row.getUpdate_address();
+		Double similarity = (AddressSimilarity.indicator(originAddress, newAddress)).jaccardSimilarity;
+		return JSON.toJSONString(newAddress + ":" + similarity);
 	}
 
 }

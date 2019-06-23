@@ -60,11 +60,11 @@ import top.geomatics.gazetteer.utilities.database.excel2gpkg.Excel2Geopackage;
 import top.geomatics.gazetteer.utilities.database.shp2gpkg.Shapefile2Geopackage;
 
 /**
- * <b>地址数据服务类</b><br>
+ * <b>地名地址数据服务类</b><br>
  * 
  * @author whudyj
  */
-@Api(value = "/data", tags = "地址数据服务")
+@Api(value = "/data", tags = "地名地址数据服务")
 @RestController
 @RequestMapping("/data")
 public class DataController {
