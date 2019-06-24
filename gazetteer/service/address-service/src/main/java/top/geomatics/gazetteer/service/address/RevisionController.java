@@ -619,11 +619,11 @@ public class RevisionController {
 	public String updateAll(
 			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
 			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename,
-			@ApiParam @RequestBody AddressEditorRow row, @ApiParam @RequestBody AddressEditorRow new_row) {
+			@ApiParam AddressEditorRow row, @ApiParam @RequestBody AddressEditorRow new_row) {
 
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(null, tablename, row, null, 0);
-		// String new_status = new_row.getStatus().toString();
-		String new_status = "1";
+		//Integer new_status = new_row.getStatus();
+		Integer new_status = 1;
 		// String new_modifier = new_row.getModifier();
 		String new_modifier = UserManager.getInstance().getUserInfo(username).getUserName();
 		// String new_update_date = new_row.getUpdate_date().toString();

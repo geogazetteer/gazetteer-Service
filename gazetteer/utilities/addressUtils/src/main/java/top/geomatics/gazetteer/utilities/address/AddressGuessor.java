@@ -11,18 +11,14 @@ import top.geomatics.gazetteer.model.IGazetteerConstant;
  *
  */
 public class AddressGuessor {
-	public static String guessStreet(AddressEditorRow originRow) {
-		String street = originRow.getStreet_();
-		street = street.trim();
+	public static String guessStreet(String originAddress) {
 		// 规则1:从历史地址中推测
-		if (street.isEmpty()) {
-			String originAddress = originRow.getOrigin_address().trim();
-			if (null != originAddress && !originAddress.isEmpty()) {
-				for (String str : IGazetteerConstant.STREET_LIST) {
-					if (originAddress.contains(str)) {
-						street = str;
-						break;
-					}
+		String street = "";
+		if (null != originAddress && !originAddress.isEmpty()) {
+			for (String str : IGazetteerConstant.STREET_LIST) {
+				if (originAddress.contains(str)) {
+					street = str;
+					break;
 				}
 			}
 		}
@@ -30,18 +26,14 @@ public class AddressGuessor {
 		return street;
 	}
 
-	public static String guessCommunity(AddressEditorRow originRow) {
-		String community = originRow.getCommunity_();
-		community = community.trim();
+	public static String guessCommunity(String originAddress) {
+		String community = "";
 		// 规则1:从历史地址中推测
-		if (community.isEmpty()) {
-			String originAddress = originRow.getOrigin_address().trim();
-			if (null != originAddress && !originAddress.isEmpty()) {
-				for (String str : IGazetteerConstant.COMMUNITY_LIST) {
-					if (originAddress.contains(str)) {
-						community = str;
-						break;
-					}
+		if (null != originAddress && !originAddress.isEmpty()) {
+			for (String str : IGazetteerConstant.COMMUNITY_LIST) {
+				if (originAddress.contains(str)) {
+					community = str;
+					break;
 				}
 			}
 		}
