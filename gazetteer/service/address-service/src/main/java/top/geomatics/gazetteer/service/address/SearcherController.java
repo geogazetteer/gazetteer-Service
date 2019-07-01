@@ -66,7 +66,7 @@ public class SearcherController {
 	 * http://localhost:8083/address/all?fields=id,address%26tablename=民治社区%26limit=10
 	 * </p>
 	 * 
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,address
 	 * @param tablename String 请求参数，指定查询的数据库表，如：油松社区
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -80,7 +80,7 @@ public class SearcherController {
 			@ApiParam(value = "查询的数据库表，如油松社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
 			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
 			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit,
-			@ApiIgnore AddressRow row) {
+			@ApiParam(value = "查询条件") AddressRow row) {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		return ControllerUtils.getResponseBody(rows);
@@ -151,7 +151,7 @@ public class SearcherController {
 	 * @param path_district  String 路径变量，固定为“龙华区”
 	 * @param path_street    String 路径变量，表示所在的街道，如：民治街道
 	 * @param path_community String 路径变量，表示所在的社区，如：民治社区
-	 * @param fields         String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields         String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param orderby        String 请求参数，指定查询结果排序方式
 	 * @param limit          int 请求参数，限定查询的记录个数，如：limit=10
 	 * @return String 返回JSON格式的查询结果
@@ -324,7 +324,7 @@ public class SearcherController {
 	 * http://localhost:8083/address/searcher/?fields=id,address%26tablename=民治社区%26address=广东省深圳市龙华区民治街道民治社区沙吓村六巷7栋
 	 * </p>
 	 * 
-	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename   String 请求参数，指定查询的数据库表
 	 * @param id          Integer 请求参数，指定查询的id字段值
 	 * @param province    String 请求参数，指定查询的province字段值
@@ -407,7 +407,7 @@ public class SearcherController {
 	 * http://localhost:8083/address/fuzzysearcher/?fields=id,address%26tablename=民治社区%26address=沙吓村六巷7栋
 	 * </p>
 	 * 
-	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename   String 请求参数，指定查询的数据库表
 	 * @param id          Integer 请求参数，指定查询的id字段值
 	 * @param province    String 请求参数，指定查询的province字段值
@@ -452,11 +452,11 @@ public class SearcherController {
 		if (null != id)
 			row.setId(id);
 		if (null != province && !province.isEmpty())
-			row.setProvince(province);
+			row.setProvince("%" + province + "%");
 		if (null != city && !city.isEmpty())
-			row.setCity(city);
+			row.setCity("%" + city + "%");
 		if (null != district && !district.isEmpty())
-			row.setDistrict(district);
+			row.setDistrict("%" + district + "%");
 		if (null != street && !street.isEmpty())
 			row.setStreet("%" + street + "%");
 		if (null != community && !community.isEmpty())
@@ -491,7 +491,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param address_id String 路径变量，指定查询的地址ID
-	 * @param fields     String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields     String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename  String 请求参数，指定查询的数据库表
 	 * @param orderby    String 请求参数，指定查询结果排序方式
 	 * @param limit      int 请求参数，限定查询的记录个数，如：limit=10
@@ -520,7 +520,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param code      String 路径变量，指定查询的地址编码
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename String 请求参数，指定查询的数据库表
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -548,7 +548,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param street    String 路径变量，指定查询的街道名称
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,address
 	 * @param tablename String 请求参数，指定查询的数据库表
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -576,7 +576,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param community String 路径变量，指定查询的社区名称
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,address
 	 * @param tablename String 请求参数，指定查询的数据库表
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -604,7 +604,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param building_id String 路径变量，指定查询的建筑物ID
-	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename   String 请求参数，指定查询的数据库表
 	 * @param orderby     String 请求参数，指定查询结果排序方式
 	 * @param limit       int 请求参数，限定查询的记录个数，如：limit=10
@@ -632,7 +632,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param building  String 路径变量，指定查询的建筑物名称
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename String 请求参数，指定查询的数据库表
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -660,7 +660,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param village   String 路径变量，指定查询的村名称
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename String 请求参数，指定查询的数据库表
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -688,7 +688,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param road      String 路径变量，指定查询的道路名称
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename String 请求参数，指定查询的数据库表
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -791,12 +791,6 @@ public class SearcherController {
 		keywords = AddressProcessor.transform(keywords, this.settings);
 		// 设置查询条件
 		String tablename = IControllerConstant.ADDRESS_TABLE;
-		for (String community : IGazetteerConstant.COMMUNITY_LIST) {
-			if (keywords.contains(community)) {
-				tablename = community;
-				break;
-			}
-		}
 		AddressRow row = new AddressRow();
 		row.setAddress("%" + keywords + "%");
 		Map<String, Object> map = ControllerUtils.getRequestMap(null, tablename, row, null, 0);

@@ -141,7 +141,7 @@ public class AddressProcessor {
 			newAddress = fullToHalf(newAddress);
 		}
 		if (settings.isChineseNumber()) {// 数字转换
-			newAddress = chineseToNumber(newAddress).toString();
+			newAddress = ChineseNumber.convert(newAddress);
 		}
 		if (settings.isInterchangeable()) {// 通假字转换
 			newAddress = exchangeWords(newAddress);
