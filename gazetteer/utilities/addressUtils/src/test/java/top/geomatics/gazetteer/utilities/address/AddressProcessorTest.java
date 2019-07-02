@@ -40,7 +40,7 @@ public class AddressProcessorTest {
 
 	@Test
 	public void testIsSensitiveWords() {
-		String s = "广东省深圳市龙华区基地组织";
+		String s = "锦绣御园8栋A座";
 		System.out.println(AddressProcessor.isSensitiveWords(s));
 	}
 

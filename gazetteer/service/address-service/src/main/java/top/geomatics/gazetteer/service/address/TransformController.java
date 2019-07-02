@@ -103,7 +103,8 @@ public class TransformController {
 	@GetMapping("/sensitive")
 	public String isSensitiveWords(
 			@ApiParam(value = "含有敏感词的输入，如基地组织") @RequestParam(value = "chars", required = true) String input) {
-		return JSON.toJSONString(AddressProcessor.isSensitiveWords(input));
+		boolean flag = AddressProcessor.isSensitiveWords(input);
+		return JSON.toJSONString(flag);
 
 	}
 
