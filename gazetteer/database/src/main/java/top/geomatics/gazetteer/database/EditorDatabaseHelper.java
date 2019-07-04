@@ -45,6 +45,11 @@ public class EditorDatabaseHelper {
 		manager = new ResourcesManager2(this.userName);
 		editor_properties_file = manager.getValue(EDITOR_DB_PROPERTIES_FILE);
 	}
+	public EditorDatabaseHelper(String userName,String prof) {
+		super();
+		this.userName = userName;
+		editor_properties_file = prof;
+	}
 
 	// 创建能执行映射文件中sql的sqlSession
 	public SqlSession getSession() {

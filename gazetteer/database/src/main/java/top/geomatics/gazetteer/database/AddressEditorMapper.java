@@ -176,4 +176,26 @@ public interface AddressEditorMapper {
 	 */
 	public Integer getCount(Map<String, Object> map);
 
+	/**
+	 * <b>获得记录个数</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中任意的select count(*)语句</i><br>
+	 * 
+	 * @param map select语句中的所有参数
+	 * @return 记录个数
+	 */
+	public Integer getCountNameLike(Map<String, Object> map);
+
+	/**
+	 * <b>任意分页精确查询</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中任意的select语句</i><br>
+	 * 
+	 * @param map select语句中的所有参数
+	 * @return 搜索结果集
+	 */
+	public List<AddressEditorRow> findPageNameLike(Map<String, Object> map);
+
 }

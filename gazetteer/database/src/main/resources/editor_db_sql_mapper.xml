@@ -299,6 +299,43 @@
 			</if>
 		</where>
 	</select>
+	<select id="getCountNameLike" resultType="int">
+		SELECT count(*)
+		FROM
+		${sql_tablename}
+		<where>
+			<if test="fid != null">
+				fid = #{fid}
+			</if>
+			<if test="name_ != null">
+				name_ LIKE #{name_}
+			</if>
+			<if test="street_ != null">
+				street_ = #{street_}
+			</if>
+			<if test="community_ != null">
+				AND community_ = #{community_}
+			</if>
+			<if test="origin_address != null">
+				AND origin_address = #{origin_address}
+			</if>
+			<if test="similar_address != null">
+				AND similar_address = #{similar_address}
+			</if>
+			<if test="standard_address != null">
+				AND standard_address = #{standard_address}
+			</if>
+			<if test="status != null">
+				AND status = #{status}
+			</if>
+			<if test="modifier != null">
+				AND modifier = #{modifier}
+			</if>
+			<if test="update_date != null">
+				AND update_date = #{update_date}
+			</if>
+		</where>
+	</select>
 
 	<select id="findPageEquals" resultType="AddressEditorRow">
 		SELECT ${sql_fields}
@@ -353,11 +390,70 @@
 			</otherwise>
 		</choose>
 	</select>
+	<select id="findPageNameLike" resultType="AddressEditorRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="fid != null">
+				fid = #{fid}
+			</if>
+			<if test="name_ != null">
+				name_ LIKE #{name_}
+			</if>
+			<if test="street_ != null">
+				street_ = #{street_}
+			</if>
+			<if test="community_ != null">
+				AND community_ = #{community_}
+			</if>
+			<if test="origin_address != null">
+				AND origin_address = #{origin_address}
+			</if>
+			<if test="similar_address != null">
+				AND similar_address = #{similar_address}
+			</if>
+			<if test="standard_address != null">
+				AND standard_address = #{standard_address}
+			</if>
+			<if test="status != null">
+				AND status = #{status}
+			</if>
+			<if test="modifier != null">
+				AND modifier = #{modifier}
+			</if>
+			<if test="update_date != null">
+				AND update_date = #{update_date}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<choose>
+			<when test="page_start != null">
+				<choose>
+					<when test="sql_limit != null">
+						LIMIT #{page_start},#{sql_limit}
+					</when>
+					<otherwise>
+						LIMIT #{page_start},10
+					</otherwise>
+				</choose>
+			</when>
+			<otherwise>
+				<if test="sql_limit != null">
+					LIMIT #{sql_limit}
+				</if>
+			</otherwise>
+		</choose>
+	</select>
 
 	<select id="findLike" resultType="AddressEditorRow">
 		SELECT ${sql_fields}
 		FROM ${sql_tablename}
 		<where>
+			<if test="name_ != null">
+				name_ LIKE #{name_}
+			</if>
 			<if test="street_ != null">
 				street_ LIKE #{street_}
 			</if>

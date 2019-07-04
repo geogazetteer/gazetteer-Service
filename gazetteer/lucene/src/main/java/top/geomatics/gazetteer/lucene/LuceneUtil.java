@@ -3,7 +3,9 @@ package top.geomatics.gazetteer.lucene;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.ansj.lucene7.AnsjAnalyzer;
 import org.ansj.lucene7.AnsjAnalyzer.TYPE;
@@ -17,7 +19,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.TotalHits;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -46,9 +47,10 @@ public class LuceneUtil {
 
 	private static final String ADDRESS_ID = Messages.getString("LuceneUtil.1"); //$NON-NLS-1$
 	private static final String ADDRESS = Messages.getString("LuceneUtil.2"); //$NON-NLS-1$
-	private static final int MAX_HITS = 100000000;
-	private static TopDocs topDocs = null;
-	private static TotalHits totalHits = null;
+	private static final int MAX_HITS = 10000;
+	private static Map<String, TopDocs> docsMap = null;
+
+	private static QueryParser queryParser = new QueryParser(ADDRESS, new AnsjAnalyzer(TYPE.query_ansj));
 
 	static {
 		if (indexSearcher == null) {
@@ -74,14 +76,26 @@ public class LuceneUtil {
 	 * 
 	 * @param query 查询对象
 	 */
-	public static void buildSearch(Query query) {
+	public static void buildSearch(int queryType, String keywords) {
+		Query query = null;
+		TopDocs topDocs = null;
+		if (null == docsMap) {
+			docsMap = new HashMap<String, TopDocs>();
+		}
+		if (docsMap.containsKey(keywords)) {
+			return;// 已经查过了
+		}
 		try {
+			query = buildQuery(queryType, keywords);
 			topDocs = indexSearcher.search(query, MAX_HITS);
-			totalHits = topDocs.totalHits;
 		} catch (IOException e) {
 			e.printStackTrace();
-			String logMsgString = String.format(Messages.getString("LuceneUtil.4"), query.toString()); //$NON-NLS-1$
+			String logMsgString = String.format(Messages.getString("LuceneUtil.4"), keywords); //$NON-NLS-1$
 			logger.error(logMsgString);
+		}
+
+		if (!docsMap.containsKey(keywords)) {
+			docsMap.put(keywords, topDocs);
 		}
 	}
 
@@ -96,7 +110,6 @@ public class LuceneUtil {
 	 */
 	public static Query buildQuery(int queryType, String keyword) {
 		Query query = null;
-		QueryParser queryParser = null;
 		switch (queryType) {
 		case 1:
 			query = new TermQuery(new Term(ADDRESS, keyword));
@@ -107,7 +120,6 @@ public class LuceneUtil {
 			break;
 		case 0:
 		default:
-			queryParser = new QueryParser(ADDRESS, new AnsjAnalyzer(TYPE.query_ansj));
 			try {
 				query = queryParser.parse(keyword);
 			} catch (ParseException e) {
@@ -123,26 +135,29 @@ public class LuceneUtil {
 	/**
 	 * <b>获得查询结果个数</b><br>
 	 * 
-	 * @param keyword   查询关键词
+	 * @param keywords  查询关键词
 	 * @param queryType 查询类型，0--QueryParse, 解析器查询 1--TermQuery 词根查询 2--
 	 *                  WildcardQuery 通配符查询
 	 * 
 	 * @return 查询结果个数
 	 */
-	public static long getCount(String keyword, int queryType) {
-		buildSearch(buildQuery(queryType, keyword));
-		return totalHits.value;
+	public static long getCount(String keywords, int queryType) {
+		if (null == docsMap || !docsMap.containsKey(keywords)) {
+			buildSearch(queryType, keywords);
+		}
+
+		return docsMap.get(keywords).totalHits.value;
 	}
 
 	/**
 	 * <b>获得查询结果个数</b><br>
 	 * 
-	 * @param keyword 查询关键词 <i> 查询类型缺省为：0--QueryParse, 解析器查询 </i>
+	 * @param keywords 查询关键词 <i> 查询类型缺省为：0--QueryParse, 解析器查询 </i>
 	 * 
 	 * @return 查询结果个数
 	 */
-	public static long getCount(String keyword) {
-		return getCount(keyword, 0);
+	public static long getCount(String keywords) {
+		return getCount(keywords, 0);
 	}
 
 	/**
@@ -153,7 +168,10 @@ public class LuceneUtil {
 	 */
 	public static List<SimpleAddressRow> search(String keywords) {
 		List<SimpleAddressRow> list = new ArrayList<SimpleAddressRow>();
-		buildSearch(buildQuery(0, keywords));
+		if (null == docsMap || !docsMap.containsKey(keywords)) {
+			buildSearch(0, keywords);
+		}
+		TopDocs topDocs = docsMap.get(keywords);
 		for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 			Document doc = null;
 			try {
@@ -194,7 +212,10 @@ public class LuceneUtil {
 	 */
 	public static List<SimpleAddressRow> searchByPage(String keywords, int pageIndex, int pageSize) {
 		List<SimpleAddressRow> list = new ArrayList<SimpleAddressRow>();
-		buildSearch(buildQuery(0, keywords));
+		if (null == docsMap || !docsMap.containsKey(keywords)) {
+			buildSearch(0, keywords);
+		}
+		TopDocs topDocs = docsMap.get(keywords);
 		int start = (pageIndex - 1) * pageSize;
 		int end = (start + pageSize) < topDocs.scoreDocs.length ? (start + pageSize) : topDocs.scoreDocs.length;
 

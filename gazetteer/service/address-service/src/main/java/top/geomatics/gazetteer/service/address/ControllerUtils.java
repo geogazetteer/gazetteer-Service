@@ -186,6 +186,9 @@ public class ControllerUtils {
 		if (null != row) {
 			// 字段
 			Integer fid = row.getFid();
+			String name_ = row.getName_();
+			String code_ = row.getCode_();
+			
 			String street_ = row.getStreet_();
 			String community_ = row.getCommunity_();
 			String origin_address = row.getOrigin_address();
@@ -204,6 +207,10 @@ public class ControllerUtils {
 					map.put("fid", fidString);
 				}
 			}
+			if (name_ != null && !name_.isEmpty())
+				map.put("name_", name_);
+			if (code_ != null && !code_.isEmpty())
+				map.put("code_", code_);
 			
 			if (street_ != null && !street_.isEmpty())
 				map.put("street_", street_);
