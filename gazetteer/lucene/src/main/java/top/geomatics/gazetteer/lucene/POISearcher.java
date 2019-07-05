@@ -249,10 +249,15 @@ public class POISearcher {
 	public static List<SimpleAddressRow> search(String keywords, int maxHits) {
 		List<EnterpriseRow> rows = GeoNameSearcher.query(keywords, maxHits);
 		List<SimpleAddressRow> simpleAddressRows = new ArrayList<SimpleAddressRow>();
+		int t = 0;
 		for (EnterpriseRow row : rows) {
-			// 二次查找
+			// 二次查找，只找100次
+			t++;
+			if (t > 100) {
+				break;
+			}
 			String queryKey = "\"" + row.getAddress() + "\"";
-			
+
 			List<SimpleAddressRow> srows = LuceneUtil.search(queryKey, maxHits);
 			for (SimpleAddressRow aRow : srows) {
 				simpleAddressRows.add(aRow);

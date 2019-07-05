@@ -44,8 +44,10 @@ public class QueryUtils {
 				rows_edit = dbInformation.getMapper().findLike(map);
 			}
 			if (null != rows_edit && rows_edit.size() > 0) {
-				// 数据库二次查找
-				for (AddressEditorRow re : rows_edit) {
+				// 数据库二次查找，只找100次
+				int t=rows_edit.size() < 100?rows_edit.size():100;
+				for (int i = 0; i < t;i++) {
+					AddressEditorRow re =rows_edit.get(i);
 					String code = re.getCode_();
 					Double lon = re.getLongitude_();
 					Double lat = re.getLatitude_();

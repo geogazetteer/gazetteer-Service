@@ -21,12 +21,15 @@ public class DatabaseManager {
 
 	private static ResourcesManager manager = null;
 	private static final String DATABASE_WORKSPACE_ROOT = "database_workspace_root";
+	private static final String EXCLUDE_DATABASES = "exclude_databases";
 	private static String database_workspace_root = null;
+	private static String exlude_databases = null;
 
 	private DatabaseManager() {
 		databaseInfos = new HashMap<String, DatabaseInformation>();
 		manager = ResourcesManager.getInstance();
 		database_workspace_root = manager.getValue(DATABASE_WORKSPACE_ROOT);
+		exlude_databases = manager.getValue(EXCLUDE_DATABASES);
 		// 得到数据库目录
 		List<String> paths = getDirectories();
 		for (String dbPaht : paths) {
@@ -40,13 +43,24 @@ public class DatabaseManager {
 	}
 
 	private List<String> getDirectories() {
+		// 排除不搜索的数据库
+		String exl[] = exlude_databases.split(",");
+		Map<String, String> exludes = new HashMap<String, String>();
+		for (int i = 0; i < exl.length; i++) {
+			exludes.put(exl[i], exl[i]);
+		}
+		// 列出应该搜索的数据库
 		List<String> paths = new ArrayList<String>();
 		File dir = new File(database_workspace_root);
 		if (dir.exists()) {
 			File[] files = dir.listFiles();
 			for (File f : files) {
 				if (f.isDirectory()) {
-					paths.add(f.getName());
+					String dirName = f.getName();
+					if (!exludes.containsKey(dirName)) {
+						paths.add(dirName);
+					}
+
 				}
 			}
 		}
@@ -72,13 +86,13 @@ public class DatabaseManager {
 
 		}
 		DatabaseInformation[] infos = null;
-		if (dbInformations.size() >0) {
+		if (dbInformations.size() > 0) {
 			infos = new DatabaseInformation[dbInformations.size()];
-			for (int i =0; i < dbInformations.size(); i++) {
+			for (int i = 0; i < dbInformations.size(); i++) {
 				infos[i] = dbInformations.get(i);
 			}
 		}
-		
+
 		return infos;
 	}
 

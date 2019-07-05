@@ -60,16 +60,16 @@ public class MatcherController {
 				break;
 			}
 		}
-//		if (true == tablename.isEmpty()) {
-//			for (String str : IGazetteerConstant.STREET_LIST) {
-//				if (keywords.contains(str)) {
-//					tablename = str;
-//					// 取街道后面的内容
+		if (true == tablename.isEmpty()) {
+			for (String str : IGazetteerConstant.STREET_LIST) {
+				if (keywords.contains(str)) {
+					tablename = str;
+					// 取街道后面的内容
 //					shortKeywords = keywords.substring(keywords.indexOf(str) + str.length());
-//					break;
-//				}
-//			}
-//		}
+					break;
+				}
+			}
+		}
 		if (true == tablename.isEmpty()) {
 			tablename = IControllerConstant.ADDRESS_TABLE;
 		}
