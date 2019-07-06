@@ -24,4 +24,11 @@ public class GPKGProcessorTest {
 //		processor.close();
 	}
 
+	@Test
+	public void testUpdateSqlite() {
+//		String geopackageName_1 = "G:\\data\\target\\企业数据-统一社会信用代码1.gpkg";
+//		GPKGProcessor processor = new GPKGProcessor(geopackageName_1, true);
+//		processor.updateSqlite();
+	}
+
 }

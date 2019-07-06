@@ -3,7 +3,6 @@
  */
 package top.geomatics.gazetteer.utilities.address;
 
-import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.IGazetteerConstant;
 
 /**
