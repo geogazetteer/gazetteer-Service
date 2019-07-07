@@ -1,5 +1,6 @@
 package top.geomatics.gazetteer.service.address;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import io.swagger.annotations.ApiParam;
 import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.IConstant;
+import top.geomatics.gazetteer.utilities.address.AddressGuessor;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.address.AddressSimilarity;
 import top.geomatics.gazetteer.utilities.database.BuildingQuery;
@@ -196,7 +198,6 @@ public class RevisionController {
 	 * 
 	 * @param username  String 请求参数，用户名
 	 * @param fid       Integer 路径变量，数据库中记录的fid
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：*表示查询所有字段
 	 * @param tablename String 请求参数，指定查询的数据库表，如：dmdz_edit
 	 * @return String 返回JSON格式的查询结果
 	 */
@@ -205,60 +206,114 @@ public class RevisionController {
 	public String guessByFid(
 			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
 			@ApiParam(value = "数据库中记录的fid") @PathVariable(value = IControllerConstant.ENTERPRISE_DB_ID, required = true) Integer fid,
-			@ApiParam(value = "查询字段，如 fid,origin_address") @RequestParam(value = IControllerConstant.TABLE_FIELDS, required = false, defaultValue = "*") String fields,
 			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename) {
 		// 查询
+		String fields = "*";
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put(IControllerConstant.ENTERPRISE_DB_ID, fid);
 		List<AddressEditorRow> rows = UserManager.getInstance().getUserInfo(username).getMapper().selectByFid(map);
-		// 计算
-		List<AddressEditorRow> newRows = new ArrayList<AddressEditorRow>();
 		for (AddressEditorRow row : rows) {
-			AddressEditorRow newRow = new AddressEditorRow();
-			// 如果没有原地址，则计算一个
+			// 已有信息
 			String originAddress = row.getOrigin_address();
 			String street_ = row.getStreet_();
 			String community_ = row.getCommunity_();
-			String codeString = null;
+			// 经纬度
+			Double longitude = row.getLongitude_();
+			Double latitude = row.getLatitude_();
+			// 根据坐标计算
 			AddressRow arow = null;
-			if (null == originAddress || originAddress.isEmpty()) {
-				// 经纬度
-				double longitude = row.getLongitude_();
-				double latitude = row.getLatitude_();
+			if (null != longitude && null != latitude) {
 				String tempString = longitude + "," + latitude;
 				if (AddressProcessor.isCoordinatesExpression(tempString)) {
 					List<String> buildingCodes = BuildingQuery.query(longitude, latitude);
-					if (buildingCodes.size() > 0) {
-						codeString = buildingCodes.get(0);
+					List<AddressRow> allRows = new ArrayList<AddressRow>();
+					for (String codeString : buildingCodes) {
 						AddressRow addrow = new AddressRow();
 						addrow.setCode(codeString);
-						Map<String, Object> para = ControllerUtils.getRequestMap("*", "dmdz", addrow, null, 1);
-						List<AddressRow> addResRows = ControllerUtils.mapper.findEquals(map);
-						if (addResRows.size() > 0) {
-							arow = addResRows.get(0);
-							originAddress = arow.getAddress();
-						}
+						Map<String, Object> para = ControllerUtils.getRequestMap("*", "dmdz", addrow, null, 0);
+						List<AddressRow> addResRows = ControllerUtils.mapper.findEquals(para);
+						allRows.addAll(addResRows);
+					}
+					if (allRows.size() > 0) {
+						arow = allRows.get(0);
 					}
 				}
 			}
-			newRow.setOrigin_address(originAddress);
+			if (null == originAddress || originAddress.isEmpty()) {
+				if (null != arow) {
+					originAddress = arow.getAddress();
+					if (originAddress != null && !originAddress.isEmpty()) {
+						row.setOrigin_address(originAddress);
+					}
+				}
+
+			}
 			if (null == street_ || street_.isEmpty()) {
 				if (null != arow) {
 					street_ = arow.getStreet();
+				} else {
+					street_ = AddressGuessor.guessStreet(originAddress);
 				}
 			}
-			newRow.setStreet_(street_);
+			row.setStreet_(street_);
 
 			if (null == community_ || community_.isEmpty()) {
 				if (null != arow) {
 					community_ = arow.getCommunity();
+				} else {
+					community_ = AddressGuessor.guessCommunity(originAddress);
 				}
 			}
-			newRow.setCommunity_(community_);
-
-			newRows.add(newRow);
+			row.setCommunity_(community_);
 		}
-		return ControllerUtils.getResponseBody_revision(newRows);
+		return ControllerUtils.getResponseBody_revision(rows);
+	}
+
+	/**
+	 * <b>根据fid查询坐标并得到标准地址</b><br>
+	 * <i>examples:<br>
+	 * http://localhost:8083/revision/address/guess/1?fields=*%26tablename=dmdz_edit
+	 * </i>
+	 * 
+	 * @param username  String 请求参数，用户名
+	 * @param fid       Integer 路径变量，数据库中记录的fid
+	 * @param tablename String 请求参数，指定查询的数据库表，如：dmdz_edit
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据fid查询坐标并得到标准地址", notes = "根据fid查询坐标并得到标准地址，示例：/revision/address/guess/1?fields=*&tablename=dmdz_edit")
+	@GetMapping("/address/guess/{fid}")
+	public String guessAddressByFid(
+			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
+			@ApiParam(value = "数据库中记录的fid") @PathVariable(value = IControllerConstant.ENTERPRISE_DB_ID, required = true) Integer fid,
+			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename) {
+		// 查询
+		String fields = "fid,name_,code_,longitude_,latitude_";
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
+		map.put(IControllerConstant.ENTERPRISE_DB_ID, fid);
+		List<AddressEditorRow> rows = UserManager.getInstance().getUserInfo(username).getMapper().selectByFid(map);
+		// 根据坐标计算
+		List<AddressRow> newRows = new ArrayList<AddressRow>();
+		for (AddressEditorRow row : rows) {
+			// 经纬度
+			Double longitude = row.getLongitude_();
+			Double latitude = row.getLatitude_();
+			if (null == longitude || null == latitude) {
+				continue;
+			}
+			String tempString = longitude + "," + latitude;
+			if (!AddressProcessor.isCoordinatesExpression(tempString)) {
+				continue;
+			}
+			List<String> buildingCodes = BuildingQuery.query(longitude, latitude);
+			for (String codeString : buildingCodes) {
+				AddressRow addrow = new AddressRow();
+				addrow.setCode(codeString);
+				Map<String, Object> para = ControllerUtils.getRequestMap("*", "dmdz", addrow, null, 0);
+				List<AddressRow> addResRows = ControllerUtils.mapper.findEquals(para);
+				newRows.addAll(addResRows);
+			}
+		}
+		return ControllerUtils.getResponseBody(newRows);
 	}
 
 	/**
@@ -622,7 +677,7 @@ public class RevisionController {
 			@ApiParam AddressEditorRow row, @ApiParam @RequestBody AddressEditorRow new_row) {
 
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(null, tablename, row, null, 0);
-		//Integer new_status = new_row.getStatus();
+		// Integer new_status = new_row.getStatus();
 		Integer new_status = 1;
 		// String new_modifier = new_row.getModifier();
 		String new_modifier = UserManager.getInstance().getUserInfo(username).getUserName();
@@ -716,6 +771,15 @@ public class RevisionController {
 //		update_date ,
 //		update_address ,
 //		update_building_code
+		if (null != new_row && null != new_row.getName_() && !new_row.getName_().trim().isEmpty()) {
+			map.put("name_", new_row.getName_());
+		}
+		if (null != new_row && null != new_row.getCode_() && !new_row.getCode_().trim().isEmpty()) {
+			map.put("code_", new_row.getCode_());
+		}
+		if (null != new_row && null != new_row.getDescription_() && !new_row.getDescription_().trim().isEmpty()) {
+			map.put("description_", new_row.getDescription_());
+		}
 		if (null != new_row && null != new_row.getStreet_() && !new_row.getStreet_().trim().isEmpty()) {
 			map.put("street_", new_row.getStreet_());
 		}
@@ -751,7 +815,8 @@ public class RevisionController {
 //		if (null != new_row && null != new_row.getUpdate_date()) {
 //			map.put("update_date", new_row.getUpdate_date());
 //		}
-		map.put("update_date", new Date());
+		SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		map.put("update_date", f.format(new Date()));
 		if (null != new_row && null != new_row.getUpdate_address() && !new_row.getUpdate_address().trim().isEmpty()) {
 			map.put("update_address", new_row.getUpdate_address());
 		}
@@ -852,7 +917,14 @@ public class RevisionController {
 			@ApiParam(value = "其他") @RequestParam(value = "suffix", required = false) String suffix) {
 
 		String address = "";
+		// 保存所有信息
 		AddressEditorRow new_row = new AddressEditorRow();
+		if (null != originAddress && !originAddress.trim().isEmpty()) {
+			new_row.setOrigin_address(originAddress);
+		}
+		if (null != username && !username.trim().isEmpty()) {
+			new_row.setModifier(username);
+		}
 		if (null != street && !street.trim().isEmpty()) {
 			new_row.setStreet_(street);
 			address += street;
