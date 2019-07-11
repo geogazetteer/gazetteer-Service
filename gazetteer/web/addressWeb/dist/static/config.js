@@ -26,6 +26,8 @@ const URLCFG={
   isSensitiveUrl:serverUrl+'transform/sensitive',//(param:chars=chars)
   //判断是否为正确的坐标
   isCoordinateUrl:serverUrl+'transform/coordinate',//(param:chars=chars)
+  //判断建筑物编码输入是否合法
+  isCodeUrl:serverUrl+'transform/buildingcode',//(param:chars=chars)
   //根据坐标查code
   getCodeByPointUrl:serverUrl+'building/codes',//(param:x=114.017776720804&y=22.6390350934369)
   //根据code搜索标准地址
@@ -121,7 +123,7 @@ const SETLABELARR={
 
 //批量匹配
 const BATCHSERVICE={
-  modelUrl:webUrl+'files/downloads/批量处理模版.xls',//模板地址
+  modelUrl:webUrl+'files/downloads/批量处理模板.xlsx',//模板地址
   uploadUrl:serverUrl+'data/upload/matcher',//文件上传
 };
 
@@ -159,5 +161,10 @@ const EDITSERVICE={
   roadCodeLikeUrl:serverUrl+'address/road_num_like',
   //小区输入联想
   addressLikeUrl:serverUrl+'address/village_like',
-  codeLikeUrl:serverUrl+'address/code_like'
+  codeLikeUrl:serverUrl+'address/code_like',
+
+  //根据坐标获取标准地址
+  getStandardByLLUrl:serverUrl+'building/address',//?x=114.019777&y=22.672456
+  //根据fid获取标准地址
+  getStandardByFidUrl:serverUrl+'revision/address/guess'// /1?username=username&tablename=dmdz_edit
 };
