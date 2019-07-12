@@ -35,8 +35,6 @@ public class BuildingController {
 	static {
 		buildingQuery.open();
 	}
-	
-	
 
 	/**
 	 * <b>根据坐标查询建筑物编码</b><br>
@@ -89,7 +87,7 @@ public class BuildingController {
 		List<AddressRow> rowsTotal = new ArrayList<>();
 		for (String code : codes) {
 			// 根据建筑物编码搜索
-			String fields = Messages.getString("BuildingController.0"); //$NON-NLS-1$
+			String fields = "*";
 			String tablename = AddressProcessor.getCommunityFromBuildingCode(code);
 			AddressRow aRow = new AddressRow();
 			aRow.setCode(code);

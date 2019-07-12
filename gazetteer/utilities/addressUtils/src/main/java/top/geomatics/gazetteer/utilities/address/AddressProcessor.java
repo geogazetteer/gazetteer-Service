@@ -3,6 +3,9 @@
  */
 package top.geomatics.gazetteer.utilities.address;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.luhuiguo.chinese.ChineseUtils;
 
 import top.geomatics.gazetteer.model.IGazetteerConstant;
@@ -20,16 +23,25 @@ public class AddressProcessor {
 	 * @return
 	 */
 	public static String fullToHalf(String input) {
-		char c[] = input.toCharArray();
-		for (int i = 0; i < c.length; i++) {
-			if (c[i] == '\u3000') {
-				c[i] = ' ';
-			} else if (c[i] > '\uFF00' && c[i] < '\uFF5F') {
-				c[i] = (char) (c[i] - 65248);
+		int CONVERT_STEP = 65248; // 全角半角转换间隔
+		Pattern pattern = Pattern.compile("[\uFE30-\uFFA0]"); // 正则表示全角字符
+		Matcher matcher = pattern.matcher(input);
+		String result = input;
+		while (matcher.find()) {
+			String regEx = matcher.group();
+			char c[] = regEx.toCharArray();
+			for (int i = 0; i < c.length; i++) {
+				if (c[i] == '\u3000') {
+					c[i] = ' ';
+				} else if (c[i] > '\uFF00' && c[i] < '\uFF5F') {
+					c[i] = (char) (c[i] - CONVERT_STEP);
+				}
 			}
+
+			String value = new String(c);
+			result = result.replaceAll(regEx, value);
 		}
-		String returnString = new String(c);
-		return returnString;
+		return result;
 	}
 
 	/**
@@ -100,37 +112,10 @@ public class AddressProcessor {
 	 * @return
 	 */
 	public static String comToSimple(String s) {
-		// String s = "头发发财";
-		// System.out.println(s + " => " + ChineseUtils.toTraditional(s));
 
 		// 繁体转中文简体
 		return ChineseUtils.toSimplified(s);
-
-		// s = "长江成长";
-//		System.out.println(s + " => " + ChineseUtils.toPinyin(s) + " ("
-//				+ ChineseUtils.toPinyin(s, PinyinFormat.UNICODE_PINYIN_FORMAT)
-//				+ ") - "
-//				+ ChineseUtils.toPinyin(s, PinyinFormat.ABBR_PINYIN_FORMAT));
 	}
-
-	// 数字转汉字
-//	public String toChinese(String string) {
-//    String[] s1 = { "零", "一", "二", "三", "四", "五", "六", "七", "八", "九" };
-//    String[] s2 = { "十", "百", "千", "万", "十", "百", "千", "亿", "十", "百", "千" };
-//
-//    String result = "";
-//    int n = string.length();
-//    for (int i = 0; i < n; i++) {
-//        int num = string.charAt(i) - '0';
-//
-//        if (i != n - 1 && num != 0) {
-//            result += s1[num] + s2[n - 2 - i];
-//        } else {
-//            result += s1[num];
-//        }
-//     }
-//     return result;
-// }
 
 	public static String transform(String address, SearcherSettings settings) {
 		String newAddress = address;
@@ -141,7 +126,7 @@ public class AddressProcessor {
 			newAddress = fullToHalf(newAddress);
 		}
 		if (settings.isChineseNumber()) {// 数字转换
-			newAddress = chineseToNumber(newAddress).toString();
+			newAddress = ChineseNumber.convert(newAddress);
 		}
 		if (settings.isInterchangeable()) {// 通假字转换
 			newAddress = exchangeWords(newAddress);
@@ -219,12 +204,7 @@ public class AddressProcessor {
 	 */
 	public static boolean isSensitiveWords(String input) {
 		boolean flag = false;
-		for (String str : ISensitiveWords.WORDS_LIST) {
-			flag = input.contains(str);
-			if (flag) {
-				break;
-			}
-		}
+		flag = SensitiveDictionary.getInstance().contains(input);
 		return flag;
 	}
 
@@ -235,13 +215,7 @@ public class AddressProcessor {
 	 * @return
 	 */
 	public static String exchangeWords(String input) {
-		String newString = input;
-		for (String key : IExchangeableWords.WORDS_MAP.keySet()) {
-			if (input.contains(key)) {
-				newString = newString.replace(key, IExchangeableWords.WORDS_MAP.get(key));
-			}
-		}
-		return newString;
+		return ExchangeDictionary.getInstance().replace(input);
 	}
 
 	/**
@@ -251,13 +225,7 @@ public class AddressProcessor {
 	 * @return
 	 */
 	public static String alias(String input) {
-		String newString = input;
-		for (String key : Alias.WORDS_MAP.keySet()) {
-			if (input.contains(key)) {
-				newString = newString.replace(key, Alias.WORDS_MAP.get(key));
-			}
-		}
-		return newString;
+		return AliasDictionary.getInstance().replace(input);
 	}
 
 	/**
@@ -267,14 +235,7 @@ public class AddressProcessor {
 	 * @return
 	 */
 	public static String synonym(String input) {
-		String newString = input;
-		for (String key : SynonymDictionary.dictionary.keySet()) {
-			if (input.contains(key)) {
-				newString = newString.replace(key, SynonymDictionary.getSynonym(key));
-				break;// 只替换一个
-			}
-		}
-		return newString;
+		return SynonymDictionary.getInstance().replace(input);
 	}
 
 	/**
@@ -284,14 +245,7 @@ public class AddressProcessor {
 	 * @return
 	 */
 	public static String homophone(String input) {
-		String newString = input;
-		for (String key : HomophoneDictionary.dictionary.keySet()) {
-			if (input.contains(key)) {
-				newString = newString.replace(key, HomophoneDictionary.getHomophone(key).get(0));
-				break;// 只替换一个
-			}
-		}
-		return newString;
+		return HomophoneDictionary.getInstance().replace(input);
 	}
 
 	/**

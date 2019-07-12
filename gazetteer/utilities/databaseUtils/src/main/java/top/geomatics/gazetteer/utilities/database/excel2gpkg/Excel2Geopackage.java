@@ -334,6 +334,11 @@ public class Excel2Geopackage {
 		processor.createAddressTable();
 
 		close();
+
+		// sqlite数据库更新
+		GPKGProcessor processor2 = new GPKGProcessor(geopackageName, true);
+		processor2.updateSqlite();
+
 		return true;
 
 	}

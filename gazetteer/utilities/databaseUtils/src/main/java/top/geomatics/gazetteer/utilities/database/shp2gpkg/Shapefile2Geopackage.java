@@ -216,6 +216,7 @@ public class Shapefile2Geopackage {
 			}
 		}
 
+		
 		SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(targetSFType);
 		List<SimpleFeature> newFeas = new ArrayList<SimpleFeature>();
 
@@ -228,6 +229,7 @@ public class Shapefile2Geopackage {
 			aFeature.getDefaultGeometry();
 
 			// 增加新的属性
+			
 			for (String originField : attrMap.keySet()) {
 				String targetField = attrMap.get(originField);
 				Object fieldValue = aFeature.getAttribute(originField);
@@ -256,6 +258,10 @@ public class Shapefile2Geopackage {
 		processor.createAddressTable();
 
 		close();
+		//sqlite数据库更新
+		GPKGProcessor processor2 = new GPKGProcessor(geopackageName, true);
+		processor2.updateSqlite();
+		
 		return true;
 
 	}

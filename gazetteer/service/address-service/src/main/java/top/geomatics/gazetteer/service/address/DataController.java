@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,17 +16,13 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.archivers.ArchiveInputStream;
-import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -426,13 +420,20 @@ public class DataController {
 		// 文件目录
 		String folder = UserManager.getInstance().getUserInfo(username).getDownloadPath();
 		InputStream inputStream = null;
+		String zipFileName = fileName.replace(".gpkg", ".zip");
+		File tf = new File(zipFileName);
+		if (!tf.exists()) {
+			ZipFileUtils.zipFiles(folder + File.separator + fileName, null, false,
+					folder + File.separator + zipFileName);
+		}
+
 		try {
-			inputStream = new FileInputStream(new File(folder, fileName));
+			inputStream = new FileInputStream(new File(folder, zipFileName));
 			OutputStream outputStream = response.getOutputStream();
 			// 指明为下载
 			response.setContentType(Messages.getString("DataController.13")); //$NON-NLS-1$
 			// 设置文件名
-			response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+			response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(zipFileName, "UTF-8"));
 
 			// 把输入流copy到输出流
 			IOUtils.copy(inputStream, outputStream);
@@ -440,7 +441,7 @@ public class DataController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			// 日志
-			String logMsgString = String.format("导出数据文件 %s 失败！", fileName);
+			String logMsgString = String.format("导出数据文件 %s 失败！", zipFileName);
 			logger.error(logMsgString);
 		} finally {
 			if (null != inputStream) {
@@ -514,7 +515,7 @@ public class DataController {
 		String ftype = dfn.substring(dfn.lastIndexOf('.') + 1, dfn.length());
 		// 如果是压缩文件，需要解压缩
 		if (ftype.compareToIgnoreCase("zip") == 0) {
-			List<String> unzippedFiles = unzip(destFN, upload_file_path);
+			List<String> unzippedFiles = ZipFileUtils.unzip(destFN, upload_file_path);
 			for (String impString : unzippedFiles) {
 				if (impString.contains("import.xml")) {
 					// 转换到数据库
@@ -620,44 +621,6 @@ public class DataController {
 			ex.printStackTrace();
 		}
 		return document;
-	}
-
-	/**
-	 * 解压Zip文件
-	 * 
-	 * @param zipFile 需要解压的zip文件位置
-	 * @param destDir 解压的目标位置
-	 */
-	private List<String> unzip(String zipFile, String destDir) {
-		File f;
-		List<String> fileNames = new ArrayList<String>();
-		try (ArchiveInputStream i = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.ZIP,
-				Files.newInputStream(Paths.get(zipFile)), "GBK")) {
-			ArchiveEntry entry = null;
-			while ((entry = i.getNextEntry()) != null) {
-				if (!i.canReadEntryData(entry)) {
-					continue;
-				}
-				fileNames.add(entry.getName());
-				f = new File(destDir, entry.getName());
-				if (entry.isDirectory()) {
-					if (!f.isDirectory() && !f.mkdirs()) {
-						throw new IOException("failed to create directory " + f);
-					}
-				} else {
-					File parent = f.getParentFile();
-					if (!parent.isDirectory() && !parent.mkdirs()) {
-						throw new IOException("failed to create directory " + parent);
-					}
-					try (OutputStream o = Files.newOutputStream(f.toPath())) {
-						IOUtils.copy(i, o);
-					}
-				}
-			}
-		} catch (IOException | ArchiveException e) {
-			e.printStackTrace();
-		}
-		return fileNames;
 	}
 
 }

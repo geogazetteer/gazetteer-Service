@@ -18,18 +18,15 @@ import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import springfox.documentation.annotations.ApiIgnore;
 import top.geomatics.gazetteer.lucene.AddressIndexer;
 import top.geomatics.gazetteer.lucene.AddressSearcherPinyin;
 import top.geomatics.gazetteer.lucene.GeoNameSearcher;
 import top.geomatics.gazetteer.lucene.LuceneUtil;
 import top.geomatics.gazetteer.lucene.POISearcher;
 import top.geomatics.gazetteer.model.AddressRow;
-import top.geomatics.gazetteer.model.IGazetteerConstant;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.address.SearcherSettings;
-import top.geomatics.gazetteer.utilities.database.BuildingQuery;
 
 /**
  * <b>搜索服务</b><br>
@@ -53,7 +50,8 @@ public class SearcherController {
 	 */
 	@ApiOperation(value = "搜索设置", notes = "设置搜索选项。示例：/address/searcher/settings")
 	@PutMapping("/searcher/settings")
-	public SearcherSettings searchSettings(@RequestBody SearcherSettings settings) {
+	public SearcherSettings searchSettings(
+			@ApiParam(value = "搜索设置") @RequestBody(required = true) SearcherSettings settings) {
 		this.settings = settings;
 		return this.settings;
 	}
@@ -66,7 +64,7 @@ public class SearcherController {
 	 * http://localhost:8083/address/all?fields=id,address%26tablename=民治社区%26limit=10
 	 * </p>
 	 * 
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,address
 	 * @param tablename String 请求参数，指定查询的数据库表，如：油松社区
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -80,7 +78,7 @@ public class SearcherController {
 			@ApiParam(value = "查询的数据库表，如油松社区") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename,
 			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
 			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit,
-			@ApiIgnore AddressRow row) {
+			@ApiParam(value = "查询条件") AddressRow row) {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
 		return ControllerUtils.getResponseBody(rows);
@@ -151,7 +149,7 @@ public class SearcherController {
 	 * @param path_district  String 路径变量，固定为“龙华区”
 	 * @param path_street    String 路径变量，表示所在的街道，如：民治街道
 	 * @param path_community String 路径变量，表示所在的社区，如：民治社区
-	 * @param fields         String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields         String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param orderby        String 请求参数，指定查询结果排序方式
 	 * @param limit          int 请求参数，限定查询的记录个数，如：limit=10
 	 * @return String 返回JSON格式的查询结果
@@ -324,7 +322,7 @@ public class SearcherController {
 	 * http://localhost:8083/address/searcher/?fields=id,address%26tablename=民治社区%26address=广东省深圳市龙华区民治街道民治社区沙吓村六巷7栋
 	 * </p>
 	 * 
-	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename   String 请求参数，指定查询的数据库表
 	 * @param id          Integer 请求参数，指定查询的id字段值
 	 * @param province    String 请求参数，指定查询的province字段值
@@ -407,7 +405,7 @@ public class SearcherController {
 	 * http://localhost:8083/address/fuzzysearcher/?fields=id,address%26tablename=民治社区%26address=沙吓村六巷7栋
 	 * </p>
 	 * 
-	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename   String 请求参数，指定查询的数据库表
 	 * @param id          Integer 请求参数，指定查询的id字段值
 	 * @param province    String 请求参数，指定查询的province字段值
@@ -452,11 +450,11 @@ public class SearcherController {
 		if (null != id)
 			row.setId(id);
 		if (null != province && !province.isEmpty())
-			row.setProvince(province);
+			row.setProvince("%" + province + "%");
 		if (null != city && !city.isEmpty())
-			row.setCity(city);
+			row.setCity("%" + city + "%");
 		if (null != district && !district.isEmpty())
-			row.setDistrict(district);
+			row.setDistrict("%" + district + "%");
 		if (null != street && !street.isEmpty())
 			row.setStreet("%" + street + "%");
 		if (null != community && !community.isEmpty())
@@ -491,7 +489,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param address_id String 路径变量，指定查询的地址ID
-	 * @param fields     String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields     String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename  String 请求参数，指定查询的数据库表
 	 * @param orderby    String 请求参数，指定查询结果排序方式
 	 * @param limit      int 请求参数，限定查询的记录个数，如：limit=10
@@ -520,7 +518,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param code      String 路径变量，指定查询的地址编码
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename String 请求参数，指定查询的数据库表
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -548,7 +546,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param street    String 路径变量，指定查询的街道名称
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,address
 	 * @param tablename String 请求参数，指定查询的数据库表
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -576,7 +574,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param community String 路径变量，指定查询的社区名称
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,address
 	 * @param tablename String 请求参数，指定查询的数据库表
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -604,7 +602,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param building_id String 路径变量，指定查询的建筑物ID
-	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields      String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename   String 请求参数，指定查询的数据库表
 	 * @param orderby     String 请求参数，指定查询结果排序方式
 	 * @param limit       int 请求参数，限定查询的记录个数，如：limit=10
@@ -632,7 +630,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param building  String 路径变量，指定查询的建筑物名称
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename String 请求参数，指定查询的数据库表
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -660,7 +658,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param village   String 路径变量，指定查询的村名称
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename String 请求参数，指定查询的数据库表
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -688,7 +686,7 @@ public class SearcherController {
 	 * </p>
 	 * 
 	 * @param road      String 路径变量，指定查询的道路名称
-	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：fid,code,name,address
+	 * @param fields    String 请求参数，需要选择的字段，多个字段以,分隔，如：id,code,name,address
 	 * @param tablename String 请求参数，指定查询的数据库表
 	 * @param orderby   String 请求参数，指定查询结果排序方式
 	 * @param limit     int 请求参数，限定查询的记录个数，如：limit=10
@@ -791,12 +789,6 @@ public class SearcherController {
 		keywords = AddressProcessor.transform(keywords, this.settings);
 		// 设置查询条件
 		String tablename = IControllerConstant.ADDRESS_TABLE;
-		for (String community : IGazetteerConstant.COMMUNITY_LIST) {
-			if (keywords.contains(community)) {
-				tablename = community;
-				break;
-			}
-		}
 		AddressRow row = new AddressRow();
 		row.setAddress("%" + keywords + "%");
 		Map<String, Object> map = ControllerUtils.getRequestMap(null, tablename, row, null, 0);
@@ -883,34 +875,50 @@ public class SearcherController {
 			@ApiParam(value = "查询关键词，如工商银行") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS, required = true) String keywords) {
 		// 关键词转换处理
 		keywords = AddressProcessor.transform(keywords, this.settings);
-		// 如果是数据库查询
-		if (true == this.settings.isDatabaseSearch()) {
-			return getTotalLike(keywords);
-		}
 		long sum = 0L;
-		// 其他为lucene搜索
-		// 如果是地名
-		if (this.settings.isGeoName()) {
-			sum = GeoNameSearcher.getCount(keywords);
-		}
-		// 如果是POI
-		else if (this.settings.isPOI()) {
-			sum = POISearcher.getCount(keywords);
+		String resFormat = "{ \"total\": " + "%d" + "}";
+		String result = String.format(resFormat, sum);
+		// 如果是坐标
+		if (this.settings.isCoordinates()) {
+			sum = CoordinateQuery.getCoordQuerys(keywords);
+			return String.format(resFormat, sum);
 		}
 		// 如果是建筑物编码
 		else if (this.settings.isBuildingCode()) {
-			sum = ControllerUtils.getCodeQuerys(keywords);
+			sum = CoordinateQuery.getCodeQuerys(keywords);
+			return String.format(resFormat, sum);
 		}
-		// 如果是坐标
-		else if (this.settings.isCoordinates()) {
-			sum = ControllerUtils.getCoordQuerys(keywords);
+		// 如果是数据库查询
+		if (true == this.settings.isDatabaseSearch()) {
+			// 如果是地名或POI查询
+			if (this.settings.isGeoName() || this.settings.isPOI()) {
+				result = QueryUtils.getCountNameLike(keywords);
+			}
+			// 如果是地址
+			else {
+				result = getTotalLike(keywords);
+			}
 		}
-		// 如果是地址
+		// 其他为lucene搜索
 		else {
-			sum = LuceneUtil.getCount(keywords);
+			String queryKeywords = "\"" + keywords + "\"";
+			// 如果是地名
+			if (this.settings.isGeoName()) {
+				sum = GeoNameSearcher.getCount(queryKeywords);
+				result = String.format(resFormat, sum);
+			}
+			// 如果是POI
+			else if (this.settings.isPOI()) {
+				sum = POISearcher.getCount(queryKeywords);
+				result = String.format(resFormat, sum);
+			}
+			// 如果是地址
+			else {
+				sum = LuceneUtil.getCount(queryKeywords);
+				result = String.format(resFormat, sum);
+			}
 		}
-		// 返回结果
-		return "{ \"total\": " + sum + "}";
+		return result;
 	}
 
 	/**
@@ -934,33 +942,46 @@ public class SearcherController {
 			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = true, defaultValue = "10") Integer limit) {
 		// 关键词转换处理
 		keywords = AddressProcessor.transform(keywords, this.settings);
-		// 如果是数据库查询
-		if (true == this.settings.isDatabaseSearch()) {
-			return selectByAddressLikePage(index, keywords, limit);
-		}
 		List<SimpleAddressRow> rows = null;
-		// 其他为lucene搜索
-		// 如果是地名
-		if (this.settings.isGeoName()) {
-			// 暂时用这个
-			rows = LuceneUtil.searchByPage(keywords, index, limit);
-		}
-		// 如果是POI
-		else if (this.settings.isPOI()) {
-			// 暂时用这个
-			rows = LuceneUtil.searchByPage(keywords, index, limit);
+		// 如果是坐标
+		if (this.settings.isCoordinates()) {
+			rows = CoordinateQuery.getCoordQuerysPage(keywords, index, limit);
+			// 返回结果
+			return ControllerUtils.getResponseBody4(rows);
 		}
 		// 如果是建筑物编码
 		else if (this.settings.isBuildingCode()) {
-			rows = ControllerUtils.getCodeQuerysPage(keywords, index, limit);
+			rows = CoordinateQuery.getCodeQuerysPage(keywords, index, limit);
+			// 返回结果
+			return ControllerUtils.getResponseBody4(rows);
 		}
-		// 如果是坐标
-		else if (this.settings.isCoordinates()) {
-			rows = ControllerUtils.getCoordQuerysPage(keywords, index, limit);
+		// 如果是数据库查询
+		if (true == this.settings.isDatabaseSearch()) {
+			// 如果是地名或POI查询
+			if (this.settings.isGeoName() || this.settings.isPOI()) {
+				return QueryUtils.queryPage(keywords, index, limit);
+			}
+			// 如果是地址
+			else {
+				return selectByAddressLikePage(index, keywords, limit);
+			}
+
 		}
-		// 如果是地址
+		// 其他为lucene搜索
 		else {
-			rows = LuceneUtil.searchByPage(keywords, index, limit);
+			String queryKeywords = "\"" + keywords + "\"";
+			// 如果是地名
+			if (this.settings.isGeoName()) {
+				rows = GeoNameSearcher.searchPage(queryKeywords, index, limit);
+			}
+			// 如果是POI
+			else if (this.settings.isPOI()) {
+				rows = POISearcher.searchPage(queryKeywords, index, limit);
+			}
+			// 如果是地址
+			else {
+				rows = LuceneUtil.searchByPage(queryKeywords, index, limit);
+			}
 		}
 		// 返回结果
 		return ControllerUtils.getResponseBody4(rows);
@@ -984,45 +1005,23 @@ public class SearcherController {
 			@ApiParam(value = "查询关键词，多个关键词以空格分隔，如：龙华") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
 			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "1000") Integer limit) {
 		keywords = AddressProcessor.transform(keywords, this.settings);
-		if (this.settings.isGeoName()) {
-			return ControllerUtils.getResponseBody4(GeoNameSearcher.search(keywords, limit));
-		}
-		if (this.settings.isPOI()) {
-			return ControllerUtils.getResponseBody4(POISearcher.search(keywords, limit));
-		}
 		if (this.settings.isCoordinates()) {
-			// 根据输入的坐标搜索
-			if (!AddressProcessor.isCoordinatesExpression(keywords)) {
-				return "";
-			}
-			String coordString[] = keywords.split(",");
-			double x = Double.parseDouble(coordString[0]);
-			double y = Double.parseDouble(coordString[1]);
-			List<String> codes = BuildingQuery.query(x, y);
-			List<AddressRow> rowsTotal = new ArrayList<>();
-			for (String code : codes) {
-				// 根据建筑物编码搜索
-				String fields = "id,address";
-				String tablename = AddressProcessor.getCommunityFromBuildingCode(code);
-				AddressRow aRow = new AddressRow();
-				aRow.setCode(code);
-				Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, aRow, null, 0);
-				List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
-				rowsTotal.addAll(rows);
-			}
-			return ControllerUtils.getResponseBody(rowsTotal);
+			// 根据坐标搜索
+			return ControllerUtils.getResponseBody4(CoordinateQuery.getCoordQueryResults(keywords));
 		}
 		if (this.settings.isBuildingCode()) {
 			// 根据建筑物编码搜索
-			String fields = "id,address";
-			String tablename = AddressProcessor.getCommunityFromBuildingCode(keywords);
-			AddressRow aRow = new AddressRow();
-			aRow.setCode(keywords);
-			Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, aRow, null, 0);
-			List<AddressRow> rows = ControllerUtils.mapper.findEquals(map);
-			return ControllerUtils.getResponseBody(rows);
+			return ControllerUtils.getResponseBody4(CoordinateQuery.getBuildingCodeQueryResults(keywords));
 		}
-
+		if (this.settings.isGeoName()) {
+			// 如果是查询地名
+			return ControllerUtils.getResponseBody4(GeoNameSearcher.search(keywords, limit));
+		}
+		if (this.settings.isPOI()) {
+			// 如果是查询POI
+			return ControllerUtils.getResponseBody4(POISearcher.search(keywords, limit));
+		}
+		// 如果是查询标准地址
 		return ControllerUtils.getResponseBody4(LuceneUtil.search(keywords, limit));
 	}
 
@@ -1043,6 +1042,7 @@ public class SearcherController {
 			@ApiParam(value = "查询关键词，如：中华工业园") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords) {
 		// 关键词转换处理
 		keywords = AddressProcessor.transform(keywords, this.settings);
+
 		long count = 0L;
 		// 如果是查询地名
 		if (this.settings.isGeoName()) {
@@ -1051,6 +1051,10 @@ public class SearcherController {
 		// 如果是POI查询
 		else if (this.settings.isPOI()) {
 			count = POISearcher.getCount(keywords);
+		}
+		// 如果是地址查询
+		else if (this.settings.isAddress()) {
+			count = LuceneUtil.getCount(keywords);
 		}
 		return "{ \"total\": " + count + "}";
 	}
@@ -1074,14 +1078,22 @@ public class SearcherController {
 			@ApiParam(value = "当前页面索引，从1开始") @PathVariable(value = "index", required = true) Integer index,
 			@ApiParam(value = "查询关键词，如：中华工业园") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS) String keywords,
 			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = true, defaultValue = "10") Integer limit) {
+		// 关键词转换处理
 		keywords = AddressProcessor.transform(keywords, this.settings);
+		// 如果是查询地名
 		if (this.settings.isGeoName()) {
-			return ControllerUtils.getResponseBody4(GeoNameSearcher.search(keywords, limit));// 暂时没有分页
+			return ControllerUtils.getResponseBody4(GeoNameSearcher.searchPage(keywords, index, limit));
 		}
-		if (this.settings.isPOI()) {
-			return ControllerUtils.getResponseBody4(POISearcher.search(keywords, limit));// 暂时没有分页
+		// 如果是POI查询
+		else if (this.settings.isPOI()) {
+			return ControllerUtils.getResponseBody4(POISearcher.searchPage(keywords, index, limit));
 		}
-		return JSON.toJSONString(LuceneUtil.searchByPage(keywords, index, limit));
+		// 如果是地址查询
+		else if (this.settings.isAddress()) {
+			return JSON.toJSONString(LuceneUtil.searchByPage(keywords, index, limit));
+		}
+		return "";
+
 	}
 
 	/**
@@ -1331,7 +1343,7 @@ public class SearcherController {
 			@ApiParam(value = "条件：指定查询的地名地址id") @RequestParam(value = IControllerConstant.ADDRESS_ADDRESS_ID, required = false, defaultValue = "") String address_id,
 			@ApiParam(value = "条件：指定查询的建筑物") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING, required = false, defaultValue = "") String building,
 			@ApiParam(value = "条件：指定查询的建筑物id") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING_ID, required = false, defaultValue = "") String building_id,
-			
+
 			@ApiParam(value = "条件：指定查询的道路") @RequestParam(value = IControllerConstant.ADDRESS_ROAD, required = false, defaultValue = "") String road,
 			@ApiParam(value = "条件：指定查询的道路编码") @RequestParam(value = IControllerConstant.ADDRESS_ROAD_NUM, required = false, defaultValue = "") String road_num,
 			@ApiParam(value = "条件：指定查询的小区或村") @RequestParam(value = IControllerConstant.ADDRESS_VILLAGE, required = false, defaultValue = "") String village,
@@ -1376,7 +1388,7 @@ public class SearcherController {
 		List<AddressRow> rows = ControllerUtils.mapper.findCodeLike(map);
 		return ControllerUtils.getResponseBody(rows);
 	}
-	
+
 	/**
 	 * <b>根据街道或社区、道路关键词查询地址</b><br>
 	 * 
@@ -1421,7 +1433,7 @@ public class SearcherController {
 			@ApiParam(value = "条件：指定查询的建筑物") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING, required = false, defaultValue = "") String building,
 			@ApiParam(value = "条件：指定查询的建筑物id") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING_ID, required = false, defaultValue = "") String building_id,
 			@ApiParam(value = "条件：指定查询的地名地址编码") @RequestParam(value = IControllerConstant.ADDRESS_CODE, required = false, defaultValue = "") String code,
-			
+
 			@ApiParam(value = "条件：指定查询的道路编码") @RequestParam(value = IControllerConstant.ADDRESS_ROAD_NUM, required = false, defaultValue = "") String road_num,
 			@ApiParam(value = "条件：指定查询的小区或村") @RequestParam(value = IControllerConstant.ADDRESS_VILLAGE, required = false, defaultValue = "") String village,
 			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
@@ -1465,7 +1477,7 @@ public class SearcherController {
 		List<AddressRow> rows = ControllerUtils.mapper.findRoadLike(map);
 		return ControllerUtils.getResponseBody(rows);
 	}
-	
+
 	/**
 	 * <b>根据街道或社区、道路编号关键词查询地址</b><br>
 	 * 
@@ -1511,7 +1523,7 @@ public class SearcherController {
 			@ApiParam(value = "条件：指定查询的建筑物id") @RequestParam(value = IControllerConstant.ADDRESS_BUILDING_ID, required = false, defaultValue = "") String building_id,
 			@ApiParam(value = "条件：指定查询的地名地址编码") @RequestParam(value = IControllerConstant.ADDRESS_CODE, required = false, defaultValue = "") String code,
 			@ApiParam(value = "条件：指定查询的道路") @RequestParam(value = IControllerConstant.ADDRESS_ROAD, required = false, defaultValue = "") String road,
-			
+
 			@ApiParam(value = "条件：指定查询的小区或村") @RequestParam(value = IControllerConstant.ADDRESS_VILLAGE, required = false, defaultValue = "") String village,
 			@ApiParam(value = "查询结果排序方式") @RequestParam(value = IControllerConstant.SQL_ORDERBY, required = false, defaultValue = "") String orderby,
 			@ApiParam(value = "限定查询的记录个数，不指定或指定值为0表示查询所有数据") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "0") int limit) {

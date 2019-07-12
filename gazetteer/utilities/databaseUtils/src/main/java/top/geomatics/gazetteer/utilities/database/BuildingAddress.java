@@ -34,7 +34,7 @@ public class BuildingAddress {
 		// 根据建筑物编码找到标准地址
 		for (String code : codes) {
 			// 根据建筑物编码搜索
-			String fields = "id,address";
+			String fields = "*";
 			String tablename = AddressProcessor.getCommunityFromBuildingCode(code);
 			// 查找条件
 			Map<String, Object> map = new HashMap<String, Object>();
