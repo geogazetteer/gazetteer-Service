@@ -225,7 +225,7 @@ public class RevisionController {
 			if (null != longitude && null != latitude) {
 				String tempString = longitude + "," + latitude;
 				if (AddressProcessor.isCoordinatesExpression(tempString)) {
-					List<String> buildingCodes = BuildingQuery.query(longitude, latitude);
+					List<String> buildingCodes = BuildingQuery.getInstance().query(longitude, latitude);
 					List<AddressRow> allRows = new ArrayList<AddressRow>();
 					for (String codeString : buildingCodes) {
 						AddressRow addrow = new AddressRow();
@@ -304,7 +304,7 @@ public class RevisionController {
 			if (!AddressProcessor.isCoordinatesExpression(tempString)) {
 				continue;
 			}
-			List<String> buildingCodes = BuildingQuery.query(longitude, latitude);
+			List<String> buildingCodes = BuildingQuery.getInstance().query(longitude, latitude);
 			for (String codeString : buildingCodes) {
 				AddressRow addrow = new AddressRow();
 				addrow.setCode(codeString);

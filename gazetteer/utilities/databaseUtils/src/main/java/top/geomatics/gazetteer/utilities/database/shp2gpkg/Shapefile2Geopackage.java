@@ -54,6 +54,8 @@ public class Shapefile2Geopackage {
 	private static final String STAT_STRING = "status";
 	private static final String CREATE_INDEX = "create_spatial_index";
 	private boolean isCreateIndex = false;
+	private static final String GUESS_FROM_GEOMETRY = "guess_from_geometry";
+	private boolean isForce = false;
 
 	private static DataStore dataStore = null;
 	private static GeoPackage geopkg = null;
@@ -115,6 +117,9 @@ public class Shapefile2Geopackage {
 		}
 		if (this.settings != null && this.settings.containsKey(CREATE_INDEX)) {
 			isCreateIndex = Boolean.parseBoolean(this.settings.get(CREATE_INDEX));
+		}
+		if (this.settings != null && this.settings.containsKey(GUESS_FROM_GEOMETRY)) {
+			isForce = Boolean.parseBoolean(this.settings.get(GUESS_FROM_GEOMETRY));
 		}
 		return true;
 	}
@@ -260,7 +265,7 @@ public class Shapefile2Geopackage {
 		close();
 		//sqlite数据库更新
 		GPKGProcessor processor2 = new GPKGProcessor(geopackageName, true);
-		processor2.updateSqlite();
+		processor2.updateSqlite(isForce);
 		
 		return true;
 

@@ -109,6 +109,17 @@ public interface AddressEditorMapper {
 	 * @return 更新成功的记录个数
 	 */
 	public Integer updateAll(Map<String, Object> map);
+	
+	/**
+	 * <b>更新记录字段</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>相当于SQL中的update语句</i><br>
+	 * 
+	 * @param map update语句中的参数
+	 * @return 更新成功的记录个数
+	 */
+	public Integer updateBatch(Map<String, Object> map);
 
 	/**
 	 * <b>根据fid查询</b><br>

@@ -63,6 +63,8 @@ public class Excel2Geopackage {
 
 	private static final String CREATE_INDEX = "create_spatial_index";
 	private boolean isCreateIndex = false;
+	private static final String GUESS_FROM_GEOMETRY = "guess_from_geometry";
+	private boolean isForce = false;
 
 	private String excelfileName = "";
 	private String geopackageName = "";
@@ -194,6 +196,9 @@ public class Excel2Geopackage {
 		}
 		if (this.settings != null && this.settings.containsKey(CREATE_INDEX)) {
 			isCreateIndex = Boolean.parseBoolean(this.settings.get(CREATE_INDEX));
+		}
+		if (this.settings != null && this.settings.containsKey(GUESS_FROM_GEOMETRY)) {
+			isForce = Boolean.parseBoolean(this.settings.get(GUESS_FROM_GEOMETRY));
 		}
 		return true;
 	}
@@ -337,7 +342,7 @@ public class Excel2Geopackage {
 
 		// sqlite数据库更新
 		GPKGProcessor processor2 = new GPKGProcessor(geopackageName, true);
-		processor2.updateSqlite();
+		processor2.updateSqlite(isForce);
 
 		return true;
 

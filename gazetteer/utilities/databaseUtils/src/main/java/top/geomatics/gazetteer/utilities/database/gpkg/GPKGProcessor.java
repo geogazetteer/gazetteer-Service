@@ -6,6 +6,7 @@ package top.geomatics.gazetteer.utilities.database.gpkg;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -174,7 +175,7 @@ public class GPKGProcessor {
 		geopkg.close();
 	}
 
-	public void updateSqlite() {
+	public void updateSqlite(boolean force) {
 		// 查询所有记录
 		String sql_fields = "*";
 		String sql_tablename = "dmdz_edit";
@@ -182,61 +183,31 @@ public class GPKGProcessor {
 		map.put("sql_fields", sql_fields);
 		map.put("sql_tablename", sql_tablename);
 		List<AddressEditorRow> oldRows = mapper_revision.findEquals(map);
+
+		Map<String, Object> map_t = new HashMap<String, Object>();
+		map_t.put("sql_tablename", sql_tablename);
 		for (AddressEditorRow oldRow : oldRows) {
 			// 更新一条记录
+			List<AddressEditorRow> newRows = new ArrayList<AddressEditorRow>();
 			AddressEditorRow newRow = new AddressEditorRow();
-			modifyRecordByAddress(oldRow, newRow);
-			Map<String, Object> map_t = new HashMap<String, Object>();
-			map_t.put("sql_tablename", sql_tablename);
-			map_t.put("fid", oldRow.getFid());// 条件
-			boolean canUpdate = false;
-			// 更新street_字段
-			String oldStreet = oldRow.getStreet_();
-			String newStreet = newRow.getStreet_();
-			if (null == oldStreet || oldStreet.isEmpty()) {
-				if (null != newStreet && !newStreet.isEmpty()) {
-					map_t.put("new_street_", newStreet);
-					canUpdate = true;
-				}
-			}
-			// 更新community_字段
-			String oldCommunity = oldRow.getCommunity_();
-			String newCommunity = newRow.getCommunity_();
-			if (null == oldCommunity || oldCommunity.isEmpty()) {
-				if (null != newCommunity && !newCommunity.isEmpty()) {
-					map_t.put("new_community_", newCommunity);
-					canUpdate = true;
-				}
-			}
-			// 更新longitude_字段
-			Double oldLongitude = oldRow.getLongitude_();
-			Double newLongitude = newRow.getLongitude_();
-			if (null == oldLongitude) {
-				if (null != newLongitude) {
-					map_t.put("new_longitude_", newLongitude);
-					canUpdate = true;
-				}
-			}
-			// 更新latitude_字段
-			Double oldLatitude = oldRow.getLatitude_();
-			Double newLatitude = newRow.getLatitude_();
-			if (null == oldLatitude) {
-				if (null != newLatitude) {
-					map_t.put("new_latitude_", newLatitude);
-					canUpdate = true;
-				}
-			}
-
-			if (canUpdate) {
-				Integer updatedRows = mapper_revision.updateAll(map_t);
-			}
-
+			if (!modifyRecordByAddress(oldRow, newRow,force))
+				continue;
+			newRows.add(newRow);
+			map_t.put("list", newRows);
+			Integer updatedRows = mapper_revision.updateBatch(map_t);
 		}
+
 		session_revision.commit();
 
 	}
 
-	public void modifyRecordByAddress(AddressEditorRow oldRow, AddressEditorRow newRow) {
+	public boolean modifyRecordByAddress(AddressEditorRow oldRow, AddressEditorRow newRow,boolean force) {
+		if (null == oldRow || null == newRow) {
+			return false;
+		}
+		Integer oldFid = oldRow.getFid();
+		newRow.setFid(oldFid);
+
 		String originAddress = oldRow.getOrigin_address();
 		Double longitude = oldRow.getLongitude_();
 		Double latitude = oldRow.getLatitude_();
@@ -264,27 +235,33 @@ public class GPKGProcessor {
 		if (null != newStreet && !newStreet.isEmpty() && null != newCommunity && !newCommunity.isEmpty()) {
 			newRow.setStreet_(newStreet);
 			newRow.setCommunity_(newCommunity);
-			return;
+			return true;
 		}
-		/*
-		// 根据坐标来推测
-		List<AddressRow> aRows = null;
-		if (null != longitude && null != latitude) {
-			aRows = BuildingAddress.findAddressByCoords(longitude, latitude);
-		}
-		if (null != aRows && aRows.size() > 0) {
-			// 推荐用第一条记录
-			AddressRow arow = aRows.get(0);
-			if (null == newStreet || newStreet.isEmpty()) {
-				newStreet = arow.getStreet();
+		if (force) {
+			// 根据坐标来推测
+			List<AddressRow> aRows = null;
+			if (null != longitude && null != latitude) {
+				aRows = BuildingAddress.getInstance().findAddressByCoords(longitude, latitude);
 			}
-			if (null == newCommunity || newCommunity.isEmpty()) {
-				newCommunity = arow.getCommunity();
+			if (null != aRows && aRows.size() > 0) {
+				// 推荐用第一条记录
+				AddressRow arow = aRows.get(0);
+				if (null == newStreet || newStreet.isEmpty()) {
+					newStreet = arow.getStreet();
+				}
+				if (null == newCommunity || newCommunity.isEmpty()) {
+					newCommunity = arow.getCommunity();
+				}
 			}
+			if (null == newCommunity && null == newStreet) {
+				return false;
+			}
+			newRow.setStreet_(newStreet);
+			newRow.setCommunity_(newCommunity);
+			return true;
 		}
-		*/
-		newRow.setStreet_(newStreet);
-		newRow.setCommunity_(newCommunity);
+		
+		return false;
 	}
 
 }

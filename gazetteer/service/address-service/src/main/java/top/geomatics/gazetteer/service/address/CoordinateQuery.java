@@ -41,7 +41,7 @@ public class CoordinateQuery {
 		String coordString[] = keywords.split(",");
 		double x = Double.parseDouble(coordString[0]);
 		double y = Double.parseDouble(coordString[1]);
-		List<String> codes = BuildingQuery.query(x, y);
+		List<String> codes = BuildingQuery.getInstance().query(x, y);
 
 		for (String code : codes) {
 			// 根据建筑物编码搜索
