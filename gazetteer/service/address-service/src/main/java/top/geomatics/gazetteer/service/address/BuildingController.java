@@ -70,6 +70,30 @@ public class BuildingController {
 	}
 
 	/**
+	 * <b>根据多个建筑物编码查询坐标</b><br>
+	 * 
+	 * example:
+	 * http://localhost:8083/building/points?codes=4403060090030100104,44030600800448T0041,4403060100024900021,
+	 * 4403060100037000131,4403060080030400113,4403060080040900084,44030600800109T0143,4403060080012100049,4403060100020500120
+	 * 
+	 * @param codes 指定筑物编码，如4403060070051200001
+	 * @return JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据多个建筑物编码查询坐标", notes = "根据多个建筑物编码查询坐标\r\n 示例：/building/points")
+	@GetMapping("/points")
+	public String queryPoints(
+			@ApiParam(value = "指定筑物编码，如4403060090030100104,44030600800448T0041,4403060100024900021,\r\n"
+					+ "4403060100037000131,4403060080030400113,4403060080040900084,44030600800109T0143,4403060080012100049,4403060100020500120") @RequestParam(value = "code", required = true) String codes) {
+		List<String> codes_t = new ArrayList<String>();
+		String[] cs = codes.split(",");
+		for (String s : cs) {
+			codes_t.add(s);
+		}
+		return JSON.toJSONString(buildingQuery.query(codes_t));
+
+	}
+
+	/**
 	 * <b>根据坐标查询标准地址</b><br>
 	 * 
 	 * example: http://localhost:8083/building/address?x=114.019777%26y=22.672456

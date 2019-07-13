@@ -151,6 +151,66 @@ public class BuildingQuery {
 
 		return point;
 	}
+	
+	/**
+	 * <b>根据多个建筑物编码查询其位置</b><br>
+	 * 
+	 * @param czwCode List 建筑物编码字段名称
+	 * @return GeoPoint 建筑物位置坐标
+	 */
+	public List<GeoPoint> query(List<String> czwCodes) {
+		List<GeoPoint> geoPoints = new ArrayList<GeoPoint>();
+		// 设置查询条件
+		Filter filter = null;
+		List<Filter> fls = new ArrayList<Filter>();
+		for (String czwCode:czwCodes) {
+			Filter f1 = ff.equals(ff.property(field_czwcode), ff.literal(czwCode));
+			fls.add(f1);
+		}
+		filter = ff.or(fls);
+		SimpleFeatureReader feaReader = null;
+		try {
+			// 查询
+			feaReader = geoPackage.reader(entry, filter, null);
+			// 因为建筑物编码唯一，查询结果应该只有一个。如果有多个查询结果，则返回最后一个查询结果的建筑物位置坐标
+			while (feaReader.hasNext()) {
+				GeoPoint point = null;
+				SimpleFeature feature = feaReader.next();
+				Object g = feature.getAttribute(geoCol);// 几何
+				Geometries geomType = Geometries.get((Geometry) g);
+				point = new GeoPoint();
+				Point p = null;
+				switch (geomType) {
+				case MULTIPOLYGON:
+					MultiPolygon mPolygon = (MultiPolygon) g;
+					p = mPolygon.getCentroid();
+					point.setX(p.getX());
+					point.setY(p.getY());
+					break;
+
+				case POLYGON:
+					Polygon polygon = (Polygon) g;
+					p = polygon.getCentroid();
+					point.setX(p.getX());
+					point.setY(p.getY());
+					break;
+
+				default:
+					break;
+				}
+				geoPoints.add(point);
+			}
+			feaReader.close();
+			feaReader = null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			// 日志
+			String logMsgString = String.format(Messages.getString("BuildingQuery.5"), czwCodes.toString()); //$NON-NLS-1$
+			logger.error(logMsgString);
+		}
+
+		return geoPoints;
+	}
 
 	/**
 	 * <b>根据坐标获得建筑物编码</b><br>

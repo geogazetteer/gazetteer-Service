@@ -431,9 +431,13 @@ public class DataController {
 			inputStream = new FileInputStream(new File(folder, zipFileName));
 			OutputStream outputStream = response.getOutputStream();
 			// 指明为下载
-			response.setContentType(Messages.getString("DataController.13")); //$NON-NLS-1$
+			response.setCharacterEncoding("UTF-8");
+			response.setContentType(Messages.getString("DataController.13") + ";charset=UTF-8"); //$NON-NLS-1$
 			// 设置文件名
-			response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(zipFileName, "UTF-8"));
+			String fn = URLEncoder.encode(zipFileName, "UTF-8");
+			response.addHeader("Content-Disposition", "attachment;filename=" + fn);
+//			response.addHeader("Content-Disposition",
+//					"attachment;filename=" + new String(zipFileName.getBytes("GBK"), "iso-8859-1"));
 
 			// 把输入流copy到输出流
 			IOUtils.copy(inputStream, outputStream);
