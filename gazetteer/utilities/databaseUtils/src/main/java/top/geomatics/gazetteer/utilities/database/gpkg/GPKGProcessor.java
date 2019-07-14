@@ -26,10 +26,8 @@ import org.slf4j.LoggerFactory;
 import top.geomatics.gazetteer.database.AddressEditorMapper;
 import top.geomatics.gazetteer.database.EditorDatabaseHelper;
 import top.geomatics.gazetteer.model.AddressEditorRow;
-import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.IGazetteerConstant;
-import top.geomatics.gazetteer.utilities.address.AddressGuessor;
-import top.geomatics.gazetteer.utilities.database.BuildingAddress;
+import top.geomatics.gazetteer.utilities.database.AddressGuessor;
 import top.geomatics.gazetteer.utilities.database.shp2gpkg.Shapefile2Geopackage;
 
 /**
@@ -190,7 +188,7 @@ public class GPKGProcessor {
 			// 更新一条记录
 			List<AddressEditorRow> newRows = new ArrayList<AddressEditorRow>();
 			AddressEditorRow newRow = new AddressEditorRow();
-			if (!modifyRecordByAddress(oldRow, newRow,force))
+			if (!AddressGuessor.modifyRecordByAddress(oldRow, newRow, force))
 				continue;
 			newRows.add(newRow);
 			map_t.put("list", newRows);
@@ -199,69 +197,6 @@ public class GPKGProcessor {
 
 		session_revision.commit();
 
-	}
-
-	public boolean modifyRecordByAddress(AddressEditorRow oldRow, AddressEditorRow newRow,boolean force) {
-		if (null == oldRow || null == newRow) {
-			return false;
-		}
-		Integer oldFid = oldRow.getFid();
-		newRow.setFid(oldFid);
-
-		String originAddress = oldRow.getOrigin_address();
-		Double longitude = oldRow.getLongitude_();
-		Double latitude = oldRow.getLatitude_();
-		// 补充街道信息
-		String oldStreet = oldRow.getStreet_();
-		String newStreet = null;
-		if (null == oldStreet || oldStreet.isEmpty()) {
-
-			if (null != originAddress && !originAddress.isEmpty()) {
-				// 从原地址中推测
-				newStreet = AddressGuessor.guessStreet(originAddress);
-			}
-		}
-		// 补充街道信息
-		String oldCommunity = oldRow.getCommunity_();
-		String newCommunity = null;
-
-		if (null == oldCommunity || oldCommunity.isEmpty()) {
-			if (null != originAddress && !originAddress.isEmpty()) {
-				// 从原地址中推测
-				newCommunity = AddressGuessor.guessCommunity(originAddress);
-			}
-		}
-		// 找到了就返回
-		if (null != newStreet && !newStreet.isEmpty() && null != newCommunity && !newCommunity.isEmpty()) {
-			newRow.setStreet_(newStreet);
-			newRow.setCommunity_(newCommunity);
-			return true;
-		}
-		if (force) {
-			// 根据坐标来推测
-			List<AddressRow> aRows = null;
-			if (null != longitude && null != latitude) {
-				aRows = BuildingAddress.getInstance().findAddressByCoords(longitude, latitude);
-			}
-			if (null != aRows && aRows.size() > 0) {
-				// 推荐用第一条记录
-				AddressRow arow = aRows.get(0);
-				if (null == newStreet || newStreet.isEmpty()) {
-					newStreet = arow.getStreet();
-				}
-				if (null == newCommunity || newCommunity.isEmpty()) {
-					newCommunity = arow.getCommunity();
-				}
-			}
-			if (null == newCommunity && null == newStreet) {
-				return false;
-			}
-			newRow.setStreet_(newStreet);
-			newRow.setCommunity_(newCommunity);
-			return true;
-		}
-		
-		return false;
 	}
 
 }

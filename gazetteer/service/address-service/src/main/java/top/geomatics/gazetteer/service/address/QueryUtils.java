@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
-import top.geomatics.gazetteer.utilities.database.building.BuildingQuery;
+import top.geomatics.gazetteer.utilities.database.building.BuildingQueryExt;
 
 /**
  * @author whudyj
@@ -35,7 +35,7 @@ public class QueryUtils {
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(fileds, tablename, row, null, 0);
 		DatabaseManager dm = DatabaseManager.getInstance();
 		DatabaseInformation[] dbInfos = dm.list();
-		BuildingQuery buildingQuery = new BuildingQuery();
+		BuildingQueryExt buildingQuery = new BuildingQueryExt();
 		buildingQuery.open();
 		for (DatabaseInformation dbInformation : dbInfos) {
 			List<AddressEditorRow> rows_edit = null;

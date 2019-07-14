@@ -23,7 +23,9 @@ import top.geomatics.gazetteer.lucene.AddressSearcherPinyin;
 import top.geomatics.gazetteer.lucene.GeoNameSearcher;
 import top.geomatics.gazetteer.lucene.LuceneUtil;
 import top.geomatics.gazetteer.lucene.POISearcher;
+import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.model.GeoPoint;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.address.SearcherSettings;
@@ -1565,6 +1567,58 @@ public class SearcherController {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, row, orderby, limit);
 		List<AddressRow> rows = ControllerUtils.mapper.findRoadNumLike(map);
 		return ControllerUtils.getResponseBody(rows);
+	}
+	
+	/**
+	 * <b>根据id查询坐标信息</b><br>
+	 * <i>examples:<br>
+	 * http://localhost:8083/address/point?id=1%26tablename=dmdz </i>
+	 * 
+	 * @param id       Integer 请求参数，数据库中记录的id
+	 * @param tablename String 请求参数，指定查询的数据库表，如：dmdz
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据id查询坐标信息", notes = "根据id查询坐标信息，示例：/address/point?id=1&tablename=dmdz")
+	@GetMapping("/point")
+	public String getPointByFid(
+			@ApiParam(value = "数据库中地址记录的fid") @RequestParam(value = IControllerConstant.ADDRESS_DB_ID, required = true) Integer id,
+			@ApiParam(value = "查询的数据库表，如dmdz") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename) {
+		String fields = "*";
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
+		map.put(IControllerConstant.ADDRESS_DB_ID, id);
+		List<AddressRow> rows = ControllerUtils.mapper.selectById(id);
+		
+		List<GeoPoint> points = CoordinateQuery.getAddressPoints(rows);
+		return JSON.toJSONString(points);
+	}
+	
+	/**
+	 * <b>根据一组id查询坐标信息</b><br>
+	 * <i>examples:<br>
+	 * http://localhost:8083/address/points?id=1,2,3%26tablename=dmdz </i>
+	 * 
+	 * @param ids       String 请求参数，数据库中记录的ids
+	 * @param tablename String 请求参数，指定查询的数据库表，如：dmdz
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据一组id查询坐标信息", notes = "根据一组id查询坐标信息，示例：/address/points?id=1,2,3&tablename=dmdz")
+	@GetMapping("/points")
+	public String getPointsByFids(
+			@ApiParam(value = "数据库中地址记录的ids,如1,2,3") @RequestParam(value = "ids", required = true) String ids,
+			@ApiParam(value = "查询的数据库表，如dmdz") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename) {
+		String fields = "*";
+		List<Integer> idList = new ArrayList<Integer>();
+		String listString[] = ids.split(",");
+		for (String str : listString) {
+			idList.add(Integer.parseInt(str));
+		}
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
+		map.put("list", idList);
+		
+		List<AddressRow> rows = ControllerUtils.mapper.selectByIds(idList);
+		
+		List<GeoPoint> points = CoordinateQuery.getAddressPoints(rows);
+		return JSON.toJSONString(points);
 	}
 
 }

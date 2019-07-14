@@ -171,6 +171,9 @@
 				<if test="newRow.latitude_!=null">
 					latitude_ = #{newRow.latitude_},
 				</if>
+				<if test="newRow.origin_address!=null">
+					origin_address = #{newRow.origin_address},
+				</if>
 				<if test="newRow.similar_address!=null">
 					similar_address = #{newRow.similar_address},
 				</if>

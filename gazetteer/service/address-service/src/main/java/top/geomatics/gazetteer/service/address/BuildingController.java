@@ -19,7 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
-import top.geomatics.gazetteer.utilities.database.building.BuildingQuery;
+import top.geomatics.gazetteer.utilities.database.building.BuildingQueryExt;
 
 /**
  * <b>建筑物查询服务类</b><br>
@@ -31,7 +31,7 @@ import top.geomatics.gazetteer.utilities.database.building.BuildingQuery;
 @RequestMapping("/building")
 public class BuildingController {
 
-	private static BuildingQuery buildingQuery = new BuildingQuery();
+	private static BuildingQueryExt buildingQuery = new BuildingQueryExt();
 	static {
 		buildingQuery.open();
 	}

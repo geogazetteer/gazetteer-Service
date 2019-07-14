@@ -609,6 +609,15 @@ public class DataController {
 			if (null != indexString && !indexString.isEmpty()) {
 				// settings.put("create_spatial_index", indexString);
 			}
+			Element guessFromGeometry = settingElement.element("guess_from_geometry");
+			String guessString = null;
+			if (null != guessFromGeometry) {
+				guessString = guessFromGeometry.getText();
+			}
+
+			if (null != guessString && !guessString.isEmpty()) {
+				settings.put("guess_from_geometry", guessString);
+			}
 			// 开始数据转换
 			String fname = fnString.substring(0, fnString.lastIndexOf('.'));
 			String ftype = fnString.substring(fnString.lastIndexOf('.') + 1, fnString.length());

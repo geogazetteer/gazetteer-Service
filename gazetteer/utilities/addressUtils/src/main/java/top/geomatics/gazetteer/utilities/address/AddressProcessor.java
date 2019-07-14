@@ -258,7 +258,7 @@ public class AddressProcessor {
 		String newString = "dmdz";
 		for (String key : IGazetteerConstant.COMMUNITY_MAP.keySet()) {
 			String value = IGazetteerConstant.COMMUNITY_MAP.get(key);
-			if (0 == value.compareTo(code)) {
+			if (code.contains(value)) {
 				newString = key;
 				break;
 			}

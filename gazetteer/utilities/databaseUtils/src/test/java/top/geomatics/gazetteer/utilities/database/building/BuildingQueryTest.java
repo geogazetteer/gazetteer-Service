@@ -14,11 +14,11 @@ import top.geomatics.gazetteer.model.GeoPoint;
 import top.geomatics.gazetteer.model.IGazetteerConstant;
 
 public class BuildingQueryTest {
-	BuildingQuery query = null;
+	BuildingQueryExt query = null;
 
 	@Before
 	public void testOpen() {
-		query = new BuildingQuery();
+		query = new BuildingQueryExt();
 		query.open();
 		assertNotNull(query);
 	}

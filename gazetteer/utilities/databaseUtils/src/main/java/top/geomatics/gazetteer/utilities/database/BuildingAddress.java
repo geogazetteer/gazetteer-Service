@@ -58,6 +58,19 @@ public class BuildingAddress {
 		return rows;
 	}
 
+	public List<AddressRow> findAddressByCode(String code) {
+		// 根据建筑物编码搜索
+		String fields = "*";
+		String tablename = AddressProcessor.getCommunityFromBuildingCode(code);
+		// 查找条件
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("sql_fields", fields);
+		map.put("sql_tablename", tablename);
+		map.put("code", code);
+		List<AddressRow> temprows = mapper.findEquals(map);
+		return temprows;
+	}
+
 	public List<BuildingPositionRow> findCoordsByAddress(String address) {
 		//
 		List<BuildingPositionRow> rows = new ArrayList<>();

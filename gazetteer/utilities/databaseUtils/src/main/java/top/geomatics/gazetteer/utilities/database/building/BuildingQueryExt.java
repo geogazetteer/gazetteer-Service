@@ -42,9 +42,9 @@ import top.geomatics.gazetteer.model.GeoPoint;
  * @author whudyj
  *
  */
-public class BuildingQuery {
+public class BuildingQueryExt {
 	// 添加slf4j日志实例对象
-	final static Logger logger = LoggerFactory.getLogger(BuildingQuery.class);
+	final static Logger logger = LoggerFactory.getLogger(BuildingQueryExt.class);
 
 	// 配置信息
 	private ResourcesManager manager = ResourcesManager.getInstance();
