@@ -1,8 +1,14 @@
 /**
  * Created by lixiaochao on 2019/3/21.
  */
-const IP = 'http://119.3.72.23';
+
+// const IP = 'http://localhost';//本地ip
+const IP = 'http://119.3.72.23';	//华为云ip
+// const IP = 'http://10.148.26.63'; //政务内网ip
 const serverUrl = IP+':8083/';//服务器地址
+const geoServerUrl=IP + ':8085/';//geoserver服务地址
+const webUrl=IP + ':8087/';
+
 const URLCFG={
   searchCtxUrl:serverUrl+'address/hint',//搜索联想，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
   searchAddressUrl:serverUrl+'address/hint',//搜索，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
@@ -39,6 +45,10 @@ const URLCFG={
 
   //根据楼栋编号查询坐标
   getCoordinatesByCodeUrl:serverUrl+'building/point',//(param:code='')
+  //根据一组id查询坐标信息
+  getLLByIdUrl:serverUrl+'address/point',//?id=1,2,3&tablename=dmdz
+  //根据一组id查询坐标信息
+  getLLByIdsUrl:serverUrl+'address/points',//?id=1,2,3&tablename=dmdz
   //获取搜索结果总数
   searchCtxTotalUrl:serverUrl+'address/sum',//param：keywords=''
   //根据页码获取搜索结果
@@ -67,8 +77,6 @@ const URLCFG={
 
 };
 
-const geoServerUrl=IP + ':8085/';//geoserver服务地址
-const webUrl=IP + ':8087/';
 const MAPURL={
   //雪碧图
   sprite:webUrl+'sprite/sprite',
@@ -166,5 +174,8 @@ const EDITSERVICE={
   //根据坐标获取标准地址
   getStandardByLLUrl:serverUrl+'building/address',//?x=114.019777&y=22.672456
   //根据fid获取标准地址
-  getStandardByFidUrl:serverUrl+'revision/address/guess'// /1?username=username&tablename=dmdz_edit
+  getStandardByFidUrl:serverUrl+'revision/address/guess',// /1?username=username&tablename=dmdz_edit
+
+  //根据fid获取一组坐标
+  getLLByFIdsUrl:serverUrl+'revision/points',//?id=1,2,3&tablename=dmdz
 };
