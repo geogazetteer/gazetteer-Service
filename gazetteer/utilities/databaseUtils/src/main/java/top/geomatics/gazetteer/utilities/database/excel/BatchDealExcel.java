@@ -74,7 +74,7 @@ public class BatchDealExcel {
 			String addressString = row.getAddress();
 			double longitude;
 			double latitude;
-			List<BuildingPositionRow> rows = BuildingAddress.findCoordsByAddress(addressString);
+			List<BuildingPositionRow> rows = BuildingAddress.getInstance().findCoordsByAddress(addressString);
 			// 可能会匹配到0个或多个
 			if (rows.size() < 1) {
 				MatcherResultRow aRow = new MatcherResultRow();
@@ -103,7 +103,7 @@ public class BatchDealExcel {
 			String addressString = "！未匹配到地址！";
 			double longitude = row.getLongitude();
 			double latitude = row.getLatitude();
-			List<AddressRow> rows = BuildingAddress.findAddressByCoords(longitude, latitude);
+			List<AddressRow> rows = BuildingAddress.getInstance().findAddressByCoords(longitude, latitude);
 			// 可能会匹配到0个或多个
 			if (rows.size() < 1) {
 				MatcherResultRow aRow = new MatcherResultRow();

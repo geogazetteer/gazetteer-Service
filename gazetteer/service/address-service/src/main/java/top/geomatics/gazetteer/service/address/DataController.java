@@ -431,9 +431,13 @@ public class DataController {
 			inputStream = new FileInputStream(new File(folder, zipFileName));
 			OutputStream outputStream = response.getOutputStream();
 			// 指明为下载
-			response.setContentType(Messages.getString("DataController.13")); //$NON-NLS-1$
+			response.setCharacterEncoding("UTF-8");
+			response.setContentType(Messages.getString("DataController.13") + ";charset=UTF-8"); //$NON-NLS-1$
 			// 设置文件名
-			response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(zipFileName, "UTF-8"));
+			String fn = URLEncoder.encode(zipFileName, "UTF-8");
+			response.addHeader("Content-Disposition", "attachment;filename=" + fn);
+//			response.addHeader("Content-Disposition",
+//					"attachment;filename=" + new String(zipFileName.getBytes("GBK"), "iso-8859-1"));
 
 			// 把输入流copy到输出流
 			IOUtils.copy(inputStream, outputStream);
@@ -549,52 +553,72 @@ public class DataController {
 			// 文件名和设置
 			String fnString = "";
 			String geometryString = "";
-			List<Element> fElements = elm.elements("FileName");
-			if (fElements.size() > 0) {
-				fnString = fElements.get(0).getText();
-			} else {
+			Element fileElement = elm.element("FileName");
+			Element settingElement = elm.element("Settings");
+			if (null == fileElement) {
 				continue;
 			}
+			fnString = fileElement.getText();
 			if (fnString.trim().isEmpty()) {
 				continue;
 			}
 			Map<String, String> settings = new HashMap<String, String>();
-			List<Element> sElements = elm.elements("Settings");
-			if (sElements.size() > 0) {
-				Element se = sElements.get(0);
-				List<Element> se2 = se.elements("Fields");
-				if (se2.size() > 0) {
-					Element se3 = se2.get(0);
-					List<Element> lse3 = se3.elements("Field");
-					if (lse3.size() > 0) {
-						Element se4 = lse3.get(0);
-						for (int i = 0; i < fileds.length; i++) {
-							Field fld = fileds[i];
-							String fldName = fld.getName();
-							List<Element> lse4 = se4.elements(fldName);
-							if (lse4.size() > 0) {
-								Element se5 = lse4.get(0);
-								String orgin = se5.getText();
-								if (!orgin.isEmpty()) {
-									settings.put(orgin, fldName);
+			if (null != settingElement) {
+				Element fieldsElement = settingElement.element("Fields");
+				if (null != fieldsElement) {
+					List<Element> fieldElements = fieldsElement.elements("Field");
+					if (null != fieldElements && fieldElements.size() > 0) {
+						for (int i = 0; i < fieldElements.size(); i++) {
+							Element fldElement = fieldElements.get(i);
+							if (null == fldElement) {
+								continue;
+							}
+							Element srcElement = fldElement.element("source");
+							Element tarElement = fldElement.element("target");
+							if (null == srcElement || null == tarElement) {
+								continue;
+							}
+							String source = srcElement.getText();
+							String target = tarElement.getText();
+
+							for (int j = 0; j < fileds.length; j++) {
+								Field fld = fileds[j];
+								String fldName = fld.getName();
+								if (0 == fldName.compareToIgnoreCase(target)) {
+									settings.put(source, fldName);
 								}
 							}
-
 						}
-						List<Element> lse4_g = se4.elements("build_geometry");
-
-						if (lse4_g.size() > 0) {
-							Element se5 = lse4_g.get(0);
-							geometryString = se5.getText();
-							if (!geometryString.isEmpty()) {
-								// settings.put("buildGeometry", geometryString);
-							}
-						}
-
 					}
 				}
-
 			}
+			Element buildGeometry = settingElement.element("build_geometry");
+			if (null != buildGeometry) {
+				geometryString = buildGeometry.getText();
+			}
+
+			if (null != geometryString && !geometryString.isEmpty()) {
+				// settings.put("buildGeometry", geometryString);
+			}
+			Element indexGeometry = settingElement.element("create_spatial_index");
+			String indexString = null;
+			if (null != indexGeometry) {
+				indexString = indexGeometry.getText();
+			}
+
+			if (null != indexString && !indexString.isEmpty()) {
+				// settings.put("create_spatial_index", indexString);
+			}
+			Element guessFromGeometry = settingElement.element("guess_from_geometry");
+			String guessString = null;
+			if (null != guessFromGeometry) {
+				guessString = guessFromGeometry.getText();
+			}
+
+			if (null != guessString && !guessString.isEmpty()) {
+				settings.put("guess_from_geometry", guessString);
+			}
+			// 开始数据转换
 			String fname = fnString.substring(0, fnString.lastIndexOf('.'));
 			String ftype = fnString.substring(fnString.lastIndexOf('.') + 1, fnString.length());
 			String sourceFN = upload_file_path + File.separator + fnString;

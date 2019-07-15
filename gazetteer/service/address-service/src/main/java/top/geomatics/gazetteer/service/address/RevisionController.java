@@ -25,10 +25,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.model.GeoPoint;
 import top.geomatics.gazetteer.model.IConstant;
-import top.geomatics.gazetteer.utilities.address.AddressGuessor;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.address.AddressSimilarity;
+import top.geomatics.gazetteer.utilities.database.AddressGuessor;
 import top.geomatics.gazetteer.utilities.database.BuildingQuery;
 
 /**
@@ -225,7 +226,7 @@ public class RevisionController {
 			if (null != longitude && null != latitude) {
 				String tempString = longitude + "," + latitude;
 				if (AddressProcessor.isCoordinatesExpression(tempString)) {
-					List<String> buildingCodes = BuildingQuery.query(longitude, latitude);
+					List<String> buildingCodes = BuildingQuery.getInstance().query(longitude, latitude);
 					List<AddressRow> allRows = new ArrayList<AddressRow>();
 					for (String codeString : buildingCodes) {
 						AddressRow addrow = new AddressRow();
@@ -304,7 +305,7 @@ public class RevisionController {
 			if (!AddressProcessor.isCoordinatesExpression(tempString)) {
 				continue;
 			}
-			List<String> buildingCodes = BuildingQuery.query(longitude, latitude);
+			List<String> buildingCodes = BuildingQuery.getInstance().query(longitude, latitude);
 			for (String codeString : buildingCodes) {
 				AddressRow addrow = new AddressRow();
 				addrow.setCode(codeString);
@@ -343,6 +344,62 @@ public class RevisionController {
 		map.put("fids", idList);
 		List<AddressEditorRow> row = UserManager.getInstance().getUserInfo(username).getMapper().selectByFids(map);
 		return ControllerUtils.getResponseBody_revision(row);
+	}
+	
+	/**
+	 * <b>根据fid查询坐标信息</b><br>
+	 * <i>examples:<br>
+	 * http://localhost:8083/revision/point?fid=1%26tablename=dmdz_edit </i>
+	 * 
+	 * @param username  String 请求参数，用户名
+	 * @param fid       Integer 请求参数，数据库中记录的fid
+	 * @param tablename String 请求参数，指定查询的数据库表，如：dmdz_edit
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据fid查询坐标信息", notes = "根据fid查询坐标信息，示例：/revision/point?fid=1&tablename=dmdz_edit")
+	@GetMapping("/point")
+	public String getPointByFid(
+			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
+			@ApiParam(value = "数据库中地址记录的fid") @RequestParam(value = IControllerConstant.ENTERPRISE_DB_ID, required = true) Integer fid,
+			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename) {
+		String fields = "*";
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
+		map.put(IControllerConstant.ENTERPRISE_DB_ID, fid);
+		List<AddressEditorRow> rows = UserManager.getInstance().getUserInfo(username).getMapper().selectByFid(map);
+		
+		List<GeoPoint> points = CoordinateQuery.getPoints(rows);
+		return JSON.toJSONString(points);
+	}
+	
+	/**
+	 * <b>根据一组fid查询坐标信息</b><br>
+	 * <i>examples:<br>
+	 * http://localhost:8083/revision/points?fid=1,2,3%26tablename=dmdz_edit </i>
+	 * 
+	 * @param username  String 请求参数，用户名
+	 * @param fids       Integer 请求参数，数据库中记录的fids
+	 * @param tablename String 请求参数，指定查询的数据库表，如：dmdz_edit
+	 * @return String 返回JSON格式的查询结果
+	 */
+	@ApiOperation(value = "根据一组fid查询坐标信息", notes = "根据一组fid查询坐标信息，示例：/revision/points?fid=1&tablename=dmdz_edit")
+	@GetMapping("/points")
+	public String getPointsByFids(
+			@ApiParam(value = "用户名") @RequestParam(value = "username", required = true, defaultValue = DEFAULT_USERNAME) String username,
+			@ApiParam(value = "数据库中地址记录的fids,如1,2,3") @RequestParam(value = "fids", required = true) String fids,
+			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename) {
+		String fields = "*";
+		List<Integer> idList = new ArrayList<Integer>();
+		String listString[] = fids.split(",");
+		for (String str : listString) {
+			idList.add(Integer.parseInt(str));
+		}
+		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
+		map.put("fids", idList);
+		
+		List<AddressEditorRow> rows = UserManager.getInstance().getUserInfo(username).getMapper().selectByFids(map);
+		
+		List<GeoPoint> points = CoordinateQuery.getPoints(rows);
+		return JSON.toJSONString(points);
 	}
 
 	/**

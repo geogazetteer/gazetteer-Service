@@ -11,7 +11,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.fastjson.JSON;
+
+import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.model.GeoPoint;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.database.BuildingQuery;
@@ -41,7 +45,7 @@ public class CoordinateQuery {
 		String coordString[] = keywords.split(",");
 		double x = Double.parseDouble(coordString[0]);
 		double y = Double.parseDouble(coordString[1]);
-		List<String> codes = BuildingQuery.query(x, y);
+		List<String> codes = BuildingQuery.getInstance().query(x, y);
 
 		for (String code : codes) {
 			// 根据建筑物编码搜索
@@ -124,6 +128,42 @@ public class CoordinateQuery {
 			rows.add(saRows.get(i));
 		}
 		return rows;
+	}
+
+	public static List<GeoPoint> getPoints(List<AddressEditorRow> rows) {
+		List<GeoPoint> points = new ArrayList<GeoPoint>();
+		for (AddressEditorRow row : rows) {
+			GeoPoint point = null;
+			if (null != row) {
+				Double x = row.getLongitude_();
+				Double y = row.getLatitude_();
+				String code = row.getCode_();
+				if (null != x && null != y) {
+					point = new GeoPoint();
+					point.setX(x);
+					point.setY(y);
+				} else if (null != code && !code.trim().isEmpty()) {
+					point = BuildingQuery.getInstance().query(code);
+				}
+			}
+			points.add(point);
+		}
+		return points;
+	}
+
+	public static List<GeoPoint> getAddressPoints(List<AddressRow> rows) {
+		List<GeoPoint> points = new ArrayList<GeoPoint>();
+		for (AddressRow row : rows) {
+			GeoPoint point = null;
+			if (null != row) {
+				String code = row.getCode();
+				if (null != code && !code.trim().isEmpty()) {
+					point = BuildingQuery.getInstance().query(code);
+				}
+			}
+			points.add(point);
+		}
+		return points;
 	}
 
 }
