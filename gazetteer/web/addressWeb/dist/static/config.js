@@ -6,7 +6,7 @@
 const IP = 'http://119.3.72.23';	//华为云ip
 // const IP = 'http://10.148.26.63'; //政务内网ip
 const serverUrl = IP+':8083/';//服务器地址
-const geoServerUrl=IP + ':8085/';//geoserver服务地址
+// const geoServerUrl=IP + ':8085/';//geoserver服务地址
 const webUrl=IP + ':8087/';
 
 const URLCFG={
@@ -78,18 +78,24 @@ const URLCFG={
 };
 
 const MAPURL={
-  //雪碧图
-  sprite:webUrl+'sprite/sprite',
-  //底图
-  mapTile:webUrl+"mapboxLayer/{z}/{x}/{y}.pbf",
-  //字体
-  glyphs:webUrl+"myfonts/{fontstack}/{range}.pbf",
-  //政务网底图  http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile/0/1072/1461
+  /* //雪碧图
+sprite:webUrl+'sprite/sprite',
+ //底图
+ mapTile:webUrl+"mapboxLayer/{z}/{x}/{y}.pbf",
+ //字体
+ glyphs:webUrl+"myfonts/{fontstack}/{range}.pbf",
+ ol_map_tile:'http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile',
+ //房屋面
+ building_vec_tile:geoServerUrl+"geoserver/gwc/service/tms/1.0.0/gazetteer%3ALH_building_4490@EPSG%3A900913@png/{z}/{x}/{y}.png"
+*/
+
+  //政务网底图地址
   //http://10.148.26.61:6080/arcgis/rest/services/basemap/szmap_4490/MapServer
   ol_map_tile:'http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile',
-  //房屋面
-  building_vec_tile:geoServerUrl+"geoserver/gwc/service/tms/1.0.0/gazetteer%3ALH_building_4490@EPSG%3A900913@png/{z}/{x}/{y}.png"
+
+  isZWW:false,//是否选择政务网
 };
+
 //编辑模块，左侧街道社区selector配置
 const EDITSELECTORCFG={
   street:['民治街道','观湖街道','福城街道','观澜街道','龙华街道','大浪街道']
