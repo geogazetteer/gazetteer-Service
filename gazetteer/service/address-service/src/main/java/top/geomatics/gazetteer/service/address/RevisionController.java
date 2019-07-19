@@ -288,31 +288,20 @@ public class RevisionController {
 			@ApiParam(value = "数据库中记录的fid") @PathVariable(value = IControllerConstant.ENTERPRISE_DB_ID, required = true) Integer fid,
 			@ApiParam(value = "查询的数据库表，如dmdz_edit") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = TABLENAME) String tablename) {
 		// 查询
-		String fields = "fid,name_,code_,longitude_,latitude_";
+		String fields = "*";
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put(IControllerConstant.ENTERPRISE_DB_ID, fid);
 		List<AddressEditorRow> rows = UserManager.getInstance().getUserInfo(username).getMapper().selectByFid(map);
 		// 根据坐标计算
+		boolean isForce = true;
 		List<AddressRow> newRows = new ArrayList<AddressRow>();
 		for (AddressEditorRow row : rows) {
-			// 经纬度
-			Double longitude = row.getLongitude_();
-			Double latitude = row.getLatitude_();
-			if (null == longitude || null == latitude) {
-				continue;
+			AddressRow addrow = new AddressRow();
+			boolean flag = AddressGuessor.guessRecordByAddress(row, addrow, isForce);
+			if (flag) {
+				newRows.add(addrow);
 			}
-			String tempString = longitude + "," + latitude;
-			if (!AddressProcessor.isCoordinatesExpression(tempString)) {
-				continue;
-			}
-			List<String> buildingCodes = BuildingQuery.getInstance().query(longitude, latitude);
-			for (String codeString : buildingCodes) {
-				AddressRow addrow = new AddressRow();
-				addrow.setCode(codeString);
-				Map<String, Object> para = ControllerUtils.getRequestMap("*", "dmdz", addrow, null, 0);
-				List<AddressRow> addResRows = ControllerUtils.mapper.findEquals(para);
-				newRows.addAll(addResRows);
-			}
+
 		}
 		return ControllerUtils.getResponseBody(newRows);
 	}
@@ -345,7 +334,7 @@ public class RevisionController {
 		List<AddressEditorRow> row = UserManager.getInstance().getUserInfo(username).getMapper().selectByFids(map);
 		return ControllerUtils.getResponseBody_revision(row);
 	}
-	
+
 	/**
 	 * <b>根据fid查询坐标信息</b><br>
 	 * <i>examples:<br>
@@ -366,18 +355,18 @@ public class RevisionController {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put(IControllerConstant.ENTERPRISE_DB_ID, fid);
 		List<AddressEditorRow> rows = UserManager.getInstance().getUserInfo(username).getMapper().selectByFid(map);
-		
+
 		List<GeoPoint> points = CoordinateQuery.getPoints(rows);
 		return JSON.toJSONString(points);
 	}
-	
+
 	/**
 	 * <b>根据一组fid查询坐标信息</b><br>
 	 * <i>examples:<br>
 	 * http://localhost:8083/revision/points?fid=1,2,3%26tablename=dmdz_edit </i>
 	 * 
 	 * @param username  String 请求参数，用户名
-	 * @param fids       Integer 请求参数，数据库中记录的fids
+	 * @param fids      Integer 请求参数，数据库中记录的fids
 	 * @param tablename String 请求参数，指定查询的数据库表，如：dmdz_edit
 	 * @return String 返回JSON格式的查询结果
 	 */
@@ -395,9 +384,9 @@ public class RevisionController {
 		}
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put("fids", idList);
-		
+
 		List<AddressEditorRow> rows = UserManager.getInstance().getUserInfo(username).getMapper().selectByFids(map);
-		
+
 		List<GeoPoint> points = CoordinateQuery.getPoints(rows);
 		return JSON.toJSONString(points);
 	}

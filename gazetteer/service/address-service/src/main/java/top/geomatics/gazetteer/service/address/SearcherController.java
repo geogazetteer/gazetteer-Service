@@ -29,6 +29,7 @@ import top.geomatics.gazetteer.model.GeoPoint;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.address.SearcherSettings;
+import top.geomatics.gazetteer.utilities.database.AddressGuessor;
 
 /**
  * <b>搜索服务</b><br>
@@ -791,6 +792,11 @@ public class SearcherController {
 		keywords = AddressProcessor.transform(keywords, this.settings);
 		// 设置查询条件
 		String tablename = IControllerConstant.ADDRESS_TABLE;
+		// 为了缩小搜索范围
+		String community = AddressGuessor.guessCommunity(keywords);
+		if (null != community && !community.trim().isEmpty()) {
+			tablename = community;
+		}
 		AddressRow row = new AddressRow();
 		row.setAddress("%" + keywords + "%");
 		Map<String, Object> map = ControllerUtils.getRequestMap(null, tablename, row, null, 0);
@@ -819,6 +825,12 @@ public class SearcherController {
 		keywords = AddressProcessor.transform(keywords, this.settings);
 		// 设置查询条件
 		String tablename = IControllerConstant.ADDRESS_TABLE;
+		// 为了缩小搜索范围
+		String community = AddressGuessor.guessCommunity(keywords);
+		if (null != community && !community.trim().isEmpty()) {
+			tablename = community;
+		}
+
 		String fieldString = IControllerConstant.ADDRESS_FIELDS;
 		AddressRow row = new AddressRow();
 		row.setAddress("%" + keywords + "%");
@@ -850,6 +862,12 @@ public class SearcherController {
 		keywords = AddressProcessor.transform(keywords, this.settings);
 		// 设置查询条件
 		String tablename = IControllerConstant.ADDRESS_TABLE;
+		// 为了缩小搜索范围
+		String community = AddressGuessor.guessCommunity(keywords);
+		if (null != community && !community.trim().isEmpty()) {
+			tablename = community;
+		}
+
 		String fieldString = IControllerConstant.ADDRESS_FIELDS;
 		AddressRow row = new AddressRow();
 		row.setAddress("%" + keywords + "%");
@@ -1568,13 +1586,13 @@ public class SearcherController {
 		List<AddressRow> rows = ControllerUtils.mapper.findRoadNumLike(map);
 		return ControllerUtils.getResponseBody(rows);
 	}
-	
+
 	/**
 	 * <b>根据id查询坐标信息</b><br>
 	 * <i>examples:<br>
 	 * http://localhost:8083/address/point?id=1%26tablename=dmdz </i>
 	 * 
-	 * @param id       Integer 请求参数，数据库中记录的id
+	 * @param id        Integer 请求参数，数据库中记录的id
 	 * @param tablename String 请求参数，指定查询的数据库表，如：dmdz
 	 * @return String 返回JSON格式的查询结果
 	 */
@@ -1587,11 +1605,11 @@ public class SearcherController {
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put(IControllerConstant.ADDRESS_DB_ID, id);
 		List<AddressRow> rows = ControllerUtils.mapper.selectById(id);
-		
+
 		List<GeoPoint> points = CoordinateQuery.getAddressPoints(rows);
 		return JSON.toJSONString(points);
 	}
-	
+
 	/**
 	 * <b>根据一组id查询坐标信息</b><br>
 	 * <i>examples:<br>
@@ -1614,9 +1632,9 @@ public class SearcherController {
 		}
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
 		map.put("list", idList);
-		
+
 		List<AddressRow> rows = ControllerUtils.mapper.selectByIds(idList);
-		
+
 		List<GeoPoint> points = CoordinateQuery.getAddressPoints(rows);
 		return JSON.toJSONString(points);
 	}

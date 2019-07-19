@@ -276,5 +276,159 @@ public class AddressGuessor {
 
 		return canUpdate;
 	}
+	
+	public static boolean guessRecordByAddress(AddressEditorRow oldRow, AddressRow newRow, boolean force) {
+		if (null == oldRow || null == newRow) {
+			return false;
+		}
+	
+		String old_name = oldRow.getName_();
+		String old_Code = oldRow.getCode_();
+		String old_Street = oldRow.getStreet_();
+		String old_Community = oldRow.getCommunity_();
+		String old_originAddress = oldRow.getOrigin_address();
+		Double old_longitude = oldRow.getLongitude_();
+		Double old_latitude = oldRow.getLatitude_();
+		// 需要更新的内容
+		boolean isNameEmp = true;
+		boolean isCodeEmp = true;
+		boolean isStreetEmp = true;
+		boolean isCommunityEmp = true;
+		boolean isOriginAddressEmp = true;
+		boolean canUpdate = false;
+		if (null != old_name && !old_name.trim().isEmpty()) {
+			isNameEmp = false;
+		}
+		if (null != old_Code && !old_Code.trim().isEmpty()) {
+			isCodeEmp = false;
+		}
+		if (null != old_Street && !old_Street.trim().isEmpty()) {
+			isStreetEmp = false;
+		}
+		if (null != old_Community && !old_Community.trim().isEmpty()) {
+			isCommunityEmp = false;
+		}
+		if (null != old_originAddress && !old_originAddress.trim().isEmpty()) {
+			isOriginAddressEmp = false;
+		}
+		// 没有需要更新的内容
+		if (false == isNameEmp && false == isCodeEmp && false == isStreetEmp && false == isCommunityEmp
+				&& false == isOriginAddressEmp) {
+			return canUpdate;
+		}
+
+		// 补充信息
+		String new_Name = null;
+		String new_Code = null;
+		String new_Street = null;
+		String new_Community = null;
+		String new_OriginAddress = null;
+		// 街道
+		if (isStreetEmp) {
+			if (!isOriginAddressEmp) {
+				// 首先从原地址中推测
+				new_Street = AddressGuessor.guessStreet(old_originAddress);
+				if (null != new_Street && !new_Street.trim().isEmpty()) {
+					isStreetEmp = false;
+					newRow.setStreet(new_Street);
+					canUpdate = true;
+				}
+			}
+		}
+		// 更新了街道
+		if (false == isNameEmp && false == isCodeEmp && false == isStreetEmp && false == isCommunityEmp
+				&& false == isOriginAddressEmp) {
+			return canUpdate;
+		}
+		// 社区
+		if (isCommunityEmp) {
+			if (!isOriginAddressEmp) {
+				// 首先从原地址中推测
+				new_Community = AddressGuessor.guessCommunity(old_originAddress);
+				if (null != new_Community && !new_Community.trim().isEmpty()) {
+					isCommunityEmp = false;
+					newRow.setCommunity(new_Community);
+					canUpdate = true;
+				}
+			}
+		}
+		// 更新了社区
+		if (false == isNameEmp && false == isCodeEmp && false == isStreetEmp && false == isCommunityEmp
+				&& false == isOriginAddressEmp) {
+			return canUpdate;
+		}
+		AddressRow arow = null;
+		// 根据Code来推测
+		if (false == isCodeEmp) {
+			List<AddressRow> aRows = BuildingAddress.getInstance().findAddressByCode(old_Code);
+			if (null != aRows && aRows.size() > 0) {
+				// 推荐用第一条记录
+				arow = aRows.get(0);
+			}
+		}
+		// 如果没有找到
+		if (null == arow) {
+			// 最后，根据坐标来推测
+			if (force) {
+				List<AddressRow> aRows = null;
+				if (null != old_longitude && null != old_latitude) {
+					aRows = BuildingAddress.getInstance().findAddressByCoords(old_longitude, old_latitude);
+				}
+				if (null != aRows && aRows.size() > 0) {
+					// 推荐用第一条记录
+					arow = aRows.get(0);
+				}
+			}
+		}
+		// 如果找到了，需要更新
+		if (null != arow) {
+			new_Street = arow.getStreet();
+			new_Community = arow.getCommunity();
+			new_Code = arow.getCode();
+			new_OriginAddress = arow.getAddress();
+			if (isStreetEmp) {
+				newRow.setStreet(new_Street);
+				isStreetEmp = false;
+				canUpdate = true;
+			}
+			if (isCommunityEmp) {
+				newRow.setCommunity(new_Community);
+				isCommunityEmp = false;
+				canUpdate = true;
+			}
+			if (isCodeEmp) {
+				newRow.setCode(new_Code);
+				isCodeEmp = false;
+				canUpdate = true;
+			}
+			if (isOriginAddressEmp) {
+				newRow.setAddress(new_OriginAddress);
+				isOriginAddressEmp = false;
+				canUpdate = true;
+			}
+		}
+		if (false == isNameEmp && false == isCodeEmp && false == isStreetEmp && false == isCommunityEmp
+				&& false == isOriginAddressEmp) {
+			return true;
+		}
+		// 更新Address
+		if (isOriginAddressEmp) {
+			if (!isNameEmp && null != old_name) {
+				new_OriginAddress = old_name;
+			} else {
+			}
+			if (null != new_OriginAddress && !new_OriginAddress.trim().isEmpty()) {
+				newRow.setAddress(new_OriginAddress);
+				isOriginAddressEmp = false;
+				canUpdate = true;
+			}
+		}
+		if (false == isNameEmp && false == isCodeEmp && false == isStreetEmp && false == isCommunityEmp
+				&& false == isOriginAddressEmp) {
+			return canUpdate;
+		}
+
+		return canUpdate;
+	}
 
 }

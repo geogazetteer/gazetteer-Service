@@ -77,8 +77,9 @@ public class MatcherController {
 		// </分词>
 
 		// <查询>
+		int limit_max = limit < 1?30:limit;//
 		Map<String, Object> map = ControllerUtils.getRequestMap(IControllerConstant.ADDRESS_FIELDS, tablename, row,
-				null, 0);
+				null, limit_max);
 		List<AddressRow> rows = ControllerUtils.mapper.findLike(map);
 		// </查询>
 		// <相似性计算，并排序>
