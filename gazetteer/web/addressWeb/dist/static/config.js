@@ -84,7 +84,7 @@ const MAPURL={
   mapTile:webUrl+"mapboxLayer/{z}/{x}/{y}.pbf",
   //字体
   glyphs:webUrl+"myfonts/{fontstack}/{range}.pbf",
-  //政务内网底图  http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile/0/1072/1461
+  //政务网底图  http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile/0/1072/1461
   //http://10.148.26.61:6080/arcgis/rest/services/basemap/szmap_4490/MapServer
   ol_map_tile:'http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile',
   //房屋面
