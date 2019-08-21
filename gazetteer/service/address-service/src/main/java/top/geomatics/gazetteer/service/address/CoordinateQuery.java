@@ -11,8 +11,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alibaba.fastjson.JSON;
-
 import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.GeoPoint;
@@ -67,7 +65,8 @@ public class CoordinateQuery {
 			return rows;
 		}
 		String fields = "id,address";
-		String tablename = AddressProcessor.getCommunityFromBuildingCode(keywords);
+		//String tablename = AddressProcessor.getCommunityFromBuildingCode(keywords);
+		String tablename = IControllerConstant.ADDRESS_TABLE;
 		AddressRow aRow = new AddressRow();
 		aRow.setCode(keywords);
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, aRow, null, 0);

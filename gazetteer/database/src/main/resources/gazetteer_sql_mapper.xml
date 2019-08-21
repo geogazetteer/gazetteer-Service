@@ -18,17 +18,19 @@
 			#{id}
 		</foreach>
 	</select>
-	
+
 	<!--选择dmdz表中有关词汇用于建立分词词典 -->
-	<select id="selectAddressForDictionary" resultType="AddressRow"> 
-		SELECT street,community,road,road_num,village,building,address FROM dmdz 
+	<select id="selectAddressForDictionary" resultType="AddressRow">
+		SELECT
+		street,community,road,road_num,village,building,address FROM dmdz
 	</select>
-	
+
 	<select id="getCount" resultType="int">
 		SELECT count(*)
-		FROM ${sql_tablename}
-    </select> 
-	
+		FROM
+		${sql_tablename}
+	</select>
+
 	<!--动态SQL -->
 	<select id="findEquals" resultType="AddressRow">
 		SELECT ${sql_fields}
@@ -139,7 +141,7 @@
 			LIMIT #{sql_limit}
 		</if>
 	</select>
-	
+
 	<select id="getTotalLike" resultType="int">
 		SELECT count(*)
 		FROM ${sql_tablename}
@@ -185,7 +187,7 @@
 			</if>
 		</where>
 	</select>
-	
+
 	<select id="findLike" resultType="AddressRow">
 		SELECT ${sql_fields}
 		FROM ${sql_tablename}
@@ -237,7 +239,7 @@
 			LIMIT #{sql_limit}
 		</if>
 	</select>
-	
+
 	<select id="findSimpleLike" resultType="SimpleAddressRow">
 		SELECT ${sql_fields}
 		FROM ${sql_tablename}
@@ -289,7 +291,7 @@
 			LIMIT #{sql_limit}
 		</if>
 	</select>
-	
+
 	<select id="findSimpleLikePage" resultType="SimpleAddressRow">
 		SELECT ${sql_fields}
 		FROM ${sql_tablename}
@@ -338,24 +340,24 @@
 			ORDER BY ${sql_orderBy}
 		</if>
 		<choose>
-            <when test="page_start != null">
-                <choose>
-                    <when test="sql_limit != null">
-                        LIMIT #{page_start},#{sql_limit}
-                    </when>
-                    <otherwise>
-                        LIMIT #{page_start},10
-                    </otherwise>
-                </choose>
-	        </when>
-            <otherwise>
-		        <if test="sql_limit != null">
-			        LIMIT #{sql_limit}
-		        </if>
-            </otherwise>
-        </choose>
+			<when test="page_start != null">
+				<choose>
+					<when test="sql_limit != null">
+						LIMIT #{page_start},#{sql_limit}
+					</when>
+					<otherwise>
+						LIMIT #{page_start},10
+					</otherwise>
+				</choose>
+			</when>
+			<otherwise>
+				<if test="sql_limit != null">
+					LIMIT #{sql_limit}
+				</if>
+			</otherwise>
+		</choose>
 	</select>
-	
+
 	<!--动态SQL -->
 	<select id="findBuildingEquals" resultType="BuildingPositionRow">
 		SELECT ${sql_fields}
@@ -371,10 +373,14 @@
 				AND building_id = #{building_id}
 			</if>
 			<if test="longitude != null">
-				AND longitude = #{longitude}
+				AND longitude &lt; #{longitude} + 0.000001 AND longitude
+				&gt;
+				#{longitude} - 0.000001
 			</if>
 			<if test="latitude != null">
-				AND latitude = #{latitude}
+				AND latitude &lt; #{latitude} + 0.000001 AND latitude
+				&gt;
+				#{latitude} - 0.000001
 			</if>
 		</where>
 		<if test="sql_orderBy != null">
@@ -385,7 +391,8 @@
 		</if>
 	</select>
 	<!--动态SQL -->
-	<select id="findBuildingByPoint" resultType="BuildingPositionRow">
+	<select id="findBuildingByPoint"
+		resultType="BuildingPositionRow">
 		SELECT ${sql_fields}
 		FROM ${sql_tablename}
 		<where>
@@ -399,10 +406,12 @@
 				AND building_id = #{building_id}
 			</if>
 			<if test="longitude != null">
-				AND longitude &lt; #{longitude} + 0.0000001 AND longitude &gt; #{longitude} - 0.0000001
+				AND longitude &lt; #{longitude} + 0.000001 AND longitude
+				&gt; #{longitude} - 0.000001
 			</if>
 			<if test="latitude != null">
-				AND latitude &lt; #{latitude} + 0.0000001 AND latitude &gt; #{latitude} - 0.0000001
+				AND latitude &lt; #{latitude} + 0.000001 AND latitude
+				&gt; #{latitude} - 0.000001
 			</if>
 		</where>
 		<if test="sql_orderBy != null">
@@ -412,6 +421,16 @@
 			LIMIT #{sql_limit}
 		</if>
 	</select>
+	
+	<!--通过codes查询所有字段 -->
+	<select id="selectBuildingByCodes" resultType="BuildingPositionRow">
+		SELECT ${sql_fields} FROM ${sql_tablename} where code in
+		<foreach collection="list" index="index" item="code" open="("
+			separator="," close=")">
+			#{code}
+		</foreach>
+	</select>
+	
 	<!-- 根据街道或社区、地址关键词搜索 -->
 	<select id="findAddressLike" resultType="AddressRow">
 		SELECT ${sql_fields}
@@ -688,15 +707,17 @@
 		</if>
 	</select>
 	<!--ended by dyj 20190316 -->
-	
+
 	<!--drop table -->
 	<update id="dropTable" parameterType="String">
-		DROP TABLE IF EXISTS ${_parameter}
+		DROP TABLE IF EXISTS
+		${_parameter}
 	</update>
 
 	<!--create table -->
 	<update id="createAddressTable" parameterType="String">
-		CREATE TABLE ${_parameter} (
+		CREATE TABLE
+		${_parameter} (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		address_id TEXT,
 		code TEXT,
@@ -720,7 +741,8 @@
 	</update>
 	<!--create table -->
 	<update id="createBuildingPositionTable" parameterType="String">
-		CREATE TABLE ${_parameter} (
+		CREATE
+		TABLE ${_parameter} (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		code TEXT,
 		building_id TEXT,
@@ -731,7 +753,8 @@
 
 	<!--insert into table -->
 	<insert id="insertAddress" parameterType="map">
-		insert into ${sql_tablename}
+		insert into
+		${sql_tablename}
 		(
 		address_id ,
 		code ,
@@ -776,7 +799,8 @@
 	</insert>
 	<!--insert into table -->
 	<insert id="insertBuildingPosition" parameterType="map">
-		insert into ${sql_tablename}
+		insert into
+		${sql_tablename}
 		(
 		code ,
 		building_id ,
@@ -793,14 +817,16 @@
 	</insert>
 
 	<update id="createDistrictTable" parameterType="String">
-		CREATE TABLE ${_parameter} (
+		CREATE TABLE
+		${_parameter} (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		street TEXT
 		)
 	</update>
 
 	<insert id="insertDistrict" parameterType="map">
-		insert into ${sql_tablename}
+		insert into
+		${sql_tablename}
 		(
 		street
 		)
@@ -810,14 +836,16 @@
 		)
 	</insert>
 	<update id="createStreetTable" parameterType="String">
-		CREATE TABLE ${_parameter} (
+		CREATE TABLE
+		${_parameter} (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		community TEXT
 		)
 	</update>
 
 	<insert id="insertStreet" parameterType="map">
-		insert into ${sql_tablename}
+		insert into
+		${sql_tablename}
 		(
 		community
 		)

@@ -21,6 +21,7 @@ import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.BuildingPositionRow;
 import top.geomatics.gazetteer.model.ComparableAddress;
 import top.geomatics.gazetteer.model.EnterpriseRow;
+import top.geomatics.gazetteer.model.IGazetteerConstant;
 import top.geomatics.gazetteer.model.MatcherResultRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 
@@ -353,6 +354,45 @@ public class ControllerUtils {
 	public static String getUpdateResponseBody(Integer updateRows) {
 		// {"update": "ok","total": 10}
 		return "{\"update\": \"ok\",\"total\":" + updateRows + "}";
+	}
+
+	/**
+	 * @param code
+	 * @return
+	 */
+	public static AddressRow getAddressRowByCode(String code) {
+		// 440306 009003 1200105
+		// 440306 007003 3600024 000002
+		// 只取前面19位
+		if (code.length() > 19) {
+			code = code.substring(0, 19);
+		}
+		// 街道，取前9位
+		String streetCode = code.substring(0, 9);
+		String streetString = null;
+		// 社区，取前12位
+		String communityCode = code.substring(0, 12);
+		String communityString = null;
+
+		for (int i = 0; i < IGazetteerConstant.STREET_CODE_LIST.size(); i++) {
+			String street_code = IGazetteerConstant.STREET_CODE_LIST.get(i);
+			if (0 == streetCode.compareToIgnoreCase(street_code)) {
+				streetString = IGazetteerConstant.STREET_LIST.get(i);
+			}
+		}
+
+		for (int i = 0; i < IGazetteerConstant.COMMUNITY_CODE_LIST.size(); i++) {
+			String community_code = IGazetteerConstant.COMMUNITY_CODE_LIST.get(i);
+			if (0 == communityCode.compareToIgnoreCase(community_code)) {
+				communityString = IGazetteerConstant.COMMUNITY_LIST.get(i);
+			}
+		}
+
+		AddressRow row = new AddressRow();
+		row.setCommunity(communityString);
+		row.setStreet(streetString);
+		
+		return row;
 	}
 
 }
