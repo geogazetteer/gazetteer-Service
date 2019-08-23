@@ -3,6 +3,7 @@
  */
 package top.geomatics.gazetteer.service.address;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.BuildingPositionRow;
 import top.geomatics.gazetteer.model.ComparableAddress;
 import top.geomatics.gazetteer.model.EnterpriseRow;
+import top.geomatics.gazetteer.model.GeoPoint;
 import top.geomatics.gazetteer.model.IGazetteerConstant;
 import top.geomatics.gazetteer.model.MatcherResultRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
@@ -361,12 +363,7 @@ public class ControllerUtils {
 	 * @return
 	 */
 	public static AddressRow getAddressRowByCode(String code) {
-		// 440306 009003 1200105
-		// 440306 007003 3600024 000002
-		// 只取前面19位
-		if (code.length() > 19) {
-			code = code.substring(0, 19);
-		}
+		code = coding(code);
 		// 街道，取前9位
 		String streetCode = code.substring(0, 9);
 		String streetString = null;
@@ -391,8 +388,65 @@ public class ControllerUtils {
 		AddressRow row = new AddressRow();
 		row.setCommunity(communityString);
 		row.setStreet(streetString);
-		
+
 		return row;
+	}
+
+	/**
+	 * @param code
+	 * @return
+	 */
+	public static String coding(String code) {
+		String code_t = code;
+		// 440306 009003 1200105
+		// 440306 007003 3600024 000002
+		// 只取前面19位
+		if (code.length() > 19) {
+			code_t = code.substring(0, 19);
+		}
+		return code_t;
+	}
+
+	public static List<GeoPoint> getPointsByCodes(List<String> codes) {
+		List<GeoPoint> geoPoints = new ArrayList<GeoPoint>();
+
+		String TABLENAME = "building_position";
+		String fields = "longitude,latitude";
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("sql_fields", fields);
+		map.put("sql_tablename", TABLENAME);
+
+		// sqlite无法一一对应
+//		map.put("list", codes);
+//
+//		List<BuildingPositionRow> building_rows = mapper.selectBuildingByCodes(map);
+//		
+//		for (BuildingPositionRow row : building_rows) {
+//			GeoPoint point = new GeoPoint();
+//			point.setX(row.getLongitude());
+//			point.setY(row.getLatitude());
+//			geoPoints.add(point);
+//		}
+
+		for (int i = 0; i < codes.size(); i++) {
+			String code = codes.get(i);
+			code = coding(code);
+			map.put("code", code);
+			List<BuildingPositionRow> building_rows = mapper.findBuildingEquals(map);
+			// 如果没有找到
+			if (null == building_rows || building_rows.size() < 1) {
+				geoPoints.add(null);
+				continue;
+			}
+			// 一般只能找到一个
+			BuildingPositionRow bRow = building_rows.get(0);
+			GeoPoint point = new GeoPoint();
+			point.setX(bRow.getLongitude());
+			point.setY(bRow.getLatitude());
+			geoPoints.add(point);
+		}
+
+		return geoPoints;
 	}
 
 }

@@ -4,7 +4,6 @@
 package top.geomatics.gazetteer.service.address;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +18,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import top.geomatics.gazetteer.model.AddressRow;
-import top.geomatics.gazetteer.model.BuildingPositionRow;
 import top.geomatics.gazetteer.model.GeoPoint;
 
 /**
@@ -52,22 +50,26 @@ public class BuildingController {
 	public String queryCodes(
 			@ApiParam(value = "指定x坐标，如x=114.017776") @RequestParam(value = "x", required = true) Double x,
 			@ApiParam(value = "指定y坐标，如y=22.639035") @RequestParam(value = "y", required = true) Double y) {
-		String fields = "code";
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("sql_fields", fields);
-		map.put("sql_tablename", TABLENAME);
+		/*
+		 * 这种方法找不准
+		 */
+		/*
+		 * String fields = "code"; Map<String, Object> map = new HashMap<String,
+		 * Object>(); map.put("sql_fields", fields); map.put("sql_tablename",
+		 * TABLENAME);
+		 * 
+		 * map.put("longitude", x); map.put("latitude", y);
+		 * 
+		 * List<BuildingPositionRow> rows =
+		 * ControllerUtils.mapper.findBuildingEquals(map);
+		 * 
+		 * List<String> czwcodes = new ArrayList<>(); for (BuildingPositionRow row :
+		 * rows) { czwcodes.add(row.getCode()); }
+		 */
+		String keywords = x.toString() + "," + y.toString();
+		List<String> codes = CoordinateQuery.getCodesByCoords(keywords);
 
-		map.put("longitude", x);
-		map.put("latitude", y);
-
-		List<BuildingPositionRow> rows = ControllerUtils.mapper.findBuildingEquals(map);
-
-		List<String> czwcodes = new ArrayList<>();
-		for (BuildingPositionRow row : rows) {
-			czwcodes.add(row.getCode());
-		}
-
-		return JSON.toJSONString(czwcodes);
+		return JSON.toJSONString(codes);
 	}
 
 	/**
@@ -83,29 +85,10 @@ public class BuildingController {
 	public String queryPoint(
 			@ApiParam(value = "指定筑物编码，如4403060090031200105") @RequestParam(value = "code", required = true) String code) {
 
-		String fields = "longitude,latitude";
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("sql_fields", fields);
-		map.put("sql_tablename", TABLENAME);
+		List<String> codes = new ArrayList<String>();
+		codes.add(code);
 
-		// 440306 009003 1200105
-		// 440306 007003 3600024 000002
-		// 只取前面19位
-		if (code.length() > 19) {
-			code = code.substring(0, 19);
-		}
-
-		map.put("code", code);
-
-		List<BuildingPositionRow> rows = ControllerUtils.mapper.findBuildingEquals(map);
-
-		List<GeoPoint> geoPoints = new ArrayList<GeoPoint>();
-		for (BuildingPositionRow row : rows) {
-			GeoPoint point = new GeoPoint();
-			point.setX(row.getLongitude());
-			point.setY(row.getLatitude());
-			geoPoints.add(point);
-		}
+		List<GeoPoint> geoPoints = ControllerUtils.getPointsByCodes(codes);
 
 		return JSON.toJSONString(geoPoints);
 
@@ -128,24 +111,11 @@ public class BuildingController {
 		List<String> codes_t = new ArrayList<String>();
 		String[] cs = codes.split(",");
 		for (String s : cs) {
+			s = ControllerUtils.coding(s);
 			codes_t.add(s);
 		}
-		String fields = "longitude,latitude";
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("sql_fields", fields);
-		map.put("sql_tablename", TABLENAME);
 
-		map.put("list", codes_t);
-
-		List<BuildingPositionRow> rows = ControllerUtils.mapper.selectBuildingByCodes(map);
-
-		List<GeoPoint> geoPoints = new ArrayList<GeoPoint>();
-		for (BuildingPositionRow row : rows) {
-			GeoPoint point = new GeoPoint();
-			point.setX(row.getLongitude());
-			point.setY(row.getLatitude());
-			geoPoints.add(point);
-		}
+		List<GeoPoint> geoPoints = ControllerUtils.getPointsByCodes(codes_t);
 
 		return JSON.toJSONString(geoPoints);
 
@@ -166,29 +136,36 @@ public class BuildingController {
 			@ApiParam(value = "指定x坐标，如x=114.017776") @RequestParam(value = "x", required = true) Double x,
 			@ApiParam(value = "指定y坐标，如y=22.639035") @RequestParam(value = "y", required = true) Double y) {
 
-		String fields = "code";
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("sql_fields", fields);
-		map.put("sql_tablename", TABLENAME);
+		/*
+		 * 这种方法找不准
+		 */
+		/*
+		 * String fields = "code"; Map<String, Object> map = new HashMap<String,
+		 * Object>(); map.put("sql_fields", fields); map.put("sql_tablename",
+		 * TABLENAME);
+		 * 
+		 * map.put("longitude", x); map.put("latitude", y);
+		 * 
+		 * List<BuildingPositionRow> rows =
+		 * ControllerUtils.mapper.findBuildingEquals(map);
+		 */
 
-		map.put("longitude", x);
-		map.put("latitude", y);
-
-		List<BuildingPositionRow> rows = ControllerUtils.mapper.findBuildingEquals(map);
+		String keywords = x.toString() + "," + y.toString();
+		List<String> codes = CoordinateQuery.getCodesByCoords(keywords);
 
 		List<AddressRow> rowsTotal = new ArrayList<>();
-		for (BuildingPositionRow row : rows) {
-			String code = row.getCode();
-			// 根据建筑物编码搜索
+		for (String code : codes) {
+			// 根据建筑物编码搜索，一般是19位
 			String fields_t = "*";
 			// String tablename = AddressProcessor.getCommunityFromBuildingCode(code);
 			String tablename = IControllerConstant.ADDRESS_TABLE;
 			AddressRow aRow = new AddressRow();
-			aRow.setCode(code);
+			aRow.setCode("%" + code + "%");
 			Map<String, Object> map_t = ControllerUtils.getRequestMap(fields_t, tablename, aRow, null, 0);
-			List<AddressRow> rows_t = ControllerUtils.mapper.findEquals(map_t);
+			List<AddressRow> rows_t = ControllerUtils.mapper.findLike(map_t);
 			rowsTotal.addAll(rows_t);
 		}
+
 		return ControllerUtils.getResponseBody(rowsTotal);
 	}
 }

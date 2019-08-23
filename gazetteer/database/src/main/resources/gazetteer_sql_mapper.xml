@@ -421,16 +421,18 @@
 			LIMIT #{sql_limit}
 		</if>
 	</select>
-	
+
 	<!--通过codes查询所有字段 -->
-	<select id="selectBuildingByCodes" resultType="BuildingPositionRow">
+	<select id="selectBuildingByCodes"
+		resultType="BuildingPositionRow">
 		SELECT ${sql_fields} FROM ${sql_tablename} where code in
 		<foreach collection="list" index="index" item="code" open="("
 			separator="," close=")">
 			#{code}
 		</foreach>
+		
 	</select>
-	
+
 	<!-- 根据街道或社区、地址关键词搜索 -->
 	<select id="findAddressLike" resultType="AddressRow">
 		SELECT ${sql_fields}

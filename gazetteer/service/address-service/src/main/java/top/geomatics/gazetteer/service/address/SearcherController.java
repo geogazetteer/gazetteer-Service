@@ -25,6 +25,7 @@ import top.geomatics.gazetteer.lucene.LuceneUtil;
 import top.geomatics.gazetteer.lucene.POISearcher;
 import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.model.BuildingPositionRow;
 import top.geomatics.gazetteer.model.GeoPoint;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
@@ -1601,13 +1602,19 @@ public class SearcherController {
 	public String getPointByFid(
 			@ApiParam(value = "数据库中地址记录的fid") @RequestParam(value = IControllerConstant.ADDRESS_DB_ID, required = true) Integer id,
 			@ApiParam(value = "查询的数据库表，如dmdz") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename) {
-		String fields = "*";
-		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
-		map.put(IControllerConstant.ADDRESS_DB_ID, id);
 		List<AddressRow> rows = ControllerUtils.mapper.selectById(id);
 
-		List<GeoPoint> points = CoordinateQuery.getAddressPoints(rows);
-		return JSON.toJSONString(points);
+		// 找到建筑物编码
+		List<String> codes = new ArrayList<String>();
+		for (AddressRow row : rows) {
+			String code = row.getCode();
+			code = ControllerUtils.coding(code);
+			codes.add(code);
+		}
+
+		List<GeoPoint> geoPoints = ControllerUtils.getPointsByCodes(codes);
+
+		return JSON.toJSONString(geoPoints);
 	}
 
 	/**
@@ -1624,19 +1631,28 @@ public class SearcherController {
 	public String getPointsByFids(
 			@ApiParam(value = "数据库中地址记录的ids,如1,2,3") @RequestParam(value = "ids", required = true) String ids,
 			@ApiParam(value = "查询的数据库表，如dmdz") @RequestParam(value = IControllerConstant.TABLE_NAME, required = false, defaultValue = IControllerConstant.ADDRESS_TABLE) String tablename) {
-		String fields = "*";
 		List<Integer> idList = new ArrayList<Integer>();
+		if (ids.endsWith(",")) {
+			ids = ids.substring(0, ids.length() - 1);
+		}
 		String listString[] = ids.split(",");
 		for (String str : listString) {
 			idList.add(Integer.parseInt(str));
 		}
-		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, null, null, 0);
-		map.put("list", idList);
 
 		List<AddressRow> rows = ControllerUtils.mapper.selectByIds(idList);
 
-		List<GeoPoint> points = CoordinateQuery.getAddressPoints(rows);
-		return JSON.toJSONString(points);
+		// 找到建筑物编码
+		List<String> codes = new ArrayList<String>();
+		for (AddressRow row : rows) {
+			String code = row.getCode();
+			code = ControllerUtils.coding(code);
+			codes.add(code);
+		}
+
+		List<GeoPoint> geoPoints = ControllerUtils.getPointsByCodes(codes);
+
+		return JSON.toJSONString(geoPoints);
 	}
 
 }

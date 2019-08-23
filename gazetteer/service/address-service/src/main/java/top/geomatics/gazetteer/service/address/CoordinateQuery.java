@@ -52,6 +52,24 @@ public class CoordinateQuery {
 		}
 		return rowsTotal;
 	}
+	
+	/**
+	 * <b>根据输入的坐标搜索,获得建筑物编码</b><br>
+	 * 
+	 * @param keywords 输入的坐标
+	 * @return 搜索结果
+	 */
+	public static List<String> getCodesByCoords(String keywords) {
+		if (!AddressProcessor.isCoordinatesExpression(keywords)) {
+			return null;
+		}
+		String coordString[] = keywords.split(",");
+		double x = Double.parseDouble(coordString[0]);
+		double y = Double.parseDouble(coordString[1]);
+		List<String> codes = BuildingQuery.getInstance().query(x, y);
+
+		return codes;
+	}
 
 	/**
 	 * <b>根据输入的建筑物编码,获得搜索结果</b><br>
@@ -68,9 +86,11 @@ public class CoordinateQuery {
 		//String tablename = AddressProcessor.getCommunityFromBuildingCode(keywords);
 		String tablename = IControllerConstant.ADDRESS_TABLE;
 		AddressRow aRow = new AddressRow();
-		aRow.setCode(keywords);
+		//建筑物编码 可能为19位
+		
+		aRow.setCode("%" + keywords +"%");
 		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, aRow, null, 0);
-		rows = ControllerUtils.mapper.findSimpleEquals(map);
+		rows = ControllerUtils.mapper.findSimpleLike(map);
 
 		return rows;
 	}

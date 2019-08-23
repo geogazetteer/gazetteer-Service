@@ -61,12 +61,7 @@ public class AddressController {
 	public String selectByCode(
 			@ApiParam(value = "查询的地址编码，如4403060090031200105") @PathVariable(value = IControllerConstant.ADDRESS_CODE, required = true) String code) {
 
-		// 440306 009003 1200105
-		// 440306 007003 3600024 000002
-		// 只取前面19位
-		if (code.length() > 19) {
-			code = code.substring(0, 19);
-		}
+		code = ControllerUtils.coding(code);
 
 		map.put(Messages.getString("AddressController.4"), code); //$NON-NLS-1$
 		List<BuildingPositionRow> rows = mapper.findBuildingEquals(map);
@@ -112,6 +107,7 @@ public class AddressController {
 			@ApiParam(value = "指定查询的x坐标，如114.017776720804") @RequestParam(value = "x", required = true) Double x,
 			@ApiParam(value = "指定查询的y坐标，如22.6390350934369") @RequestParam(value = "y", required = true) Double y) {
 
+		/*
 		map.put(Messages.getString("AddressController.5"), x); //$NON-NLS-1$
 		map.put(Messages.getString("AddressController.6"), y); //$NON-NLS-1$
 		List<BuildingPositionRow> rows = mapper.findBuildingByPoint(map);
@@ -122,8 +118,17 @@ public class AddressController {
 			AddressRow arow = ControllerUtils.getAddressRowByCode(code);
 			addressRows.add(arow);
 		}
-
-		return JSON.toJSONString(addressRows);
+		*/
+		String keywords = x.toString() + "," + y.toString();
+		List<String> codes = CoordinateQuery.getCodesByCoords(keywords);
+		//一个坐标只属于一个社区
+		AddressRow arow = null;
+		if (codes.size() > 0) {
+			arow = ControllerUtils.getAddressRowByCode(codes.get(0));
+		}
+		
+	
+		return JSON.toJSONString(arow);
 	}
 
 	/**
