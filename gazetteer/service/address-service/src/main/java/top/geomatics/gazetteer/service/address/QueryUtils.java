@@ -45,9 +45,9 @@ public class QueryUtils {
 			}
 			if (null != rows_edit && rows_edit.size() > 0) {
 				// 数据库二次查找，只找100次
-				int t=rows_edit.size() < 100?rows_edit.size():100;
-				for (int i = 0; i < t;i++) {
-					AddressEditorRow re =rows_edit.get(i);
+				int t = rows_edit.size() < 100 ? rows_edit.size() : 100;
+				for (int i = 0; i < t; i++) {
+					AddressEditorRow re = rows_edit.get(i);
 					String code = re.getCode_();
 					Double lon = re.getLongitude_();
 					Double lat = re.getLatitude_();
@@ -55,15 +55,7 @@ public class QueryUtils {
 					String flds = "id,address";
 					String tname = "dmdz";
 
-					if (null != oAddress && !oAddress.isEmpty()) {
-						// 先根据地址查找
-						AddressRow arow = new AddressRow();
-						arow.setAddress("%" + oAddress + "%");
-						Map<String, Object> map_t = ControllerUtils.getRequestMap(flds, tname, arow, null, 0);
-						List<SimpleAddressRow> rows_t = ControllerUtils.mapper.findSimpleLike(map_t);
-
-						rows.addAll(rows_t);
-					} else if (null != code && !code.isEmpty()) {
+					if (null != code && !code.isEmpty()) {
 						// 再根据代码查找
 						AddressRow arow = new AddressRow();
 						arow.setCode(code);
@@ -83,6 +75,14 @@ public class QueryUtils {
 
 							rows.addAll(rows_t);
 						}
+					} else if (null != oAddress && !oAddress.isEmpty()) {
+						// 最后根据地址查找
+						AddressRow arow = new AddressRow();
+						arow.setAddress("%" + oAddress + "%");
+						Map<String, Object> map_t = ControllerUtils.getRequestMap(flds, tname, arow, null, 0);
+						List<SimpleAddressRow> rows_t = ControllerUtils.mapper.findSimpleLike(map_t);
+
+						rows.addAll(rows_t);
 					}
 
 				}

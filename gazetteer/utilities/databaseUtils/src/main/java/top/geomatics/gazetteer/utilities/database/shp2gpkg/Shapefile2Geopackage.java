@@ -24,10 +24,13 @@ import org.geotools.geopkg.Entry;
 import org.geotools.geopkg.FeatureEntry;
 import org.geotools.geopkg.GeoPackage;
 import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryType;
+import org.opengis.geometry.coordinate.ParamForPoint;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +60,8 @@ public class Shapefile2Geopackage {
 	private boolean isCreateIndex = false;
 	private static final String GUESS_FROM_GEOMETRY = "guess_from_geometry";
 	private boolean isForce = false;
+	private static final String ADD_GEOMETRY = "add_geometry";
+	private boolean isAddGeometry = false;
 
 	private static DataStore dataStore = null;
 	private static GeoPackage geopkg = null;
@@ -121,6 +126,9 @@ public class Shapefile2Geopackage {
 		}
 		if (this.settings != null && this.settings.containsKey(GUESS_FROM_GEOMETRY)) {
 			isForce = Boolean.parseBoolean(this.settings.get(GUESS_FROM_GEOMETRY));
+		}
+		if (this.settings != null && this.settings.containsKey(ADD_GEOMETRY)) {
+			isAddGeometry = Boolean.parseBoolean(this.settings.get(ADD_GEOMETRY));
 		}
 		return true;
 	}
@@ -232,7 +240,17 @@ public class Shapefile2Geopackage {
 			SimpleFeature targetFeature = null;
 			featureBuilder.addAll(aFeature.getAttributes());
 			// 几何
-			aFeature.getDefaultGeometry();
+			if (isAddGeometry) {
+				Geometry geom = (Geometry) aFeature.getDefaultGeometry();
+				if (geom != null && geom.isValid()) {
+					Point p = geom.getCentroid();
+					if (null != p) {
+						featureBuilder.set("longitude_", p.getX());
+						featureBuilder.set("latitude_", p.getY());
+					}
+				}
+			}
+			
 
 			// 增加新的属性
 			//Map<String, Object> kvp = new HashMap<String, Object>();
