@@ -794,10 +794,10 @@ public class SearcherController {
 		// 设置查询条件
 		String tablename = IControllerConstant.ADDRESS_TABLE;
 		// 为了缩小搜索范围
-		String community = AddressGuessor.guessCommunity(keywords);
-		if (null != community && !community.trim().isEmpty()) {
-			tablename = community;
-		}
+//		String community = AddressGuessor.guessCommunity(keywords);
+//		if (null != community && !community.trim().isEmpty()) {
+//			tablename = community;
+//		}
 		AddressRow row = new AddressRow();
 		row.setAddress("%" + keywords + "%");
 		Map<String, Object> map = ControllerUtils.getRequestMap(null, tablename, row, null, 0);
@@ -827,10 +827,10 @@ public class SearcherController {
 		// 设置查询条件
 		String tablename = IControllerConstant.ADDRESS_TABLE;
 		// 为了缩小搜索范围
-		String community = AddressGuessor.guessCommunity(keywords);
-		if (null != community && !community.trim().isEmpty()) {
-			tablename = community;
-		}
+//		String community = AddressGuessor.guessCommunity(keywords);
+//		if (null != community && !community.trim().isEmpty()) {
+//			tablename = community;
+//		}
 
 		String fieldString = IControllerConstant.ADDRESS_FIELDS;
 		AddressRow row = new AddressRow();
@@ -864,10 +864,10 @@ public class SearcherController {
 		// 设置查询条件
 		String tablename = IControllerConstant.ADDRESS_TABLE;
 		// 为了缩小搜索范围
-		String community = AddressGuessor.guessCommunity(keywords);
-		if (null != community && !community.trim().isEmpty()) {
-			tablename = community;
-		}
+//		String community = AddressGuessor.guessCommunity(keywords);
+//		if (null != community && !community.trim().isEmpty()) {
+//			tablename = community;
+//		}
 
 		String fieldString = IControllerConstant.ADDRESS_FIELDS;
 		AddressRow row = new AddressRow();
