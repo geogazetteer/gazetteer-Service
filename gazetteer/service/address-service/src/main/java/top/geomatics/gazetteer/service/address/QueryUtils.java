@@ -30,6 +30,7 @@ public class QueryUtils {
 		List<SimpleAddressRow> rows = new ArrayList<SimpleAddressRow>();
 		String fileds = "fid,name_,code_,longitude_,latitude_,origin_address";
 		String tablename = "dmdz_edit";
+		int maxHits = 100;//为了保证查询耗时短，限制找到的个数。如果找到100个，就不再找了。
 		AddressEditorRow row = new AddressEditorRow();
 		row.setName_("%" + keywords + "%");
 		Map<String, Object> map = ControllerUtils.getRequestMap_revision(fileds, tablename, row, null, 0);
@@ -38,6 +39,9 @@ public class QueryUtils {
 		BuildingQueryExt buildingQuery = new BuildingQueryExt();
 		buildingQuery.open();
 		for (DatabaseInformation dbInformation : dbInfos) {
+			if (rows.size() > maxHits) {
+				break;
+			}
 			List<AddressEditorRow> rows_edit = null;
 			if (null != dbInformation) {
 				logger.debug("查询数据库： " + dbInformation.getDbPath());
@@ -45,8 +49,12 @@ public class QueryUtils {
 			}
 			if (null != rows_edit && rows_edit.size() > 0) {
 				// 数据库二次查找，只找100次
-				int t = rows_edit.size() < 100 ? rows_edit.size() : 100;
+				int t = rows_edit.size() < maxHits ? rows_edit.size() : maxHits;
 				for (int i = 0; i < t; i++) {
+					if (rows.size() > maxHits) {
+						break;
+					}
+					
 					AddressEditorRow re = rows_edit.get(i);
 					String code = re.getCode_();
 					Double lon = re.getLongitude_();
