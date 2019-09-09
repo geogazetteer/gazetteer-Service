@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import top.geomatics.gazetteer.database.AddressMapper;
 import top.geomatics.gazetteer.database.DatabaseHelper;
@@ -261,7 +262,7 @@ public class ControllerUtils {
 		 */
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
 		// 使用阿里巴巴的fastjson
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -273,7 +274,7 @@ public class ControllerUtils {
 	 */
 	public static String getResponseBody2(List<EnterpriseRow> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -285,7 +286,7 @@ public class ControllerUtils {
 	 */
 	public static String getResponseBody_revision(List<AddressEditorRow> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -297,7 +298,7 @@ public class ControllerUtils {
 	 */
 	public static String getResponseBody3(List<ComparableAddress> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -309,7 +310,7 @@ public class ControllerUtils {
 	 */
 	public static String getResponseBody4(List<SimpleAddressRow> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -326,7 +327,7 @@ public class ControllerUtils {
 		 */
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
 		// 使用阿里巴巴的fastjson
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -343,7 +344,7 @@ public class ControllerUtils {
 		 */
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
 		// 使用阿里巴巴的fastjson
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
