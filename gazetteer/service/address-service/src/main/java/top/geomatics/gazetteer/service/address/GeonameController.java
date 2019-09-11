@@ -38,7 +38,7 @@ public class GeonameController {
 	private static final String TABLENAME = "dmdz_edit";// 表名
 
 	private static Map<String, List<SimpleAddressRow>> rows_map = null;
-	private static Map<String, List<AddressEditorRow>> poi_rows_map = null;
+	private static Map<String, List<SimpleAddressRow2>> poi_rows_map = null;
 	private static int maxHits = 100;// 为了保证查询耗时短，限制找到的个数。如果找到100个，就不再找了。
 
 	/**
@@ -120,7 +120,7 @@ public class GeonameController {
 			@ApiParam(value = "当前页面索引，从1开始") @PathVariable(value = "index", required = true) Integer index,
 			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "10") Integer limit) {
 
-		return queryPoiPage2(keywords, index, limit);
+		return queryPoiPage(keywords, index, limit);
 	}
 
 	/**
@@ -200,12 +200,21 @@ public class GeonameController {
 				poi_rows.addAll(rows_edit);
 			}
 		}
-		if (poi_rows_map == null) {
-			poi_rows_map = new HashMap<String, List<AddressEditorRow>>();
+
+		List<SimpleAddressRow2> poi_rows_t = new ArrayList<SimpleAddressRow2>();
+		for (AddressEditorRow adRow : poi_rows) {
+			SimpleAddressRow2 srow2 = getAddress(adRow);
+			if (srow2 != null) {
+				poi_rows_t.add(srow2);
+			}
 		}
-		poi_rows_map.put(keywords, poi_rows);
+
+		if (poi_rows_map == null) {
+			poi_rows_map = new HashMap<String, List<SimpleAddressRow2>>();
+		}
+		poi_rows_map.put(keywords, poi_rows_t);
 		String resFormat = "{ \"total\": " + "%d" + "}";
-		return String.format(resFormat, poi_rows.size());
+		return String.format(resFormat, poi_rows_t.size());
 	}
 
 	private String queryPoiPage(String keywords, Integer index, Integer limit) {
@@ -213,30 +222,13 @@ public class GeonameController {
 		if (null == poi_rows_map || !poi_rows_map.containsKey(keywords)) {
 			getCountPoiNameLike(keywords);
 		}
-		List<AddressEditorRow> rows = poi_rows_map.get(keywords);
-
-		List<AddressEditorRow> rows_t = new ArrayList<AddressEditorRow>();
-		int start = (index - 1) * limit;
-		int end = (start + limit) < rows.size() ? (start + limit) : rows.size();
-		for (int i = start; i < end; i++) {
-			rows_t.add(rows.get(i));
-		}
-		return ControllerUtils.getResponseBody_revision(rows_t);
-	}
-
-	private String queryPoiPage2(String keywords, Integer index, Integer limit) {
-
-		if (null == poi_rows_map || !poi_rows_map.containsKey(keywords)) {
-			getCountPoiNameLike(keywords);
-		}
-		List<AddressEditorRow> rows = poi_rows_map.get(keywords);
+		List<SimpleAddressRow2> rows = poi_rows_map.get(keywords);
 
 		List<SimpleAddressRow2> rows_t = new ArrayList<SimpleAddressRow2>();
 		int start = (index - 1) * limit;
 		int end = (start + limit) < rows.size() ? (start + limit) : rows.size();
 		for (int i = start; i < end; i++) {
-			AddressEditorRow row = rows.get(i);
-			rows_t.add(getAddress(row));
+			rows_t.add(rows.get(i));
 		}
 		return ControllerUtils.getResponseBody7(rows_t);
 	}
@@ -290,9 +282,7 @@ public class GeonameController {
 			}
 		}
 		// 没有找到
-		row2 = new SimpleAddressRow2();
-		row2.setName(row.getName_());
-		return row2;
+		return null;
 	}
 
 	private SimpleAddressRow2 getAddressByCode(String code, String name) {
