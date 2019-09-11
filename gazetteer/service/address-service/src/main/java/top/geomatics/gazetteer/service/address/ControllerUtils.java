@@ -27,6 +27,7 @@ import top.geomatics.gazetteer.model.GeoPoint;
 import top.geomatics.gazetteer.model.IGazetteerConstant;
 import top.geomatics.gazetteer.model.MatcherResultRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
+import top.geomatics.gazetteer.model.SimpleAddressRow2;
 
 /**
  * @author whudyj
@@ -344,6 +345,18 @@ public class ControllerUtils {
 		 */
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
 		// 使用阿里巴巴的fastjson
+		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
+		responseString += "}";
+		return responseString;
+
+	}
+	
+	/**
+	 * @param rows
+	 * @return
+	 */
+	public static String getResponseBody7(List<SimpleAddressRow2> rows) {
+		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
 		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
