@@ -182,13 +182,13 @@ public class GeonameController {
 		String tablename = "dmdz_edit";
 		AddressEditorRow row = new AddressEditorRow();
 		row.setName_("%" + keywords + "%");
-		Map<String, Object> map = ControllerUtils.getRequestMap_revision(fileds, tablename, row, null, 0);
+		Map<String, Object> map = ControllerUtils.getRequestMap_revision(fileds, tablename, row, null, maxHits);
 		DatabaseManager dm = DatabaseManager.getInstance();
 		DatabaseInformation[] dbInfos = dm.list();
 		List<AddressEditorRow> poi_rows = new ArrayList<AddressEditorRow>();
 
 		for (DatabaseInformation dbInformation : dbInfos) {
-			if (poi_rows.size() > maxHits) {
+			if (poi_rows.size() >= maxHits) {
 				break;
 			}
 			List<AddressEditorRow> rows_edit = null;
@@ -202,7 +202,9 @@ public class GeonameController {
 		}
 
 		List<SimpleAddressRow2> poi_rows_t = new ArrayList<SimpleAddressRow2>();
-		for (AddressEditorRow adRow : poi_rows) {
+		int max = poi_rows.size() > maxHits ? maxHits : poi_rows.size();
+		for (int i = 0; i < max; i++) {
+			AddressEditorRow adRow = poi_rows.get(i);
 			SimpleAddressRow2 srow2 = getAddress(adRow);
 			if (srow2 != null) {
 				poi_rows_t.add(srow2);
@@ -270,7 +272,7 @@ public class GeonameController {
 			String tname = "dmdz";
 			AddressRow arow = new AddressRow();
 			arow.setAddress("%" + oAddress + "%");
-			Map<String, Object> map_t = ControllerUtils.getRequestMap(flds, tname, arow, null, 0);
+			Map<String, Object> map_t = ControllerUtils.getRequestMap(flds, tname, arow, null, 1);
 			List<SimpleAddressRow> rows_t = ControllerUtils.mapper.findSimpleLike(map_t);
 			if (rows_t.size() > 0) {
 				SimpleAddressRow srow = rows_t.get(0);
@@ -291,7 +293,7 @@ public class GeonameController {
 		// 根据代码查找
 		AddressRow arow = new AddressRow();
 		arow.setCode(code);
-		Map<String, Object> map_t = ControllerUtils.getRequestMap(flds, tname, arow, null, 0);
+		Map<String, Object> map_t = ControllerUtils.getRequestMap(flds, tname, arow, null, 1);
 		List<SimpleAddressRow> rows_t = ControllerUtils.mapper.findSimpleEquals(map_t);
 
 		if (rows_t.size() > 0) {
