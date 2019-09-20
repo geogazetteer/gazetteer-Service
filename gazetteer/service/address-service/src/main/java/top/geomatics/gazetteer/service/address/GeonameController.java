@@ -1,14 +1,21 @@
 package top.geomatics.gazetteer.service.address;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +32,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.AddressRow;
+import top.geomatics.gazetteer.model.GeoPoint;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow2;
 import top.geomatics.gazetteer.utilities.database.building.BuildingQueryExt;
@@ -45,8 +53,8 @@ import top.geomatics.gazetteer.utilities.database.building.BuildingQueryExt;
 public class GeonameController {
 	// 添加slf4j日志实例对象
 	private final static Logger logger = LoggerFactory.getLogger(GeonameController.class);
-	
-	//高得地图API Key和URL
+
+	// 高得地图API Key和URL
 	private final static String API_KEY = "2b499f1c9f1fe0b10e175fdfd452fcb2";
 	private final static String API_URL_GEO = "https://restapi.amap.com/v3/geocode/geo";
 	private final static String CITY_SZ = "深圳";
@@ -114,9 +122,10 @@ public class GeonameController {
 	@ApiOperation(value = "返回查询的地名/POI记录总数", notes = "返回查询的地名/POI记录总数")
 	@GetMapping("name/sum")
 	public String getCountNameLike(
-			@ApiParam(value = "查询关键词，如深圳市乐宾科技有限公司") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS, required = true) String keywords) {
+			@ApiParam(value = "查询关键词，如深圳市乐宾科技有限公司") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS, required = true) String keywords,
+			@ApiParam(value = "API_KEY") @RequestParam(value = "高得", required = false, defaultValue = API_KEY) String api_key) {
 
-		return getCountPoiNameLike(keywords);
+		return getCountPoiNameLike(keywords, api_key);
 	}
 
 	/**
@@ -133,10 +142,11 @@ public class GeonameController {
 	@GetMapping("name/page/{index}")
 	public String queryAllPage(
 			@ApiParam(value = "查询关键词，如深圳市乐宾科技有限公司") @RequestParam(value = IControllerConstant.QUERY_KEYWORDS, required = true) String keywords,
+			@ApiParam(value = "API_KEY") @RequestParam(value = "高得", required = false, defaultValue = API_KEY) String api_key,
 			@ApiParam(value = "当前页面索引，从1开始") @PathVariable(value = "index", required = true) Integer index,
 			@ApiParam(value = "限定每页查询的记录个数") @RequestParam(value = IControllerConstant.SQL_LIMIT, required = false, defaultValue = "10") Integer limit) {
 
-		return queryPoiPage(keywords, index, limit);
+		return queryPoiPage(api_key, keywords, index, limit);
 	}
 
 	/**
@@ -193,12 +203,12 @@ public class GeonameController {
 		return queryPage(row, index, limit);
 	}
 
-	private String getCountPoiNameLike(String keywords) {
-		
+	private String getCountPoiNameLike(String keywords, String api_key) {
+
 		List<SimpleAddressRow2> poi_rows_t = getCountFromDB(keywords);
 		if (null == poi_rows_t || poi_rows_t.size() < 1) {
-			//用高得地图找
-			poi_rows_t = getAddressFromAmap(keywords,API_KEY);
+			// 用高得地图找
+			poi_rows_t = getAddressFromAmap(keywords, api_key);
 		}
 
 		if (poi_rows_map == null) {
@@ -208,7 +218,7 @@ public class GeonameController {
 		String resFormat = "{ \"total\": " + "%d" + "}";
 		return String.format(resFormat, poi_rows_t.size());
 	}
-	
+
 	private List<SimpleAddressRow2> getCountFromDB(String keywords) {
 		String fileds = "fid,name_,code_,longitude_,latitude_,origin_address";
 		String tablename = "dmdz_edit";
@@ -240,18 +250,27 @@ public class GeonameController {
 			SimpleAddressRow2 srow2 = getAddress(adRow);
 			if (srow2 != null) {
 				poi_rows_t.add(srow2);
+			} else if (null != adRow)// 如果没有找到，直接用原来的信息
+			{
+				SimpleAddressRow2 srow3 = new SimpleAddressRow2();
+				srow3.setId(-1);
+				srow3.setAddress(adRow.getOrigin_address());
+				srow3.setName(adRow.getName_());
+				srow3.setX(adRow.getLongitude_());
+				srow3.setY(adRow.getLatitude_());
+
+				poi_rows_t.add(srow3);
 			}
 		}
-		
+
 		return poi_rows_t;
-		
+
 	}
 
-
-	private String queryPoiPage(String keywords, Integer index, Integer limit) {
+	private String queryPoiPage(String api_key, String keywords, Integer index, Integer limit) {
 
 		if (null == poi_rows_map || !poi_rows_map.containsKey(keywords)) {
-			getCountPoiNameLike(keywords);
+			getCountPoiNameLike(keywords, api_key);
 		}
 		List<SimpleAddressRow2> rows = poi_rows_map.get(keywords);
 
@@ -271,14 +290,24 @@ public class GeonameController {
 		String code = row.getCode_();
 		Double lon = row.getLongitude_();
 		Double lat = row.getLatitude_();
-		String oAddress = row.getOrigin_address();
-
+	
 		SimpleAddressRow2 row2 = null;
 
 		if (null != code && !code.isEmpty()) {
 			// 根据代码查找
 			row2 = getAddressByCode(code, row.getName_());
 			if (null != row2) {
+				if (null != lon && null != lat) {
+					row2.setX(lon);
+					row2.setY(lat);
+				}else {
+					//查询坐标
+					GeoPoint point = ControllerUtils.getPointByCode(code);
+					if (null != point) {
+						row2.setX(point.getX());
+						row2.setY(point.getY());
+					}
+				}
 				return row2;
 			}
 
@@ -291,27 +320,24 @@ public class GeonameController {
 			if (codes.size() > 0) {
 				row2 = getAddressByCode(codes.get(0), row.getName_());
 				if (null != row2) {
+					row2.setX(lon);
+					row2.setY(lat);
 					return row2;
 				}
 			}
 
-		} else if (null != oAddress && !oAddress.isEmpty()) {
-			// 最后根据地址查找
-			String flds = "id,address";
-			String tname = "dmdz";
-			AddressRow arow = new AddressRow();
-			arow.setAddress("%" + oAddress + "%");
-			Map<String, Object> map_t = ControllerUtils.getRequestMap(flds, tname, arow, null, 1);
-			List<SimpleAddressRow> rows_t = ControllerUtils.mapper.findSimpleLike(map_t);
-			if (rows_t.size() > 0) {
-				SimpleAddressRow srow = rows_t.get(0);
-				SimpleAddressRow2 srow2 = new SimpleAddressRow2();
-				srow2.setId(srow.getId());
-				srow2.setAddress(srow.getAddress());
-				srow2.setName(row.getName_());
-				return srow2;
-			}
 		}
+		/*
+		 * else if (null != oAddress && !oAddress.isEmpty()) { // 最后根据地址查找 String flds =
+		 * "id,address"; String tname = "dmdz"; AddressRow arow = new AddressRow();
+		 * arow.setAddress("%" + oAddress + "%"); Map<String, Object> map_t =
+		 * ControllerUtils.getRequestMap(flds, tname, arow, null, 1);
+		 * List<SimpleAddressRow> rows_t = ControllerUtils.mapper.findSimpleLike(map_t);
+		 * if (rows_t.size() > 0) { SimpleAddressRow srow = rows_t.get(0);
+		 * SimpleAddressRow2 srow2 = new SimpleAddressRow2(); srow2.setId(srow.getId());
+		 * srow2.setAddress(srow.getAddress()); srow2.setName(row.getName_()); return
+		 * srow2; } }
+		 */
 		// 没有找到
 		return null;
 	}
@@ -329,6 +355,7 @@ public class GeonameController {
 			SimpleAddressRow srow = rows_t.get(0);
 			SimpleAddressRow2 row2 = new SimpleAddressRow2();
 			row2.setId(srow.getId());
+			row2.setCode(code);
 			row2.setAddress(srow.getAddress());
 			row2.setName(name);
 			return row2;
@@ -406,83 +433,100 @@ public class GeonameController {
 		}
 		return ControllerUtils.getResponseBody4(rows_t);
 	}
-	
-	private List<SimpleAddressRow2> getAddressFromAmap(String keywords,String api_key) {
+
+	private List<SimpleAddressRow2> getAddressFromAmap(String keywords, String api_key) {
 		StringBuffer parameters = new StringBuffer();
 		parameters.append("key=" + api_key + "&address=" + keywords);
 		parameters.append("&city=" + CITY_SZ);
-	    String res = sendGet(API_URL_GEO, parameters.toString());
-	    logger.info(res);
-	    JSONObject jsonObject = JSONObject.parseObject(res);
-	    JSONArray jsonArray = JSONArray.parseArray(jsonObject.getString("geocodes"));
-	    
-	    int max = jsonArray.size() > maxHits ? maxHits : jsonArray.size();
-	    
-	    List<SimpleAddressRow2> poi_rows_t = new ArrayList<SimpleAddressRow2>();
-	    for (int i = 0; i < max; i++) {
-	    	JSONObject location = (JSONObject)jsonArray.get(i);
-	    	String ll = location.get("location").toString();
-	    	String loc[] = ll.split(",");
-	    	if (loc.length < 2) {
+		String res = sendGet(API_URL_GEO, parameters.toString());
+//		logger.info(res);
+		JSONObject jsonObject = JSONObject.parseObject(res);
+		JSONArray jsonArray = JSONArray.parseArray(jsonObject.getString("geocodes"));
+
+		int max = jsonArray.size() > maxHits ? maxHits : jsonArray.size();
+
+		List<SimpleAddressRow2> poi_rows_t = new ArrayList<SimpleAddressRow2>();
+		for (int i = 0; i < max; i++) {
+			JSONObject location = (JSONObject) jsonArray.get(i);
+			String ll = location.get("location").toString();
+			String loc[] = ll.split(",");
+			if (loc.length < 2) {
 				continue;
 			}
-	    	Double x = Double.parseDouble(loc[0]);
-	    	Double y = Double.parseDouble(loc[1]);
-	    	AddressEditorRow adRow = new AddressEditorRow();
-	    	adRow.setLongitude_(x);
-	    	adRow.setLatitude_(y);
-	    	
-	    	SimpleAddressRow2 srow2 = getAddress(adRow);
-			if (srow2 != null) {
-				poi_rows_t.add(srow2);
+			Double x = Double.parseDouble(loc[0]);
+			Double y = Double.parseDouble(loc[1]);
+			String address = location.getString("formatted_address");
+			AddressEditorRow adRow = new AddressEditorRow();
+			adRow.setLongitude_(x);
+			adRow.setLatitude_(y);
+			adRow.setOrigin_address(address);
+			adRow.setName_(keywords);
+
+//	    	SimpleAddressRow2 srow2 = getAddress(adRow);
+//			if (srow2 != null) {
+//				poi_rows_t.add(srow2);
+//			}else if(null != adRow)//如果没有找到，直接用原来的信息
+			{
+				SimpleAddressRow2 srow3 = new SimpleAddressRow2();
+				srow3.setId(-1);
+				srow3.setAddress(adRow.getOrigin_address());
+				srow3.setName(adRow.getName_());
+				srow3.setX(adRow.getLongitude_());
+				srow3.setY(adRow.getLatitude_());
+
+				poi_rows_t.add(srow3);
 			}
 		}
-		   	   
+
 		return poi_rows_t;
 	}
-	
-	public static String sendGet(String url, String param) {
-	    String result = "";
-	    BufferedReader in = null;
-	    try {
-	        String urlNameString = url + "?" + param;
-	        URL realUrl = new URL(urlNameString);
-	        // 打开和URL之间的连接
-	        URLConnection connection = realUrl.openConnection();
-	        // 设置通用的请求属性
-	        connection.setRequestProperty("accept", "*/*");
-	        connection.setRequestProperty("connection", "Keep-Alive");
-	        connection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-	        // 建立实际的连接
-	        connection.connect();
-	        // 获取所有响应头字段
-	        Map<String, List<String>> map = connection.getHeaderFields();
-	        // 遍历所有的响应头字段
-	        for (String key : map.keySet()) {
-	            logger.info(key + "--->" + map.get(key));
-	        }
-	        // 定义 BufferedReader输入流来读取URL的响应
-	        in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-	        String line;
-	        while ((line = in.readLine()) != null) {
-	            result += line;
-	        }
-	    } catch (Exception e) {
-	        logger.info("发送GET请求出现异常！" + e);
-	        e.printStackTrace();
-	    }
-	    // 使用finally块来关闭输入流
-	    finally {
-	        try {
-	            if (in != null) {
-	                in.close();
-	            }
-	        } catch (Exception e2) {
-	            e2.printStackTrace();
-	        }
-	    }
-	    return result;
-	}
 
+	public static String sendGet(String url, String param) {
+		String result = "";
+		BufferedReader in = null;
+		CloseableHttpResponse response = null;
+		try {
+			String urlNameString = url + "?" + param;
+			URL realUrl = new URL(urlNameString);
+//			logger.info("URL: " + realUrl);
+			// 打开和URL之间的连接
+			CloseableHttpClient httpclient = HttpClients.createDefault();
+			RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(1000).setConnectTimeout(1000).build();
+			HttpGet httpget = new HttpGet(realUrl.toURI());
+			httpget.setConfig(requestConfig);
+			response = httpclient.execute(httpget);
+			Header[] headers = response.getAllHeaders();
+//			for (Header header : headers) {
+//				logger.info(header.getName() + "--->" + header.getValue());
+//			}
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				InputStream instream = ((org.apache.http.HttpEntity) entity).getContent();
+				// 定义 BufferedReader输入流来读取URL的响应
+				in = new BufferedReader(new InputStreamReader(instream,"utf-8"));
+				String line;
+				while ((line = in.readLine()) != null) {
+					result += line;
+				}
+			}
+		} catch (Exception e) {
+			logger.info("发送GET请求出现异常！" + e);
+			e.printStackTrace();
+		}
+		// 使用finally块来关闭输入流
+		finally {
+			try {
+				if (null != response) {
+					response.close();
+				}
+				if (in != null) {
+					in.close();
+				}
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+		return result;
+	}
 
 }

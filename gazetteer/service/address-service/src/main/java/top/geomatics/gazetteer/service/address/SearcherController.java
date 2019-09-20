@@ -23,14 +23,12 @@ import top.geomatics.gazetteer.lucene.AddressSearcherPinyin;
 import top.geomatics.gazetteer.lucene.GeoNameSearcher;
 import top.geomatics.gazetteer.lucene.LuceneUtil;
 import top.geomatics.gazetteer.lucene.POISearcher;
-import top.geomatics.gazetteer.model.AddressEditorRow;
 import top.geomatics.gazetteer.model.AddressRow;
-import top.geomatics.gazetteer.model.BuildingPositionRow;
 import top.geomatics.gazetteer.model.GeoPoint;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
+import top.geomatics.gazetteer.model.SimpleAddressRow2;
 import top.geomatics.gazetteer.utilities.address.AddressProcessor;
 import top.geomatics.gazetteer.utilities.address.SearcherSettings;
-import top.geomatics.gazetteer.utilities.database.AddressGuessor;
 
 /**
  * <b>搜索服务</b><br>
@@ -876,7 +874,23 @@ public class SearcherController {
 		Integer page_start = (index - 1) * limit;
 		map.put("page_start", page_start);
 		// 返回查询结果
-		return ControllerUtils.getResponseBody4(ControllerUtils.mapper.findSimpleLikePage(map));
+		List<SimpleAddressRow> rows = ControllerUtils.mapper.findSimpleLikePage(map);
+		List<SimpleAddressRow2> rows2 = new ArrayList<SimpleAddressRow2>();
+		for (SimpleAddressRow r : rows) {
+			SimpleAddressRow2 r2 = new SimpleAddressRow2();
+			r2.setId(r.getId());
+			r2.setAddress(r.getAddress());
+			r2.setCode(r.getCode());
+			r2.setName(keywords);
+			// 查询坐标
+			GeoPoint point = ControllerUtils.getPointByCode(r.getCode());
+			if (null != point) {
+				r2.setX(point.getX());
+				r2.setY(point.getY());
+			}
+			rows2.add(r2);
+		}
+		return ControllerUtils.getResponseBody7(rows2);
 	}
 
 	/**

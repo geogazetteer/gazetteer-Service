@@ -263,7 +263,7 @@ public class ControllerUtils {
 		 */
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
 		// 使用阿里巴巴的fastjson
-		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -275,7 +275,7 @@ public class ControllerUtils {
 	 */
 	public static String getResponseBody2(List<EnterpriseRow> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -287,7 +287,7 @@ public class ControllerUtils {
 	 */
 	public static String getResponseBody_revision(List<AddressEditorRow> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -299,7 +299,7 @@ public class ControllerUtils {
 	 */
 	public static String getResponseBody3(List<ComparableAddress> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -311,7 +311,7 @@ public class ControllerUtils {
 	 */
 	public static String getResponseBody4(List<SimpleAddressRow> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -328,7 +328,7 @@ public class ControllerUtils {
 		 */
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
 		// 使用阿里巴巴的fastjson
-		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -345,19 +345,19 @@ public class ControllerUtils {
 		 */
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
 		// 使用阿里巴巴的fastjson
-		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
 	}
-	
+
 	/**
 	 * @param rows
 	 * @return
 	 */
 	public static String getResponseBody7(List<SimpleAddressRow2> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		responseString += JSON.toJSONString(rows,SerializerFeature.DisableCircularReferenceDetect);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -461,6 +461,29 @@ public class ControllerUtils {
 		}
 
 		return geoPoints;
+	}
+
+	public static GeoPoint getPointByCode(String code) {
+
+		String TABLENAME = "building_position";
+		String fields = "longitude,latitude";
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("sql_fields", fields);
+		map.put("sql_tablename", TABLENAME);
+
+		String code_t = coding(code);
+		map.put("code", code_t);
+		List<BuildingPositionRow> building_rows = mapper.findBuildingEquals(map);
+		// 如果没有找到
+		if (null == building_rows || building_rows.size() < 1) {
+			return null;
+		}
+		// 一般只能找到一个
+		BuildingPositionRow bRow = building_rows.get(0);
+		GeoPoint point = new GeoPoint();
+		point.setX(bRow.getLongitude());
+		point.setY(bRow.getLatitude());
+		return point;
 	}
 
 }
