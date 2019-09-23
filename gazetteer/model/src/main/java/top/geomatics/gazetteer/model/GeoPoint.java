@@ -9,6 +9,16 @@ package top.geomatics.gazetteer.model;
 public class GeoPoint {
 	private double x; // x坐标
 	private double y; // y坐标
+	
+	public GeoPoint() {
+		super();
+	}
+
+	public GeoPoint(double x, double y) {
+		super();
+		this.x = x;
+		this.y = y;
+	}
 
 	public double getX() {
 		return x;

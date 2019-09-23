@@ -35,6 +35,7 @@ import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.GeoPoint;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow2;
+import top.geomatics.gazetteer.utilities.address.CoordTransformation;
 import top.geomatics.gazetteer.utilities.database.building.BuildingQueryExt;
 
 /**
@@ -455,6 +456,11 @@ public class GeonameController {
 			}
 			Double x = Double.parseDouble(loc[0]);
 			Double y = Double.parseDouble(loc[1]);
+			//高得坐标转换为WGS84坐标
+			GeoPoint gp = new GeoPoint(x,y);
+			x = CoordTransformation.gcj02_to_wgs84(gp).getX();
+			y = CoordTransformation.gcj02_to_wgs84(gp).getY();
+			
 			String address = location.getString("formatted_address");
 			AddressEditorRow adRow = new AddressEditorRow();
 			adRow.setLongitude_(x);
