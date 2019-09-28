@@ -105,6 +105,18 @@ public interface AddressMapper {
 	 * @return 搜索结果集
 	 */
 	public List<BuildingPositionRow> findBuildingEquals(Map<String, Object> map);
+	
+	/**
+	 * <b>根据一组code查询</b><br>
+	 * 
+	 * <i>说明：</i><br>
+	 * <i>表名固定为：building_position</i><br>
+	 * 
+	 * @param codes 一组code
+	 * @return 搜索结果集
+	 */
+	public List<BuildingPositionRow> selectBuildingByCodes(Map<String, Object> map);
+
 
 	/**
 	 * <b>任意模糊查询</b><br>

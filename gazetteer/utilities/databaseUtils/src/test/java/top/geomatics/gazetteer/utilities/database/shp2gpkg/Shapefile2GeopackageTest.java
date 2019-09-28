@@ -7,17 +7,22 @@ import java.util.Map;
 import org.junit.Test;
 
 public class Shapefile2GeopackageTest {
-	private static final String shapefileName = "H:\\temp\\深圳龙华社康\\民营医院社康中心.shp";
-	private static final String geopackageName = "H:\\temp\\深圳龙华社康\\民营医院社康中心.gpkg";
+	private static final String shapefileName = "D:\\data\\数据整合_邓老师\\法人数据2\\法人数据（简化）1.shp";
+	private static final String geopackageName = "H:\\temp\\data2\\企业法人数据.gpkg";
 	private Map<String, String> settings = new HashMap<String, String>();
 	
 	@Test
 	public void testExecute() {
-//		settings.put("地址", "origin_address");
-//		settings.put("X", "longitude_");
-//		settings.put("Y", "latitude_");
-//		Shapefile2Geopackage s2g = new Shapefile2Geopackage(shapefileName, geopackageName,settings);
-//		s2g.execute();
+		settings.put("NAME", "name_");
+		settings.put("CZWCODE", "code_");
+		settings.put("JYCS", "origin_address");
+		settings.put("X", "longitude_");
+		settings.put("Y", "latitude_");
+		settings.put("JDNAME", "street_");
+		settings.put("SQNAME", "community_");
+		//settings.put("add_geometry", "true");
+		Shapefile2Geopackage s2g = new Shapefile2Geopackage(shapefileName, geopackageName,settings);
+		s2g.execute();
 	}
 	@Test
 	public void testGetFields() {

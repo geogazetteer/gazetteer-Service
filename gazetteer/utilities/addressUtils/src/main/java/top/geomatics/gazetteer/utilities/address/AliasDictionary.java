@@ -9,11 +9,11 @@ package top.geomatics.gazetteer.utilities.address;
  * @author whudyj
  *
  */
-public class AliasDictionary extends ChineseDictionary {
+public class AliasDictionary {
 	private static final String DICTIONARY_FILE = "alias_dictionary";
+	private ChineseDictionary dictionary = new ChineseDictionary(DICTIONARY_FILE);
 
 	private AliasDictionary() {
-		super(DICTIONARY_FILE);
 	}
 
 	private static class AliasInstance {
@@ -22,6 +22,22 @@ public class AliasDictionary extends ChineseDictionary {
 
 	public static AliasDictionary getInstance() {
 		return AliasInstance.instance;
+	}
+
+	public String getSynonym(String word) {
+		return dictionary.getSynonym(word);
+	}
+
+	public boolean containsKey(String word) {
+		return dictionary.containsKey(word);
+	}
+
+	public boolean contains(String word) {
+		return dictionary.contains(word);
+	}
+
+	public String replace(String word) {
+		return dictionary.replace(word);
 	}
 
 }

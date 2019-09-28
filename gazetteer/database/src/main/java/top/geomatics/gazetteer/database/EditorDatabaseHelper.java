@@ -36,14 +36,47 @@ public class EditorDatabaseHelper {
 	private static SqlSessionFactory sessionFactory = null;
 
 	private ResourcesManager2 manager = null;
-	
+
 	private String editor_properties_file = null;
+
+	private Properties prop = null;
 
 	public EditorDatabaseHelper(String userName) {
 		super();
 		this.userName = userName;
 		manager = new ResourcesManager2(this.userName);
 		editor_properties_file = manager.getValue(EDITOR_DB_PROPERTIES_FILE);
+		// 数据库配置
+		prop = new Properties();
+		try {
+			prop.load(new BufferedReader(new InputStreamReader(new FileInputStream(editor_properties_file), "UTF-8")));
+		} catch (Exception e) {
+			e.printStackTrace();
+			String logMsgString = String.format(Messages.getString("EnterpriseDatabaseHelper.1"), //$NON-NLS-1$
+					editor_properties_file);
+			logger.error(logMsgString);
+		}
+	}
+
+	public EditorDatabaseHelper(String userName, String prof) {
+		super();
+		this.userName = userName;
+		editor_properties_file = prof;
+		// 数据库配置
+		prop = new Properties();
+		try {
+			prop.load(new BufferedReader(new InputStreamReader(new FileInputStream(editor_properties_file), "UTF-8")));
+		} catch (Exception e) {
+			e.printStackTrace();
+			String logMsgString = String.format(Messages.getString("EnterpriseDatabaseHelper.1"), //$NON-NLS-1$
+					editor_properties_file);
+			logger.error(logMsgString);
+		}
+	}
+
+	public EditorDatabaseHelper(Properties prop) {
+		super();
+		this.prop = prop;
 	}
 
 	// 创建能执行映射文件中sql的sqlSession
@@ -51,9 +84,6 @@ public class EditorDatabaseHelper {
 		try {
 			// 使用MyBatis提供的Resources类加载mybatis的配置文件
 			InputStream inputStream = Resources.getResourceAsStream(resource);
-			Properties prop = new Properties();
-			prop.load(new BufferedReader(new InputStreamReader(new FileInputStream(editor_properties_file), "UTF-8")));
-			// prop.load(new FileInputStream(new File(editor_properties_file)));
 			// 构建sqlSession的工厂
 			sessionFactory = new SqlSessionFactoryBuilder().build(inputStream, prop);
 		} catch (Exception e) {

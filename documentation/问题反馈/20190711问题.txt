@@ -1,0 +1,9 @@
+3.搜索结果显示前十条在地图上落点
+需要一个接口返回前十条数据的坐标，否则需要调用building/point?code=code接口10次
+
+5.编辑数据下载
+导出的数据调用了数据导出服务，在swagger-ui上下载的数据是否能够打开呢？
+
+6。编辑数据补充完整
+接口http://119.3.72.23:8083/revision/fid/4?fields=*&tablename=dmdz_edit&username=user_enterprise1  
+返回的数据中没有street_,community_字段

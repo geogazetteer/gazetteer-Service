@@ -3,7 +3,9 @@ package top.geomatics.gazetteer.lucene;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.ansj.lucene7.AnsjAnalyzer;
 import org.ansj.lucene7.AnsjAnalyzer.TYPE;
@@ -17,7 +19,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.TotalHits;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -41,15 +42,17 @@ public class GeoNameSearcher {
 
 	private static ResourcesManager manager = ResourcesManager.getInstance();
 	private static final String LUCENE_INDEX_PATH = Messages.getString("GeoNameSearcher.0"); //$NON-NLS-1$
-	private static final int MAX_HITS = 100000000;
+	private static final int MAX_HITS = 10000;
 
 	@Value("${index.path}")
 	public static String INDEX_PATH = manager.getValue(LUCENE_INDEX_PATH);
 	private static IndexSearcher indexSearcher = null;
 	private static final String GEONAME = Messages.getString("GeoNameSearcher.1"); //$NON-NLS-1$
 	private static final String ADDRESS = Messages.getString("GeoNameSearcher.2"); //$NON-NLS-1$
-	private static TopDocs topDocs = null;
-	private static TotalHits totalHits = null;
+	private static Map<String, TopDocs> docsMap = null;
+
+	private static Map<String, List<SimpleAddressRow>> rows_map = null;
+	private static QueryParser queryParser = new QueryParser(GEONAME, new AnsjAnalyzer(TYPE.query_ansj));
 
 	/**
 	 * <b>初始化索引搜索对象</b><br>
@@ -78,14 +81,25 @@ public class GeoNameSearcher {
 	 * 
 	 * @param query 查询对象
 	 */
-	public static void buildSearch(Query query) {
+	public static void buildSearch(int queryType, String keywords) {
+		Query query = null;
+		TopDocs topDocs = null;
+		if (null == docsMap) {
+			docsMap = new HashMap<String, TopDocs>();
+		}
+		if (docsMap.containsKey(keywords)) {
+			return;// 已经查过了
+		}
 		try {
+			query = buildQuery(queryType, keywords);
 			topDocs = indexSearcher.search(query, MAX_HITS);
-			totalHits = topDocs.totalHits;
 		} catch (IOException e) {
 			e.printStackTrace();
 			String logMsgString = String.format(Messages.getString("GeoNameSearcher.4"), query.toString()); //$NON-NLS-1$
 			logger.error(logMsgString);
+		}
+		if (!docsMap.containsKey(keywords)) {
+			docsMap.put(keywords, topDocs);
 		}
 	}
 
@@ -100,7 +114,6 @@ public class GeoNameSearcher {
 	 */
 	public static Query buildQuery(int queryType, String keyword) {
 		Query query = null;
-		QueryParser queryParser = null;
 		switch (queryType) {
 		case 1:
 			query = new TermQuery(new Term(GEONAME, keyword));
@@ -111,7 +124,6 @@ public class GeoNameSearcher {
 			break;
 		case 0:
 		default:
-			queryParser = new QueryParser(GEONAME, new AnsjAnalyzer(TYPE.query_ansj));
 			try {
 				query = queryParser.parse(keyword);
 			} catch (ParseException e) {
@@ -134,8 +146,11 @@ public class GeoNameSearcher {
 	 * @return 查询结果个数
 	 */
 	public static long getCount(String keyword, int queryType) {
-		buildSearch(buildQuery(queryType, keyword));
-		return totalHits.value;
+		if (null == docsMap || !docsMap.containsKey(keyword)) {
+			buildSearch(queryType, keyword);
+		}
+
+		return docsMap.get(keyword).totalHits.value;
 	}
 
 	/**
@@ -146,8 +161,7 @@ public class GeoNameSearcher {
 	 * @return 查询结果个数
 	 */
 	public static long getCount(String keyword) {
-		buildSearch(buildQuery(0, keyword));
-		return totalHits.value;
+		return getCount(keyword, 0);
 	}
 
 	/**
@@ -160,9 +174,11 @@ public class GeoNameSearcher {
 	 */
 	public static List<EnterpriseRow> query(String keywords, int maxHits) {
 		List<EnterpriseRow> list = new ArrayList<EnterpriseRow>();
+		if (null == docsMap || !docsMap.containsKey(keywords)) {
+			buildSearch(0, keywords);
+		}
+		TopDocs topDocs = docsMap.get(keywords);
 		try {
-			buildSearch(buildQuery(0, keywords));
-
 			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 				Document doc = indexSearcher.doc(scoreDoc.doc);
 
@@ -187,26 +203,7 @@ public class GeoNameSearcher {
 	 * @return List 返回一个企业法人地址数组
 	 */
 	public static List<EnterpriseRow> query(String keywords) {
-		List<EnterpriseRow> list = new ArrayList<EnterpriseRow>();
-		try {
-			buildSearch(buildQuery(0, keywords));
-
-			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-				Document doc = indexSearcher.doc(scoreDoc.doc);
-				// System.out.println(keywords + "\t" + scoreDoc.score + "\t" + doc.get(GEONAME)
-				// + "\t" + doc.get(ADDRESS));
-
-				EnterpriseRow row = new EnterpriseRow();
-				row.setName(doc.get(GEONAME));
-				row.setAddress(doc.get(ADDRESS));
-				list.add(row);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			String logMsgString = String.format(Messages.getString("GeoNameSearcher.7"), keywords); //$NON-NLS-1$
-			logger.error(logMsgString);
-		}
-		return list;
+		return query(keywords, MAX_HITS);
 	}
 
 	/**
@@ -220,7 +217,10 @@ public class GeoNameSearcher {
 	 */
 	public static List<EnterpriseRow> queryPage(String keywords, int pageIndex, int pageSize) {
 		List<EnterpriseRow> list = new ArrayList<EnterpriseRow>();
-		buildSearch(buildQuery(0, keywords));
+		if (null == docsMap || !docsMap.containsKey(keywords)) {
+			buildSearch(0, keywords);
+		}
+		TopDocs topDocs = docsMap.get(keywords);
 		int start = (pageIndex - 1) * pageSize;
 		int end = (start + pageSize) < topDocs.scoreDocs.length ? (start + pageSize) : topDocs.scoreDocs.length;
 
@@ -257,8 +257,15 @@ public class GeoNameSearcher {
 	public static List<SimpleAddressRow> search(String keywords, int maxHits) {
 		List<EnterpriseRow> rows = GeoNameSearcher.query(keywords, maxHits);
 		List<SimpleAddressRow> simpleAddressRows = new ArrayList<SimpleAddressRow>();
+		int t=0;
 		for (EnterpriseRow row : rows) {
-			List<SimpleAddressRow> srows = LuceneUtil.search(row.getAddress(), maxHits);
+			// 二次查找，只找100次
+			t++;
+			if (t>100) {
+				break;
+			}
+			String queryKey = "\"" + row.getAddress() + "\"";
+			List<SimpleAddressRow> srows = LuceneUtil.search(queryKey, maxHits);
 			for (SimpleAddressRow aRow : srows) {
 				simpleAddressRows.add(aRow);
 			}
@@ -274,19 +281,34 @@ public class GeoNameSearcher {
 	 * @return List 返回一个简单地址数组
 	 */
 	public static List<SimpleAddressRow> search(String keywords) {
-		List<EnterpriseRow> rows = GeoNameSearcher.query(keywords);
-		List<SimpleAddressRow> simpleAddressRows = new ArrayList<SimpleAddressRow>();
-		for (EnterpriseRow row : rows) {
-			List<SimpleAddressRow> srows = LuceneUtil.search(row.getAddress(), 10);
-			for (SimpleAddressRow aRow : srows) {
-				simpleAddressRows.add(aRow);
-				System.out.println(keywords + Messages.getString("GeoNameSearcher.9") + row.getAddress() + Messages.getString("GeoNameSearcher.10") + aRow.getAddress()); //$NON-NLS-1$ //$NON-NLS-2$
-				break;
-			}
-			// 只搜搜第一个（分数最高的）
-			break;
+
+		return search(keywords, MAX_HITS);
+	}
+
+	public static Integer getSum(String keywords) {
+		if (rows_map == null) {
+			rows_map = new HashMap<String, List<SimpleAddressRow>>();
 		}
-		return simpleAddressRows;
+		if (!rows_map.containsKey(keywords)) {
+			List<SimpleAddressRow> rows = search(keywords);
+			rows_map.put(keywords, rows);
+		}
+		List<SimpleAddressRow> rows_t = rows_map.get(keywords);
+		return rows_t.size();
+	}
+
+	public static List<SimpleAddressRow> searchPage(String keywords, Integer index, Integer limit) {
+		if (null == rows_map || !rows_map.containsKey(keywords)) {
+			getSum(keywords);
+		}
+		List<SimpleAddressRow> rows = rows_map.get(keywords);
+		List<SimpleAddressRow> rows_t = new ArrayList<SimpleAddressRow>();
+		int start = (index - 1) * limit;
+		int end = (start + limit) < rows.size() ? (start + limit) : rows.size();
+		for (int i = start; i < end; i++) {
+			rows_t.add(rows.get(i));
+		}
+		return rows_t;
 	}
 
 }

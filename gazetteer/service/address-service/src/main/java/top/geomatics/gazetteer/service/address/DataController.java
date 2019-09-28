@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,17 +16,13 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.archivers.ArchiveInputStream;
-import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -426,13 +420,24 @@ public class DataController {
 		// 文件目录
 		String folder = UserManager.getInstance().getUserInfo(username).getDownloadPath();
 		InputStream inputStream = null;
+		String zipFileName = fileName.replace(".gpkg", ".zip");
+		File tf = new File(zipFileName);
+		if (!tf.exists()) {
+			ZipFileUtils.zipFiles(folder + File.separator + fileName, null, false,
+					folder + File.separator + zipFileName);
+		}
+
 		try {
-			inputStream = new FileInputStream(new File(folder, fileName));
+			inputStream = new FileInputStream(new File(folder, zipFileName));
 			OutputStream outputStream = response.getOutputStream();
 			// 指明为下载
-			response.setContentType(Messages.getString("DataController.13")); //$NON-NLS-1$
+			response.setCharacterEncoding("UTF-8");
+			response.setContentType(Messages.getString("DataController.13") + ";charset=UTF-8"); //$NON-NLS-1$
 			// 设置文件名
-			response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+			String fn = URLEncoder.encode(zipFileName, "UTF-8");
+			response.addHeader("Content-Disposition", "attachment;filename=" + fn);
+//			response.addHeader("Content-Disposition",
+//					"attachment;filename=" + new String(zipFileName.getBytes("GBK"), "iso-8859-1"));
 
 			// 把输入流copy到输出流
 			IOUtils.copy(inputStream, outputStream);
@@ -440,7 +445,7 @@ public class DataController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			// 日志
-			String logMsgString = String.format("导出数据文件 %s 失败！", fileName);
+			String logMsgString = String.format("导出数据文件 %s 失败！", zipFileName);
 			logger.error(logMsgString);
 		} finally {
 			if (null != inputStream) {
@@ -514,7 +519,7 @@ public class DataController {
 		String ftype = dfn.substring(dfn.lastIndexOf('.') + 1, dfn.length());
 		// 如果是压缩文件，需要解压缩
 		if (ftype.compareToIgnoreCase("zip") == 0) {
-			List<String> unzippedFiles = unzip(destFN, upload_file_path);
+			List<String> unzippedFiles = ZipFileUtils.unzip(destFN, upload_file_path);
 			for (String impString : unzippedFiles) {
 				if (impString.contains("import.xml")) {
 					// 转换到数据库
@@ -548,52 +553,72 @@ public class DataController {
 			// 文件名和设置
 			String fnString = "";
 			String geometryString = "";
-			List<Element> fElements = elm.elements("FileName");
-			if (fElements.size() > 0) {
-				fnString = fElements.get(0).getText();
-			} else {
+			Element fileElement = elm.element("FileName");
+			Element settingElement = elm.element("Settings");
+			if (null == fileElement) {
 				continue;
 			}
+			fnString = fileElement.getText();
 			if (fnString.trim().isEmpty()) {
 				continue;
 			}
 			Map<String, String> settings = new HashMap<String, String>();
-			List<Element> sElements = elm.elements("Settings");
-			if (sElements.size() > 0) {
-				Element se = sElements.get(0);
-				List<Element> se2 = se.elements("Fields");
-				if (se2.size() > 0) {
-					Element se3 = se2.get(0);
-					List<Element> lse3 = se3.elements("Field");
-					if (lse3.size() > 0) {
-						Element se4 = lse3.get(0);
-						for (int i = 0; i < fileds.length; i++) {
-							Field fld = fileds[i];
-							String fldName = fld.getName();
-							List<Element> lse4 = se4.elements(fldName);
-							if (lse4.size() > 0) {
-								Element se5 = lse4.get(0);
-								String orgin = se5.getText();
-								if (!orgin.isEmpty()) {
-									settings.put(orgin, fldName);
+			if (null != settingElement) {
+				Element fieldsElement = settingElement.element("Fields");
+				if (null != fieldsElement) {
+					List<Element> fieldElements = fieldsElement.elements("Field");
+					if (null != fieldElements && fieldElements.size() > 0) {
+						for (int i = 0; i < fieldElements.size(); i++) {
+							Element fldElement = fieldElements.get(i);
+							if (null == fldElement) {
+								continue;
+							}
+							Element srcElement = fldElement.element("source");
+							Element tarElement = fldElement.element("target");
+							if (null == srcElement || null == tarElement) {
+								continue;
+							}
+							String source = srcElement.getText();
+							String target = tarElement.getText();
+
+							for (int j = 0; j < fileds.length; j++) {
+								Field fld = fileds[j];
+								String fldName = fld.getName();
+								if (0 == fldName.compareToIgnoreCase(target)) {
+									settings.put(source, fldName);
 								}
 							}
-
 						}
-						List<Element> lse4_g = se4.elements("build_geometry");
-
-						if (lse4_g.size() > 0) {
-							Element se5 = lse4_g.get(0);
-							geometryString = se5.getText();
-							if (!geometryString.isEmpty()) {
-								// settings.put("buildGeometry", geometryString);
-							}
-						}
-
 					}
 				}
-
 			}
+			Element buildGeometry = settingElement.element("build_geometry");
+			if (null != buildGeometry) {
+				geometryString = buildGeometry.getText();
+			}
+
+			if (null != geometryString && !geometryString.isEmpty()) {
+				// settings.put("buildGeometry", geometryString);
+			}
+			Element indexGeometry = settingElement.element("create_spatial_index");
+			String indexString = null;
+			if (null != indexGeometry) {
+				indexString = indexGeometry.getText();
+			}
+
+			if (null != indexString && !indexString.isEmpty()) {
+				// settings.put("create_spatial_index", indexString);
+			}
+			Element guessFromGeometry = settingElement.element("guess_from_geometry");
+			String guessString = null;
+			if (null != guessFromGeometry) {
+				guessString = guessFromGeometry.getText();
+			}
+
+			if (null != guessString && !guessString.isEmpty()) {
+				settings.put("guess_from_geometry", guessString);
+			}
+			// 开始数据转换
 			String fname = fnString.substring(0, fnString.lastIndexOf('.'));
 			String ftype = fnString.substring(fnString.lastIndexOf('.') + 1, fnString.length());
 			String sourceFN = upload_file_path + File.separator + fnString;
@@ -620,44 +645,6 @@ public class DataController {
 			ex.printStackTrace();
 		}
 		return document;
-	}
-
-	/**
-	 * 解压Zip文件
-	 * 
-	 * @param zipFile 需要解压的zip文件位置
-	 * @param destDir 解压的目标位置
-	 */
-	private List<String> unzip(String zipFile, String destDir) {
-		File f;
-		List<String> fileNames = new ArrayList<String>();
-		try (ArchiveInputStream i = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.ZIP,
-				Files.newInputStream(Paths.get(zipFile)), "GBK")) {
-			ArchiveEntry entry = null;
-			while ((entry = i.getNextEntry()) != null) {
-				if (!i.canReadEntryData(entry)) {
-					continue;
-				}
-				fileNames.add(entry.getName());
-				f = new File(destDir, entry.getName());
-				if (entry.isDirectory()) {
-					if (!f.isDirectory() && !f.mkdirs()) {
-						throw new IOException("failed to create directory " + f);
-					}
-				} else {
-					File parent = f.getParentFile();
-					if (!parent.isDirectory() && !parent.mkdirs()) {
-						throw new IOException("failed to create directory " + parent);
-					}
-					try (OutputStream o = Files.newOutputStream(f.toPath())) {
-						IOUtils.copy(i, o);
-					}
-				}
-			}
-		} catch (IOException | ArchiveException e) {
-			e.printStackTrace();
-		}
-		return fileNames;
 	}
 
 }

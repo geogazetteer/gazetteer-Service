@@ -74,16 +74,23 @@ public class BatchDealExcel {
 			String addressString = row.getAddress();
 			double longitude;
 			double latitude;
-			List<BuildingPositionRow> rows = BuildingAddress.findCoordsByAddress(addressString);
-			for (BuildingPositionRow buildingRow : rows) {
-				longitude = buildingRow.getLongitude();
-				latitude = buildingRow.getLatitude();
-
+			List<BuildingPositionRow> rows = BuildingAddress.getInstance().findCoordsByAddress(addressString);
+			// 可能会匹配到0个或多个
+			if (rows.size() < 1) {
 				MatcherResultRow aRow = new MatcherResultRow();
 				aRow.setAddress(addressString);
-				aRow.setLongitude(longitude);
-				aRow.setLatitude(latitude);
 				rightRows.add(aRow);
+			} else {
+				for (BuildingPositionRow buildingRow : rows) {
+					longitude = buildingRow.getLongitude();
+					latitude = buildingRow.getLatitude();
+
+					MatcherResultRow aRow = new MatcherResultRow();
+					aRow.setAddress(addressString);
+					aRow.setLongitude(longitude);
+					aRow.setLatitude(latitude);
+					rightRows.add(aRow);
+				}
 			}
 
 		}
@@ -93,19 +100,28 @@ public class BatchDealExcel {
 			if (row.getAddress() != null && !row.getAddress().isEmpty()) {
 				continue;
 			}
-			String addressString = "";
+			String addressString = "！未匹配到地址！";
 			double longitude = row.getLongitude();
 			double latitude = row.getLatitude();
-			List<AddressRow> rows = BuildingAddress.findAddressByCoords(longitude, latitude);
-			// 可能会找到多个
-			if (rows.size() > 0) {
-				addressString = rows.get(0).getAddress();
+			List<AddressRow> rows = BuildingAddress.getInstance().findAddressByCoords(longitude, latitude);
+			// 可能会匹配到0个或多个
+			if (rows.size() < 1) {
+				MatcherResultRow aRow = new MatcherResultRow();
+				aRow.setAddress(addressString);
+				aRow.setLongitude(longitude);
+				aRow.setLatitude(latitude);
+				leftRows.add(aRow);
+			} else {
+				for (AddressRow addressRow : rows) {
+					addressString = addressRow.getAddress();
+
+					MatcherResultRow aRow = new MatcherResultRow();
+					aRow.setAddress(addressString);
+					aRow.setLongitude(longitude);
+					aRow.setLatitude(latitude);
+					leftRows.add(aRow);
+				}
 			}
-			MatcherResultRow aRow = new MatcherResultRow();
-			aRow.setAddress(addressString);
-			aRow.setLongitude(longitude);
-			aRow.setLatitude(latitude);
-			leftRows.add(aRow);
 		}
 
 		try {
@@ -127,9 +143,15 @@ public class BatchDealExcel {
 		for (int i = 0; i < allRows.size(); i++) {
 			MatcherResultRow mRow = allRows.get(i);
 			xssfRow = xssfWorkbook.getSheet("搜索完成的表格").createRow(i);
-			xssfRow.createCell(0).setCellValue(mRow.getAddress());
-			xssfRow.createCell(1).setCellValue(mRow.getLongitude());
-			xssfRow.createCell(2).setCellValue(mRow.getLatitude());
+			String address = mRow.getAddress();
+			Double lon = mRow.getLongitude();
+			Double lat = mRow.getLatitude();
+			if (null != address)
+				xssfRow.createCell(0).setCellValue(address);
+			if (null != lon)
+				xssfRow.createCell(1).setCellValue(lon);
+			if (null != lat)
+				xssfRow.createCell(2).setCellValue(lat);
 		}
 		File file2 = new File(outpath);
 		if (!file2.exists()) {

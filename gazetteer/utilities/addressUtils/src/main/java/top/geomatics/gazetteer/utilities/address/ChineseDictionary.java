@@ -25,15 +25,19 @@ public class ChineseDictionary {
 	// 同义词文件
 	private ResourcesManager manager;
 	private String dic_file_name;
-	private static Map<String, List<String>> dictionary = new HashMap<>();
+	private Map<String, List<String>> dictionary;
 
-	private static final Map<String, String> regexMap = new LinkedHashMap<String, String>();
+	private Map<String, String> regexMap;
 
 	public ChineseDictionary(String config) {
 		super();
 		this.config = config;
 		manager = ResourcesManager.getInstance();
 		dic_file_name = manager.getValue(this.config);
+		
+		dictionary = new HashMap<>();
+		regexMap = new LinkedHashMap<String, String>();
+		
 		// 读取字典
 		MYCSVReader reader = new MYCSVReader(dic_file_name);
 		reader.openFile();

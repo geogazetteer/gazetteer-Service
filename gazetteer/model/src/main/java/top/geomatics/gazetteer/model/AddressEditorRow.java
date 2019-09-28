@@ -11,10 +11,10 @@ import java.util.Date;
  */
 public class AddressEditorRow {
 	private Integer fid;// 第一个字段，数据库自增长，如果原数据中有该字段，忽略原数据中的字段。
-	private String name_;//通用名称
-	private String code_;//通用编码
-	private String description_;//通用描述
-	
+	private String name_;// 通用名称
+	private String code_;// 通用编码
+	private String description_;// 通用描述
+
 	private String street_;// 表示街道。
 	private String community_;// 表示社区。
 	private Double longitude_;// 表示经度。
@@ -37,7 +37,6 @@ public class AddressEditorRow {
 	public void setFid(Integer fid) {
 		this.fid = fid;
 	}
-	
 
 	public String getName_() {
 		return name_;
@@ -157,6 +156,27 @@ public class AddressEditorRow {
 
 	public void setUpdate_building_code(String update_building_code) {
 		this.update_building_code = update_building_code;
+	}
+
+	public String encoding() {
+		String s = null;
+		if (this.code_ != null) {
+			s += this.code_;
+		}
+		if (this.longitude_ != null) {
+			s += ",";
+			s += this.longitude_.toString();
+		}
+		if (this.latitude_ != null) {
+			s += ",";
+			s += this.latitude_.toString();
+		}
+		if (this.origin_address != null) {
+			s += ",";
+			s += this.origin_address;
+		}
+		return s;
+
 	}
 
 }

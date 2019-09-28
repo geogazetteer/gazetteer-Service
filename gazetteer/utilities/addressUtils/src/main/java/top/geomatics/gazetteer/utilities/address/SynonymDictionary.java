@@ -9,11 +9,11 @@ package top.geomatics.gazetteer.utilities.address;
  * @author whudyj
  *
  */
-public class SynonymDictionary extends ChineseDictionary {
+public class SynonymDictionary {
 	private static final String DICTIONARY_FILE = "synonym_dictionary";
+	private ChineseDictionary dictionary = new ChineseDictionary(DICTIONARY_FILE);
 
 	private SynonymDictionary() {
-		super(DICTIONARY_FILE);
 	}
 
 	private static class SynonymInstance {
@@ -22,6 +22,22 @@ public class SynonymDictionary extends ChineseDictionary {
 
 	public static SynonymDictionary getInstance() {
 		return SynonymInstance.instance;
+	}
+
+	public String getSynonym(String word) {
+		return dictionary.getSynonym(word);
+	}
+
+	public boolean containsKey(String word) {
+		return dictionary.containsKey(word);
+	}
+
+	public boolean contains(String word) {
+		return dictionary.contains(word);
+	}
+
+	public String replace(String word) {
+		return dictionary.replace(word);
 	}
 
 }

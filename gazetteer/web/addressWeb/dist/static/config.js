@@ -1,8 +1,14 @@
 /**
  * Created by lixiaochao on 2019/3/21.
  */
-const IP = 'http://119.3.72.23';
+
+// const IP = 'http://localhost';//本地ip
+const IP = 'http://119.3.72.23';	//华为云ip
+// const IP = 'http://10.148.26.63'; //政务内网ip
 const serverUrl = IP+':8083/';//服务器地址
+// const geoServerUrl=IP + ':8085/';//geoserver服务地址
+const webUrl=IP + ':8087/';
+
 const URLCFG={
   searchCtxUrl:serverUrl+'address/hint',//搜索联想，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
   searchAddressUrl:serverUrl+'address/hint',//搜索，param:keywords=上塘农贸建材市场 库坑凹背村&limit=1000
@@ -26,6 +32,8 @@ const URLCFG={
   isSensitiveUrl:serverUrl+'transform/sensitive',//(param:chars=chars)
   //判断是否为正确的坐标
   isCoordinateUrl:serverUrl+'transform/coordinate',//(param:chars=chars)
+  //判断建筑物编码输入是否合法
+  isCodeUrl:serverUrl+'transform/buildingcode',//(param:chars=chars)
   //根据坐标查code
   getCodeByPointUrl:serverUrl+'building/codes',//(param:x=114.017776720804&y=22.6390350934369)
   //根据code搜索标准地址
@@ -37,6 +45,10 @@ const URLCFG={
 
   //根据楼栋编号查询坐标
   getCoordinatesByCodeUrl:serverUrl+'building/point',//(param:code='')
+  //根据一组id查询坐标信息
+  getLLByIdUrl:serverUrl+'address/point',//?id=1,2,3&tablename=dmdz
+  //根据一组id查询坐标信息
+  getLLByIdsUrl:serverUrl+'address/points',//?id=1,2,3&tablename=dmdz
   //获取搜索结果总数
   searchCtxTotalUrl:serverUrl+'address/sum',//param：keywords=''
   //根据页码获取搜索结果
@@ -65,21 +77,25 @@ const URLCFG={
 
 };
 
-const geoServerUrl=IP + ':8085/';//geoserver服务地址
-const webUrl=IP + ':8087/';
 const MAPURL={
-  //雪碧图
-  sprite:webUrl+'sprite/sprite',
-  //底图
-  mapTile:webUrl+"mapboxLayer/{z}/{x}/{y}.pbf",
-  //字体
-  glyphs:webUrl+"myfonts/{fontstack}/{range}.pbf",
-  //政务内网底图  http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile/0/1072/1461
+  /* //雪碧图
+sprite:webUrl+'sprite/sprite',
+ //底图
+ mapTile:webUrl+"mapboxLayer/{z}/{x}/{y}.pbf",
+ //字体
+ glyphs:webUrl+"myfonts/{fontstack}/{range}.pbf",
+ ol_map_tile:'http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile',
+ //房屋面
+ building_vec_tile:geoServerUrl+"geoserver/gwc/service/tms/1.0.0/gazetteer%3ALH_building_4490@EPSG%3A900913@png/{z}/{x}/{y}.png"
+*/
+
+  //政务网底图地址
   //http://10.148.26.61:6080/arcgis/rest/services/basemap/szmap_4490/MapServer
   ol_map_tile:'http://10.148.26.70:50001/proxy/layer/7C1327683470412586F72F48CBE425BA/25A0E34254A04FCFB2E3276924A03615/tile',
-  //房屋面
-  building_vec_tile:geoServerUrl+"geoserver/gwc/service/tms/1.0.0/gazetteer%3ALH_building_4490@EPSG%3A900913@png/{z}/{x}/{y}.png"
+
+  isZWW:false,//是否选择政务网
 };
+
 //编辑模块，左侧街道社区selector配置
 const EDITSELECTORCFG={
   street:['民治街道','观湖街道','福城街道','观澜街道','龙华街道','大浪街道']
@@ -121,7 +137,7 @@ const SETLABELARR={
 
 //批量匹配
 const BATCHSERVICE={
-  modelUrl:webUrl+'files/downloads/批量处理模版.xls',//模板地址
+  modelUrl:webUrl+'files/downloads/批量处理模板.xlsx',//模板地址
   uploadUrl:serverUrl+'data/upload/matcher',//文件上传
 };
 
@@ -159,5 +175,13 @@ const EDITSERVICE={
   roadCodeLikeUrl:serverUrl+'address/road_num_like',
   //小区输入联想
   addressLikeUrl:serverUrl+'address/village_like',
-  codeLikeUrl:serverUrl+'address/code_like'
+  codeLikeUrl:serverUrl+'address/code_like',
+
+  //根据坐标获取标准地址
+  getStandardByLLUrl:serverUrl+'building/address',//?x=114.019777&y=22.672456
+  //根据fid获取标准地址
+  getStandardByFidUrl:serverUrl+'revision/address/guess',// /1?username=username&tablename=dmdz_edit
+
+  //根据fid获取一组坐标
+  getLLByFIdsUrl:serverUrl+'revision/points',//?id=1,2,3&tablename=dmdz
 };

@@ -13,6 +13,11 @@
 		CREATE TABLE
 		${_parameter} (
 		fid INTEGER PRIMARY KEY AUTOINCREMENT,
+		name_ TEXT,
+		code_
+		TEXT,
+		description_ TEXT,
+
 		street_ TEXT,
 		community_ TEXT,
 		longitude_ double,
@@ -23,7 +28,8 @@
 		similar_address TEXT,
 		standard_address TEXT,
 
-		status int,
+		status
+		int,
 		modifier
 		TEXT,
 		update_date Date,
@@ -37,6 +43,9 @@
 		insert into
 		${sql_tablename}
 		(
+		<if test="name_ != null">name_,</if>
+		<if test="code_ != null">code_,</if>
+		<if test="description_ != null">description_,</if>
 		<if test="street_ != null">street_,</if>
 		<if test="community_ != null">community_,</if>
 		<if test="longitude_ != null">longitude_,</if>
@@ -52,6 +61,9 @@
 		)
 		values
 		(
+		<if test="name_ != null">#{name_},</if>
+		<if test="code_ != null">#{code_},</if>
+		<if test="description_ != null">#{description_},</if>
 		<if test="street_ != null">#{street_},</if>
 		<if test="community_ != null">#{community_},</if>
 		<if test="longitude_ != null">#{longitude_},</if>
@@ -70,6 +82,28 @@
 	<update id="updateAll" parameterType="map">
 		update ${sql_tablename}
 		<set>
+			<if test="new_name_!=null">
+				name_ = #{new_name_},
+			</if>
+			<if test="new_code_!=null">
+				code_ = #{new_code_},
+			</if>
+			<if test="new_description_!=null">
+				description_ = #{new_description_},
+			</if>
+
+			<if test="new_street_!=null">
+				street_ = #{new_street_},
+			</if>
+			<if test="new_community_!=null">
+				community_ = #{new_community_},
+			</if>
+			<if test="new_longitude_!=null">
+				longitude_ = #{new_longitude_},
+			</if>
+			<if test="new_latitude_!=null">
+				latitude_ = #{new_latitude_},
+			</if>
 			<if test="new_similar_address!=null">
 				similar_address = #{new_similar_address},
 			</if>
@@ -88,8 +122,8 @@
 			<if test="new_update_address!=null">
 				update_address = #{new_update_address},
 			</if>
-			<if test="new_update_address_id!=null">
-				update_address_id = #{new_update_address_id},
+			<if test="new_update_building_code!=null">
+				update_building_code = #{new_update_building_code},
 			</if>
 		</set>
 		<where>
@@ -106,6 +140,141 @@
 				AND update_date = #{update_date}
 			</if>
 		</where>
+	</update>
+
+	<update id="updateBatch" parameterType="map">
+		<!-- 接收list参数，循环着组装sql语句，注意for循环的写法 separator=";" 代表着每次循环完，在sql后面放一个分号 
+			item="newRow" 循环List的每条的结果集 collection="list" list 即为 map传过来的参数key -->
+		
+		<foreach collection="list" separator=";" item="newRow" index="index" open="" close="" >
+			update ${sql_tablename}
+			<set>
+				<if test="newRow.name_!=null">
+					name_ = #{newRow.name_},
+				</if>
+				<if test="newRow.code_!=null">
+					code_ = #{newRow.code_},
+				</if>
+				<if test="newRow.description_!=null">
+					description_ = #{newRow.description_},
+				</if>
+
+				<if test="newRow.street_!=null">
+					street_ = #{newRow.street_},
+				</if>
+				<if test="newRow.community_!=null">
+					community_ = #{newRow.community_},
+				</if>
+				<if test="newRow.longitude_!=null">
+					longitude_ = #{newRow.longitude_},
+				</if>
+				<if test="newRow.latitude_!=null">
+					latitude_ = #{newRow.latitude_},
+				</if>
+				<if test="newRow.origin_address!=null">
+					origin_address = #{newRow.origin_address},
+				</if>
+				<if test="newRow.similar_address!=null">
+					similar_address = #{newRow.similar_address},
+				</if>
+				<if test="newRow.standard_address!=null">
+					standard_address = #{newRow.standard_address},
+				</if>
+				<if test="newRow.status!=null">
+					status = #{newRow.status},
+				</if>
+				<if test="newRow.modifier!=null">
+					modifier = #{newRow.modifier},
+				</if>
+				<if test="newRow.update_date!=null">
+					update_date = #{newRow.update_date},
+				</if>
+				<if test="newRow.update_address!=null">
+					update_address = #{newRow.update_address},
+				</if>
+				<if test="newRow.update_building_code!=null">
+					update_building_code = #{newRow.update_building_code},
+				</if>
+			</set>
+			<where>
+				fid = #{newRow.fid}
+			</where>
+		</foreach>
+	
+	</update>
+	
+	<update id="updateBatch2" parameterType="map">
+		<!-- 接收list参数，循环着组装sql语句，注意for循环的写法 separator=";" 代表着每次循环完，在sql后面放一个分号 
+			item="newRow" 循环List的每条的结果集 collection="list" list 即为 map传过来的参数key -->
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="name_ =case" suffix="end,">
+				<foreach collection="list" item="newRow">
+					<if test="newRow.name_!=null">
+						when fid=#{newRow.fid} then #{newRow.name_}
+					</if>
+				</foreach>
+			</trim>
+		</trim>
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="code_ =case" suffix="end,">
+				<foreach collection="list" item="newRow">
+					<if test="newRow.code_!=null">
+						when fid=#{newRow.fid} then #{newRow.code_}
+					</if>
+				</foreach>
+			</trim>
+		</trim>
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="description_ =case" suffix="end,">
+				<foreach collection="list" item="newRow">
+					<if test="newRow.description_!=null">
+						when fid=#{newRow.fid} then #{newRow.description_}
+					</if>
+				</foreach>
+			</trim>
+		</trim>
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="street_ =case" suffix="end,">
+				<foreach collection="list" item="newRow">
+					<if test="newRow.street_!=null">
+						when fid=#{newRow.fid} then #{newRow.street_}
+					</if>
+				</foreach>
+			</trim>
+		</trim>
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="community_ =case" suffix="end,">
+				<foreach collection="list" item="newRow">
+					<if test="newRow.community_!=null">
+						when fid=#{newRow.fid} then #{newRow.community_}
+					</if>
+				</foreach>
+			</trim>
+		</trim>
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="longitude_ =case" suffix="end,">
+				<foreach collection="list" item="newRow">
+					<if test="newRow.longitude_!=null">
+						when fid=#{newRow.fid} then #{newRow.longitude_}
+					</if>
+				</foreach>
+			</trim>
+		</trim>
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="latitude_ =case" suffix="end,">
+				<foreach collection="list" item="newRow">
+					<if test="newRow.latitude_!=null">
+						when fid=#{newRow.fid} then #{newRow.latitude_}
+					</if>
+				</foreach>
+			</trim>
+		</trim>
+		<where>
+            <foreach collection="list" separator="or" item="newRow">
+                fid = #{newRow.fid}
+            </foreach>
+        </where>
+		
 	</update>
 
 	<update id="updateStatus" parameterType="map">
@@ -299,6 +468,43 @@
 			</if>
 		</where>
 	</select>
+	<select id="getCountNameLike" resultType="int">
+		SELECT count(*)
+		FROM
+		${sql_tablename}
+		<where>
+			<if test="fid != null">
+				fid = #{fid}
+			</if>
+			<if test="name_ != null">
+				name_ LIKE #{name_}
+			</if>
+			<if test="street_ != null">
+				street_ = #{street_}
+			</if>
+			<if test="community_ != null">
+				AND community_ = #{community_}
+			</if>
+			<if test="origin_address != null">
+				AND origin_address = #{origin_address}
+			</if>
+			<if test="similar_address != null">
+				AND similar_address = #{similar_address}
+			</if>
+			<if test="standard_address != null">
+				AND standard_address = #{standard_address}
+			</if>
+			<if test="status != null">
+				AND status = #{status}
+			</if>
+			<if test="modifier != null">
+				AND modifier = #{modifier}
+			</if>
+			<if test="update_date != null">
+				AND update_date = #{update_date}
+			</if>
+		</where>
+	</select>
 
 	<select id="findPageEquals" resultType="AddressEditorRow">
 		SELECT ${sql_fields}
@@ -353,11 +559,70 @@
 			</otherwise>
 		</choose>
 	</select>
+	<select id="findPageNameLike" resultType="AddressEditorRow">
+		SELECT ${sql_fields}
+		FROM ${sql_tablename}
+		<where>
+			<if test="fid != null">
+				fid = #{fid}
+			</if>
+			<if test="name_ != null">
+				name_ LIKE #{name_}
+			</if>
+			<if test="street_ != null">
+				street_ = #{street_}
+			</if>
+			<if test="community_ != null">
+				AND community_ = #{community_}
+			</if>
+			<if test="origin_address != null">
+				AND origin_address = #{origin_address}
+			</if>
+			<if test="similar_address != null">
+				AND similar_address = #{similar_address}
+			</if>
+			<if test="standard_address != null">
+				AND standard_address = #{standard_address}
+			</if>
+			<if test="status != null">
+				AND status = #{status}
+			</if>
+			<if test="modifier != null">
+				AND modifier = #{modifier}
+			</if>
+			<if test="update_date != null">
+				AND update_date = #{update_date}
+			</if>
+		</where>
+		<if test="sql_orderBy != null">
+			ORDER BY ${sql_orderBy}
+		</if>
+		<choose>
+			<when test="page_start != null">
+				<choose>
+					<when test="sql_limit != null">
+						LIMIT #{page_start},#{sql_limit}
+					</when>
+					<otherwise>
+						LIMIT #{page_start},10
+					</otherwise>
+				</choose>
+			</when>
+			<otherwise>
+				<if test="sql_limit != null">
+					LIMIT #{sql_limit}
+				</if>
+			</otherwise>
+		</choose>
+	</select>
 
 	<select id="findLike" resultType="AddressEditorRow">
 		SELECT ${sql_fields}
 		FROM ${sql_tablename}
 		<where>
+			<if test="name_ != null">
+				name_ LIKE #{name_}
+			</if>
 			<if test="street_ != null">
 				street_ LIKE #{street_}
 			</if>
@@ -382,8 +647,8 @@
 			<if test="update_address != null">
 				AND update_address LIKE #{update_address}
 			</if>
-			<if test="update_address_id != null">
-				AND update_address_id LIKE #{update_address_id}
+			<if test="update_building_code != null">
+				AND update_building_code LIKE #{update_building_code}
 			</if>
 		</where>
 		<if test="sql_orderBy != null">

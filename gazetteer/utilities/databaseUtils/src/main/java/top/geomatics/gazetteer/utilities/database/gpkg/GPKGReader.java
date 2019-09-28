@@ -129,5 +129,42 @@ public class GPKGReader {
 		}
 		return czwcodes;
 	}
+	
+	/**
+	 * <em>根据坐标获得建筑物编码</em><br>
+	 * 
+	 * @param czwCode
+	 * @return
+	 */
+	public List<String> query(List<GeoPoint> points) {
+		List<String> czwcodes = new ArrayList<>();
+		List<Filter> filters = new ArrayList<Filter>();
+		for (GeoPoint pnt:points) {
+			Point point = geometryFactory.createPoint(new Coordinate(pnt.getX(), pnt.getY()));
+			Filter filter1 = ff.not(ff.isNull(ff.property(geoCol)));
+			Filter filter2 = ff.contains(ff.property(geoCol), ff.literal(point));
+			Filter filr = ff.and(filter1, filter2);
+			filters.add(filr);
+		}
+		Filter filter = ff.or(filters);
+		try {
+			
+			SimpleFeatureReader feaReader = geoPackage.reader(entry, filter, null);
+			while (feaReader.hasNext()) {
+				SimpleFeature feature = feaReader.next();
+				Object g = feature.getAttribute(CZWCODE_STRING);// 几何
+				if (g instanceof String) {
+					String tempString = g.toString();
+					if (tempString != null && !tempString.isEmpty() && tempString.length() == 19) {
+						czwcodes.add(tempString);
+					}
+				}
+			}
+			feaReader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return czwcodes;
+	}
 
 }

@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import top.geomatics.gazetteer.database.AddressMapper;
 import top.geomatics.gazetteer.database.DatabaseHelper;
@@ -22,10 +23,11 @@ import top.geomatics.gazetteer.model.AddressRow;
 import top.geomatics.gazetteer.model.BuildingPositionRow;
 import top.geomatics.gazetteer.model.ComparableAddress;
 import top.geomatics.gazetteer.model.EnterpriseRow;
+import top.geomatics.gazetteer.model.GeoPoint;
+import top.geomatics.gazetteer.model.IGazetteerConstant;
 import top.geomatics.gazetteer.model.MatcherResultRow;
 import top.geomatics.gazetteer.model.SimpleAddressRow;
-import top.geomatics.gazetteer.utilities.address.AddressProcessor;
-import top.geomatics.gazetteer.utilities.database.BuildingQuery;
+import top.geomatics.gazetteer.model.SimpleAddressRow2;
 
 /**
  * @author whudyj
@@ -186,6 +188,9 @@ public class ControllerUtils {
 		if (null != row) {
 			// 字段
 			Integer fid = row.getFid();
+			String name_ = row.getName_();
+			String code_ = row.getCode_();
+
 			String street_ = row.getStreet_();
 			String community_ = row.getCommunity_();
 			String origin_address = row.getOrigin_address();
@@ -204,7 +209,11 @@ public class ControllerUtils {
 					map.put("fid", fidString);
 				}
 			}
-			
+			if (name_ != null && !name_.isEmpty())
+				map.put("name_", name_);
+			if (code_ != null && !code_.isEmpty())
+				map.put("code_", code_);
+
 			if (street_ != null && !street_.isEmpty())
 				map.put("street_", street_);
 			if (community_ != null && !community_.isEmpty())
@@ -254,7 +263,7 @@ public class ControllerUtils {
 		 */
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
 		// 使用阿里巴巴的fastjson
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -266,7 +275,7 @@ public class ControllerUtils {
 	 */
 	public static String getResponseBody2(List<EnterpriseRow> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -278,7 +287,7 @@ public class ControllerUtils {
 	 */
 	public static String getResponseBody_revision(List<AddressEditorRow> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -290,7 +299,7 @@ public class ControllerUtils {
 	 */
 	public static String getResponseBody3(List<ComparableAddress> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -302,7 +311,7 @@ public class ControllerUtils {
 	 */
 	public static String getResponseBody4(List<SimpleAddressRow> rows) {
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -319,7 +328,7 @@ public class ControllerUtils {
 		 */
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
 		// 使用阿里巴巴的fastjson
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -336,7 +345,19 @@ public class ControllerUtils {
 		 */
 		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
 		// 使用阿里巴巴的fastjson
-		responseString += JSON.toJSONString(rows);
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
+		responseString += "}";
+		return responseString;
+
+	}
+
+	/**
+	 * @param rows
+	 * @return
+	 */
+	public static String getResponseBody7(List<SimpleAddressRow2> rows) {
+		String responseString = "{ \"total\": " + rows.size() + ", \"rows\": ";
+		responseString += JSON.toJSONString(rows, SerializerFeature.DisableCircularReferenceDetect);
 		responseString += "}";
 		return responseString;
 
@@ -352,87 +373,117 @@ public class ControllerUtils {
 	}
 
 	/**
-	 * <b>根据输入的坐标搜索,获得搜索结果</b><br>
-	 * 
-	 * @param keywords 输入的坐标
-	 * @return 搜索结果
+	 * @param code
+	 * @return
 	 */
-	public static List<SimpleAddressRow> getCoordQueryResults(String keywords) {
-		List<SimpleAddressRow> rowsTotal = new ArrayList<>();
-		if (!AddressProcessor.isCoordinatesExpression(keywords)) {
-			return rowsTotal;
-		}
-		String coordString[] = keywords.split(",");
-		double x = Double.parseDouble(coordString[0]);
-		double y = Double.parseDouble(coordString[1]);
-		List<String> codes = BuildingQuery.query(x, y);
+	public static AddressRow getAddressRowByCode(String code) {
+		code = coding(code);
+		// 街道，取前9位
+		String streetCode = code.substring(0, 9);
+		String streetString = null;
+		// 社区，取前12位
+		String communityCode = code.substring(0, 12);
+		String communityString = null;
 
-		for (String code : codes) {
-			// 根据建筑物编码搜索
-			List<SimpleAddressRow> rows = getBuildingCodeQueryResults(code);
-			rowsTotal.addAll(rows);
+		for (int i = 0; i < IGazetteerConstant.STREET_CODE_LIST.size(); i++) {
+			String street_code = IGazetteerConstant.STREET_CODE_LIST.get(i);
+			if (0 == streetCode.compareToIgnoreCase(street_code)) {
+				streetString = IGazetteerConstant.STREET_LIST.get(i);
+			}
 		}
-		return rowsTotal;
+
+		for (int i = 0; i < IGazetteerConstant.COMMUNITY_CODE_LIST.size(); i++) {
+			String community_code = IGazetteerConstant.COMMUNITY_CODE_LIST.get(i);
+			if (0 == communityCode.compareToIgnoreCase(community_code)) {
+				communityString = IGazetteerConstant.COMMUNITY_LIST.get(i);
+			}
+		}
+
+		AddressRow row = new AddressRow();
+		row.setCommunity(communityString);
+		row.setStreet(streetString);
+
+		return row;
 	}
 
 	/**
-	 * <b>根据输入的建筑物编码,获得搜索结果</b><br>
-	 * 
-	 * @param keywords 建筑物编码
-	 * @return 搜索结果
+	 * @param code
+	 * @return
 	 */
-	public static List<SimpleAddressRow> getBuildingCodeQueryResults(String keywords) {
-		List<SimpleAddressRow> rows = null;
-		if (!AddressProcessor.isBuildingCode(keywords)) {
-			return rows;
+	public static String coding(String code) {
+		String code_t = code;
+		// 440306 009003 1200105
+		// 440306 007003 3600024 000002
+		// 只取前面19位
+		if (code.length() > 19) {
+			code_t = code.substring(0, 19);
 		}
-		String fields = "id,address";
-		String tablename = AddressProcessor.getCommunityFromBuildingCode(keywords);
-		AddressRow aRow = new AddressRow();
-		aRow.setCode(keywords);
-		Map<String, Object> map = ControllerUtils.getRequestMap(fields, tablename, aRow, null, 0);
-		rows = mapper.findSimpleEquals(map);
-
-		return rows;
+		return code_t;
 	}
 
-	private static List<SimpleAddressRow> buildingCodeQueryResults;
-	private static List<SimpleAddressRow> coordQueryResults;
+	public static List<GeoPoint> getPointsByCodes(List<String> codes) {
+		List<GeoPoint> geoPoints = new ArrayList<GeoPoint>();
 
-	public static int getCoordQuerys(String keywords) {
-		coordQueryResults = getCoordQueryResults(keywords);
-		return coordQueryResults.size();
+		String TABLENAME = "building_position";
+		String fields = "longitude,latitude";
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("sql_fields", fields);
+		map.put("sql_tablename", TABLENAME);
+
+		// sqlite无法一一对应
+//		map.put("list", codes);
+//
+//		List<BuildingPositionRow> building_rows = mapper.selectBuildingByCodes(map);
+//		
+//		for (BuildingPositionRow row : building_rows) {
+//			GeoPoint point = new GeoPoint();
+//			point.setX(row.getLongitude());
+//			point.setY(row.getLatitude());
+//			geoPoints.add(point);
+//		}
+
+		for (int i = 0; i < codes.size(); i++) {
+			String code = codes.get(i);
+			code = coding(code);
+			map.put("code", code);
+			List<BuildingPositionRow> building_rows = mapper.findBuildingEquals(map);
+			// 如果没有找到
+			if (null == building_rows || building_rows.size() < 1) {
+				geoPoints.add(null);
+				continue;
+			}
+			// 一般只能找到一个
+			BuildingPositionRow bRow = building_rows.get(0);
+			GeoPoint point = new GeoPoint();
+			point.setX(bRow.getLongitude());
+			point.setY(bRow.getLatitude());
+			geoPoints.add(point);
+		}
+
+		return geoPoints;
 	}
 
-	public static int getCodeQuerys(String keywords) {
-		buildingCodeQueryResults = getBuildingCodeQueryResults(keywords);
-		return buildingCodeQueryResults.size();
+	public static GeoPoint getPointByCode(String code) {
+
+		String TABLENAME = "building_position";
+		String fields = "longitude,latitude";
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("sql_fields", fields);
+		map.put("sql_tablename", TABLENAME);
+
+		String code_t = coding(code);
+		map.put("code", code_t);
+		List<BuildingPositionRow> building_rows = mapper.findBuildingEquals(map);
+		// 如果没有找到
+		if (null == building_rows || building_rows.size() < 1) {
+			return null;
+		}
+		// 一般只能找到一个
+		BuildingPositionRow bRow = building_rows.get(0);
+		GeoPoint point = new GeoPoint();
+		point.setX(bRow.getLongitude());
+		point.setY(bRow.getLatitude());
+		return point;
 	}
 
-	public static List<SimpleAddressRow> getCoordQuerysPage(String keywords, int pageIndex, int pageSize) {
-		if (null == coordQueryResults || 0 > coordQueryResults.size()) {
-			getCoordQuerys(keywords);
-		}
-		List<SimpleAddressRow> rows = new ArrayList<SimpleAddressRow>();
-		int start = (pageIndex - 1) * pageSize;
-		int end = (start + pageSize) < coordQueryResults.size() ? (start + pageSize) : coordQueryResults.size();
-		for (int i = start; i < end; i++) {
-			rows.add(coordQueryResults.get(i));
-		}
-		return rows;
-	}
-
-	public static List<SimpleAddressRow> getCodeQuerysPage(String keywords, int pageIndex, int pageSize) {
-		if (null == buildingCodeQueryResults || 0 > buildingCodeQueryResults.size()) {
-			getCodeQuerys(keywords);
-		}
-		List<SimpleAddressRow> rows = new ArrayList<SimpleAddressRow>();
-		int start = (pageIndex - 1) * pageSize;
-		int end = (start + pageSize) < buildingCodeQueryResults.size() ? (start + pageSize)
-				: buildingCodeQueryResults.size();
-		for (int i = start; i < end; i++) {
-			rows.add(buildingCodeQueryResults.get(i));
-		}
-		return rows;
-	}
 }

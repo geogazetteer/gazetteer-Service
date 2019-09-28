@@ -21,8 +21,17 @@ public class BuildingQuery {
 	public static String table_name = manager.getValue(BUILDING_TABLE_NAME);
 
 	public static GPKGReader gpkgReader = new GPKGReader(building_file);
+	private static BuildingQuery instance = new BuildingQuery();
 
-	public static void close() {
+	private BuildingQuery() {
+		super();
+	}
+
+	public static BuildingQuery getInstance() {
+		return instance;
+	}
+
+	public void close() {
 		gpkgReader.close();
 	}
 
@@ -32,7 +41,7 @@ public class BuildingQuery {
 	 * @param czwCode
 	 * @return
 	 */
-	public static GeoPoint query(String czwCode) {
+	public GeoPoint query(String czwCode) {
 		gpkgReader.preQuery(table_name);
 		return gpkgReader.query(czwCode);
 	}
@@ -43,21 +52,9 @@ public class BuildingQuery {
 	 * @param czwCode
 	 * @return
 	 */
-	public static List<String> query(double x, double y) {
+	public List<String> query(double x, double y) {
 		gpkgReader.preQuery(table_name);
 		return gpkgReader.query(x, y);
-	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		GeoPoint point = query("4403060070051200001");
-		System.out.println(point.getX() + "\t" + point.getY());
-		List<String> codes = query(114.019777,22.672456);
-		for (String str:codes) {
-			System.out.println(str);
-		}
 	}
 
 }
