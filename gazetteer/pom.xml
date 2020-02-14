@@ -14,7 +14,7 @@
 	<!-- 本项目顶级POM -->
 	<groupId>top.geomatics.gazetteer</groupId>
 	<artifactId>gs-gazetteer</artifactId>
-	<version>0.0.7-SNAPSHOT</version>
+	<version>0.0.8-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>gazetteer</name>
 	<description>gazetteer service for smart Longhhua</description>
@@ -94,7 +94,7 @@
 		<repository>
 			<id>central</id>
 			<name>Central Repository</name>
-			<url>http://repo.maven.apache.org/maven2</url> <!-- http://repo1.maven.org/maven2/ -->
+			<url>https://repo.maven.apache.org/maven2</url> <!-- https://repo.maven.apache.org/maven2/ -->
 			<layout>default</layout>
 			<snapshots>
 				<enabled>false</enabled>
