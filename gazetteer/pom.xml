@@ -51,7 +51,7 @@
 		<slf4j.version>1.7.25</slf4j.version>
 		<logging.version>1.2</logging.version>
 		<!-- log4j2 版本 -->
-		<log4j.version>2.11.2</log4j.version>
+		<log4j.version>2.13.3</log4j.version>
 		<!-- Spring版本 -->
 		<springframework.version>5.2.4.RELEASE</springframework.version>
 		<!-- Springfox版本 -->
