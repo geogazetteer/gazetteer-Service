@@ -46,7 +46,7 @@
 		<!-- JDK版本 -->
 		<java.version>11</java.version>
 		<!-- JUnit版本 -->
-		<junit.version>4.11</junit.version>
+		<junit.version>4.13.1</junit.version>
 		<!-- 日志版本 -->
 		<slf4j.version>1.7.25</slf4j.version>
 		<logging.version>1.2</logging.version>
