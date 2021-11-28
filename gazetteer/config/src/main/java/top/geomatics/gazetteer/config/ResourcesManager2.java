@@ -16,7 +16,8 @@ import java.util.Properties;
  *
  */
 public class ResourcesManager2 {
-
+	//获取每个用户下的数据库配置信息
+	//例如/usr/local/gazetteer/data/<用户名>/config/db.properties
 	private static ResourcesManager manager = ResourcesManager.getInstance();
 	private static final String USER_WORKSPACE_ROOT = "user_workspace_root";
 	private static String user_workspace_root = manager.getValue(USER_WORKSPACE_ROOT);

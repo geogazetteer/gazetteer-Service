@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>top.geomatics.gazetteer</groupId>
 		<artifactId>gs-gazetteer</artifactId>
-		<version>0.0.8-SNAPSHOT</version>
+		<version>0.0.9-SNAPSHOT</version>
 	</parent>
 
 	<!-- 模型模块 -->

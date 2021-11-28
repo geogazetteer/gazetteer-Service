@@ -137,7 +137,7 @@ public class UserController {
 
 		// 增加两个属性文件
 		String db_prop = config_path + File.separator + "db.properties";
-		String edit_prop = config_path + File.separator + "editor_db.properties";
+		String edit_prop = config_path + File.separator + "config/editor_db.properties";
 
 		Configurations db_configs = new Configurations();
 		File db_propertiesFile = new File(db_prop);

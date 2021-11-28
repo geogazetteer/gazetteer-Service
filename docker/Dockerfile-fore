@@ -1,0 +1,10 @@
+FROM tomcat:9.0.31-jdk11-adoptopenjdk-openj9
+ENV MYPATH /usr/local/tomcat/webapps
+WORKDIR $MYPATH
+
+#复制前代码
+ADD ROOT/ $MYPATH/ROOT/
+
+#设置暴露的端口
+EXPOSE 8080
+CMD ["catalina.sh", "run"]

@@ -1,0 +1,16 @@
+FROM openjdk:11.0.13-oraclelinux7
+RUN cd /usr/local/ \
+    && mkdir gazetteer \
+    && chmod 777 -R gazetteer/ \
+    && cd gazetteer/ \
+    && mkdir log
+ENV MYPATH /usr/local/gazetteer
+WORKDIR $MYPATH
+
+#复制后端代码
+ADD lib/ $MYPATH/lib/
+ADD data/ $MYPATH/data/
+ADD config/ $MYPATH/config/
+#设置暴露的端口
+EXPOSE 8083
+CMD java -jar $MYPATH/lib/gs-address-service-0.0.9-SNAPSHOT.jar
