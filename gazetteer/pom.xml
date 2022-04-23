@@ -53,7 +53,7 @@
 		<!-- log4j2 版本 -->
 		<log4j.version>2.11.2</log4j.version>
 		<!-- Spring版本 -->
-		<springframework.version>5.2.4.RELEASE</springframework.version>
+		<springframework.version>5.3.19</springframework.version>
 		<!-- Springfox版本 -->
 		<springfox.version>2.9.2</springfox.version>
 		<!-- sqlite版本 -->
