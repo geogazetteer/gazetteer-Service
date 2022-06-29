@@ -62,7 +62,7 @@
 		<mybatis.version>3.5.0</mybatis.version>
 		<!-- csv,excel版本 -->
 		<opencsv_version>4.5</opencsv_version>
-		<poi_version>4.0.1</poi_version>
+		<poi_version>4.1.1</poi_version>
 		<easyexcel.version>1.1.1</easyexcel.version>
 		<!-- geotools版本 -->
 		<geotools.version>20.2</geotools.version>
